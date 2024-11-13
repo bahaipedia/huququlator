@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hidden Transactions</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/transactions.css">
+</head>
+<body>
+    <input type="hidden" id="page-indicator" value="hidden">
+    <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
+
+    <div class="content">
+        <h1>Hidden Transactions</h1>
+
+        <!-- Tabs Navigation -->
+        <div class="tab-container">
+            <a class="tab" href="/transactions">Necessary Expenses</a>
+            <a class="tab" href="/transactions/unnecessary">Unnecessary Expenses</a>
+            <a class="tab active" href="/transactions/hidden">Hidden Transactions</a>
+        </div>
+
+        <!-- Transactions Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Account</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Tags</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% transactions.forEach(transaction => { %>
+                <tr id="transaction-<%= transaction.id %>">
+                    <td><%= transaction.date.toISOString().split('T')[0] %></td>
+                    <td><%= transaction.account %></td>
+                    <td><%= transaction.description %></td>
+                    <td><%= transaction.category %></td>
+                    <td><%= transaction.tags %></td>
+                    <td><%= transaction.amount %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/transactions.js"></script>
+</body>
+</html>

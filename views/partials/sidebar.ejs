@@ -1,0 +1,17 @@
+<!-- views/partials/sidebar.ejs -->
+<div class="sidebar">
+    <h3>Navigation</h3>
+    <ul>
+        <% if (!loggedIn) { %>
+            <li><a href="/">Home</a></li>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Register</a></li>
+        <% } else { %>
+            <li><a href="/">Home</a></li>
+            <li><a href="/upload">Upload Transactions</a></li>
+            <li><a href="/transactions">View Transactions</a></li>
+            <!-- Add other links as needed -->
+            <li><a href="/logout">Logout</a></li>
+        <% } %>
+    </ul>
+</div>

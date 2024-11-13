@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unnecessary Expenses</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/transactions.css">
+</head>
+<body>
+    <input type="hidden" id="page-indicator" value="unnecessary-expenses">
+    <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
+
+    <div class="content">
+        <h1>Unnecessary Expenses</h1>
+
+        <!-- Tabs Navigation -->
+        <div class="tab-container">
+            <a class="tab" href="/transactions">Necessary Expenses</a>
+            <a class="tab active" href="/transactions/unnecessary">Unnecessary Expenses</a>
+            <a class="tab" href="/transactions/hidden">Hidden Transactions</a>
+        </div>
+
+        <!-- Transactions Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Account</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Tags</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% transactions.forEach(transaction => { %>
+                <tr id="transaction-<%= transaction.id %>">
+                    <td><%= transaction.date.toISOString().split('T')[0] %></td>
+                    <td><%= transaction.account %></td>
+                    <td><%= transaction.description %></td>
+                    <td><%= transaction.category %></td>
+                    <td><%= transaction.tags %></td>
+                    <td><%= transaction.amount %></td>
+                    <td id="actions-<%= transaction.id %>">
+                        <button onclick="categorizeTransaction(<%= transaction.id %>, true)">Remove</button>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/transactions.js"></script>
+</body>
+</html>

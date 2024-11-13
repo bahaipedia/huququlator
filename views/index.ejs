@@ -1,0 +1,30 @@
+<!-- views/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tax Calculator - Home</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <!-- Include the sidebar partial -->
+  <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
+
+  <!-- Main content area -->
+  <div class="content">
+    <h1>Welcome to the Tax Calculator</h1>
+    <% if (!loggedIn) { %>
+      <p>This is a work-in-progress page. Please <a href="/login">Login</a> or <a href="/register">Register</a> to get started.</p>
+    <% } else { %>
+      <p>Welcome, <%= username %>! Here are the features available to you:</p>
+      <ul>
+        <li><a href="/upload">Upload Transactions</a></li>
+        <li><a href="/transactions">View Transactions</a></li>
+        <!-- Add other features as needed -->
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    <% } %>
+  </div>
+</body>
+</html>

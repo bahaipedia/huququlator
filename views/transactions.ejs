@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Necessary Expenses</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/transactions.css">
+</head>
+<body>
+    <input type="hidden" id="page-indicator" value="necessary-expenses">
+    <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
+
+    <div class="content">
+        <h1>Necessary Expenses</h1>
+
+        <!-- Tabs Navigation -->
+        <div class="tab-container">
+            <a class="tab active" href="/transactions">Necessary Expenses</a>
+            <a class="tab" href="/transactions/unnecessary">Unnecessary Expenses</a>
+            <a class="tab" href="/transactions/hidden">Hidden Transactions</a>
+        </div>
+    <div class="filter-section">
+        <label for="filterField">Mark all</label>
+        <select id="filterField">
+            <option value="date">Date</option>
+            <option value="account">Account</option>
+            <option value="description">Description</option>
+            <option value="category" selected>Category</option>
+            <option value="tags">Tags</option>
+            <option value="amount">Amount</option>
+        </select>
+        <label for="filterValue">transactions matching</label>
+        <input type="text" id="filterValue" placeholder="Enter value">
+        <label for="filterAction">as</label>
+        <select id="filterAction">
+            <option value="unnecessary">Unnecessary</option>
+            <option value="hidden">Hidden</option>
+        </select>
+        <button onclick="applyFilter()">Apply</button>
+    </div>
+        <!-- Transactions Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Account</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Tags</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% transactions.forEach(transaction => { %>
+                <tr id="transaction-<%= transaction.id %>">
+                    <td><%= transaction.date.toISOString().split('T')[0] %></td>
+                    <td><%= transaction.account %></td>
+                    <td><%= transaction.description %></td>
+                    <td><%= transaction.category %></td>
+                    <td><%= transaction.tags %></td>
+                    <td><%= transaction.amount %></td>
+                    <td id="actions-<%= transaction.id %>">
+                        <button onclick="categorizeTransaction(<%= transaction.id %>, false)">Mark as Unnecessary</button>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/transactions.js"></script>
+</body>
+</html>
