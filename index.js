@@ -307,7 +307,7 @@ app.get('/transactions/unnecessary', checkLoginStatus, async (req, res) => {
 
         // Calculate the number of transactions and total amount
         const transactionCount = transactions.length;
-        const totalAmount = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+        const totalAmount = transactions.reduce((sum, transaction) => sum + Number(transaction.amount), 0);
 
         // Render the page with additional data
         res.render('transactions_unnecessary', {
