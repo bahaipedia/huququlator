@@ -299,13 +299,21 @@ app.get('/transactions/unnecessary', checkLoginStatus, async (req, res) => {
     }
 
     try {
+        // Query for unnecessary transactions
         const [transactions] = await pool.query(
             'SELECT * FROM transactions WHERE user_id = ? AND necessity = 0 AND amount < 0 ORDER BY date DESC',
             [req.userId]
         );
 
+        // Calculate the number of transactions and total amount
+        const transactionCount = transactions.length;
+        const totalAmount = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+
+        // Render the page with additional data
         res.render('transactions_unnecessary', {
             transactions,
+            transactionCount,
+            totalAmount,
             loggedIn: req.loggedIn,
             pageIndicator: 'unnecessary-expenses'
         });
