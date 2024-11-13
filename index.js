@@ -275,14 +275,21 @@ app.get('/transactions', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        // Exclude hidden transactions
+        // Query for necessary transactions
         const [transactions] = await pool.query(
-            'SELECT * FROM transactions WHERE user_id = ? AND necessity = 1 AND amount < 0 AND hidden = 0 ORDER BY date DESC',
+            'SELECT * FROM transactions WHERE user_id = ? AND necessity = 1 AND hidden = 0 ORDER BY date DESC',
             [req.userId]
         );
 
+        // Calculate the number of transactions and total amount as a positive value
+        const transactionCount = transactions.length;
+        const totalAmount = Math.abs(transactions.reduce((sum, transaction) => sum + Number(transaction.amount), 0));
+
+        // Render the page with additional data
         res.render('transactions', {
             transactions,
+            transactionCount,
+            totalAmount,
             loggedIn: req.loggedIn,
             pageIndicator: 'necessary-expenses'
         });
