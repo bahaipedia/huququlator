@@ -138,7 +138,8 @@ async function saveFilterRule() {
             body: JSON.stringify({
                 field: filterField,
                 value: filterValue,
-                action: filterAction
+                action: filterAction,
+                originStatus: originStatus
             })
         });
 
