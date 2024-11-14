@@ -25,10 +25,10 @@
             <tbody>
                 <% rules.forEach(rule => { %>
                     <tr>
-                        <td><%= statusLabels[rule.originStatus] %></td>
+                        <td><%= statusLabels[rule.originStatus] || rule.originStatus %></td>
                         <td><%= rule.field %></td>
                         <td><%= rule.value %></td>
-                        <td><%= statusLabels[rule.markAs] %></td>
+                        <td><%= statusLabels[rule.markAs] || rule.markAs %></td>
                         <td>
                             <form action="/filter-rules/delete" method="POST">
                                 <input type="hidden" name="ruleId" value="<%= rule.id %>">
