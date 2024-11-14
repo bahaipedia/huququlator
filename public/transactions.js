@@ -98,8 +98,33 @@ function renderTransactionList(transactions) {
             <td>${transaction.category}</td>
             <td>${formattedTags}</td>
             <td>${transaction.amount}</td>
-            <td></td> <!-- Empty actions cell during preview -->
+            <td id="actions-${transaction.id}">
+                ${generateActionButtons(transaction.id, pageIndicator)}
+            </td>
         `;
         tableBody.appendChild(row);
     });
+}
+
+// Helper function to generate action buttons based on the page
+function generateActionButtons(transactionId, pageIndicator) {
+    switch (pageIndicator) {
+        case 'necessary-expenses':
+            return `
+                <button onclick="categorizeTransaction(${transactionId}, 'un')">Unnecessary</button>
+                <button onclick="categorizeTransaction(${transactionId}, 'hi')">Hidden</button>
+            `;
+        case 'unnecessary-expenses':
+            return `
+                <button onclick="categorizeTransaction(${transactionId}, 'ne')">Necessary</button>
+                <button onclick="categorizeTransaction(${transactionId}, 'hi')">Hidden</button>
+            `;
+        case 'hidden':
+            return `
+                <button onclick="categorizeTransaction(${transactionId}, 'ne')">Necessary</button>
+                <button onclick="categorizeTransaction(${transactionId}, 'un')">Unnecessary</button>
+            `;
+        default:
+            return ''; // No action buttons if the page indicator is unrecognized
+    }
 }
