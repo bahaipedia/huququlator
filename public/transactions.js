@@ -8,8 +8,11 @@ async function categorizeTransaction(transactionId, status) {
         });
 
         if (response.ok) {
-            // Remove the transaction row from the table
-            document.getElementById(`transaction-${transactionId}`).remove();
+            // Check if the transaction row is present before trying to remove it
+            const transactionRow = document.getElementById(`transaction-${transactionId}`);
+            if (transactionRow) {
+                transactionRow.remove();  // Remove the transaction row only if it's found in the DOM
+            }
         } else {
             alert('Error updating transaction. Please try again.');
         }
