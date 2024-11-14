@@ -48,7 +48,8 @@
                     <td><%= transaction.tags %></td>
                     <td><%= transaction.amount %></td>
                     <td id="actions-<%= transaction.id %>">
-                        <button onclick="categorizeTransaction(<%= transaction.id %>, 'ne')">Remove</button>
+                        <button onclick="categorizeTransaction(<%= transaction.id %>, 'ne')">Necessary</button>
+                        <button onclick="categorizeTransaction(<%= transaction.id %>, 'hi')">Hidden</button>
                     </td>
                 </tr>
                 <% }); %>
