@@ -87,6 +87,7 @@ async function applyFilter() {
     const filterField = document.getElementById("filterField").value;
     const filterValue = document.getElementById("filterValue").value;
     const filterAction = document.getElementById("filterAction").value;
+    const originStatus = document.getElementById('page-indicator').value;
 
     try {
         const response = await fetch('/transactions/filter', {
@@ -95,7 +96,8 @@ async function applyFilter() {
             body: JSON.stringify({
                 field: filterField,
                 value: filterValue,
-                action: filterAction
+                action: filterAction,
+                originStatus
             })
         });
 
