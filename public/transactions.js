@@ -98,11 +98,7 @@ function renderTransactionList(transactions) {
             <td>${transaction.category}</td>
             <td>${formattedTags}</td>
             <td>${transaction.amount}</td>
-            <td id="actions-${transaction.id}">
-                <button onclick="categorizeTransaction(${transaction.id}, '${transaction.status === 'ne' ? 'un' : 'ne'}')">
-                    ${transaction.status === 'ne' ? 'Mark as Unnecessary' : 'Mark as Necessary'}
-                </button>
-            </td>
+            <td></td> <!-- Empty actions cell during preview -->
         `;
         tableBody.appendChild(row);
     });
