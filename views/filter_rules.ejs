@@ -23,12 +23,12 @@
                 </tr>
             </thead>
             <tbody>
-                <% rules.forEach(rule => { %>
+                <% filterRules.forEach(rule => { %>
                     <tr>
-                        <td><%= rule.origin_status %></td>
+                        <td><%= statusLabels[rule.originStatus] %></td>
                         <td><%= rule.field %></td>
                         <td><%= rule.value %></td>
-                        <td><%= rule.mark_as %></td>
+                        <td><%= statusLabels[rule.markAs] %></td>
                         <td>
                             <form action="/filter-rules/delete" method="POST">
                                 <input type="hidden" name="ruleId" value="<%= rule.id %>">
