@@ -87,13 +87,16 @@ function renderTransactionList(transactions) {
     tableBody.innerHTML = ''; // Clear existing rows
 
     transactions.forEach(transaction => {
+        const formattedDate = new Date(transaction.date).toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+        const formattedTags = transaction.tags || '';  // Display empty string if tags are null
+
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${transaction.date}</td>
+            <td>${formattedDate}</td>
             <td>${transaction.account}</td>
             <td>${transaction.description}</td>
             <td>${transaction.category}</td>
-            <td>${transaction.tags}</td>
+            <td>${formattedTags}</td>
             <td>${transaction.amount}</td>
             <td id="actions-${transaction.id}">
                 <button onclick="categorizeTransaction(${transaction.id}, '${transaction.status === 'ne' ? 'un' : 'ne'}')">
