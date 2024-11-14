@@ -1,10 +1,10 @@
-// Function to categorize transactions as necessary or unnecessary via AJAX
-async function categorizeTransaction(transactionId, necessity) {
+// Function to categorize transactions via AJAX using status
+async function categorizeTransaction(transactionId, status) {
     try {
         const response = await fetch(`/transactions/categorize`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ transactionId, necessity })
+            body: JSON.stringify({ transactionId, status })
         });
 
         if (response.ok) {
@@ -12,16 +12,16 @@ async function categorizeTransaction(transactionId, necessity) {
             const pageIndicator = document.getElementById('page-indicator').value;
 
             // If on the Unnecessary Expenses page and "Remove" was clicked
-            if (pageIndicator === 'unnecessary-expenses' && necessity) {
+            if (pageIndicator === 'unnecessary-expenses' && status === 'un') {
                 // Remove the transaction row from the table on the Unnecessary Expenses page
                 document.getElementById(`transaction-${transactionId}`).remove();
             } else {
-                // Update the "Actions" cell to show the correct button based on the necessity status
+                // Update the "Actions" cell to show the correct button based on the status
                 const actionsCell = document.getElementById(`actions-${transactionId}`);
                 if (actionsCell) {
-                    actionsCell.innerHTML = necessity
-                        ? `<button onclick="categorizeTransaction(${transactionId}, false)">Mark as Unnecessary</button>`
-                        : `<button onclick="categorizeTransaction(${transactionId}, true)">Undo</button>`;
+                    actionsCell.innerHTML = status === 'ne'
+                        ? `<button onclick="categorizeTransaction(${transactionId}, 'un')">Mark as Unnecessary</button>`
+                        : `<button onclick="categorizeTransaction(${transactionId}, 'ne')">Undo</button>`;
                 }
             }
         } else {
@@ -33,7 +33,7 @@ async function categorizeTransaction(transactionId, necessity) {
     }
 }
 
-// Function to apply filter and mark transactions based on criteria
+// Function to apply filter and mark transactions based on criteria using status
 async function applyFilter() {
     const filterField = document.getElementById("filterField").value;
     const filterValue = document.getElementById("filterValue").value;
@@ -46,7 +46,7 @@ async function applyFilter() {
             body: JSON.stringify({
                 field: filterField,
                 value: filterValue,
-                action: filterAction
+                action: filterAction  // Expecting 'ne', 'un', or 'hi' directly
             })
         });
 
