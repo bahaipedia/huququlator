@@ -95,17 +95,47 @@ async function applyFilter() {
             body: JSON.stringify({
                 field: filterField,
                 value: filterValue,
-                action: filterAction  // Expecting 'ne', 'un', or 'hi' directly
+                action: filterAction
             })
         });
 
         if (response.ok) {
-            location.reload(); // Reload the page to update the displayed transactions
+            // After applying the filter, prompt to save the rule
+            document.getElementById('saveRulePrompt').style.display = 'block';
         } else {
             alert('Error applying filter. Please try again.');
         }
     } catch (error) {
         console.error('Error applying filter:', error);
+        alert('An error occurred. Please try again.');
+    }
+}
+
+// Function to save filters for the user
+async function saveFilterRule() {
+    const filterField = document.getElementById("filterField").value;
+    const filterValue = document.getElementById("filterValue").value;
+    const filterAction = document.getElementById("filterAction").value;
+
+    try {
+        const response = await fetch('/filter-rules/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                field: filterField,
+                value: filterValue,
+                action: filterAction
+            })
+        });
+
+        if (response.ok) {
+            document.getElementById('saveRulePrompt').style.display = 'none';
+            alert('Filter rule saved successfully!');
+        } else {
+            alert('Error saving filter rule. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error saving filter rule:', error);
         alert('An error occurred. Please try again.');
     }
 }
