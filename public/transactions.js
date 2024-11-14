@@ -84,11 +84,12 @@ async function applyFilter() {
 // Helper function to render transactions in the table
 function renderTransactionList(transactions) {
     const tableBody = document.querySelector('tbody');
+    const pageIndicator = document.getElementById('page-indicator').value;
     tableBody.innerHTML = ''; // Clear existing rows
 
     transactions.forEach(transaction => {
         const formattedDate = new Date(transaction.date).toISOString().split('T')[0]; // Format date as YYYY-MM-DD
-        const formattedTags = transaction.tags || '';  // Display empty string if tags are null
+        const formattedTags = transaction.tags || ''; // Display empty string if tags are null
 
         const row = document.createElement('tr');
         row.innerHTML = `
