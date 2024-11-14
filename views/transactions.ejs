@@ -11,7 +11,6 @@
     <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
 
     <div class="content">
-      <div class="sticky-container">
         <br><br><br>
         <div class="info-box">
             <p><strong>Number of Transactions:</strong> <%= transactionCount %></p>
@@ -47,11 +46,10 @@
             <button id="applyButton" onclick="applyFilter()">Apply</button>
             <button id="cancelButton" onclick="cancelPreview()" style="display: none;">Cancel</button>
         </div>
-      </div>
 
         <!-- Transactions Table -->
         <table>
-            <thead class="sticky-header">
+            <thead>
                 <tr>
                     <th>Date</th>
                     <th>Account</th>
