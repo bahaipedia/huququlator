@@ -465,6 +465,67 @@ app.post('/transactions/delete-all', checkLoginStatus, async (req, res) => {
     }
 });
 
+// Route to display saved filter rules
+app.get('/filter-rules', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.redirect('/login');
+    }
+
+    try {
+        const [rules] = await pool.query(
+            'SELECT * FROM filter_rules WHERE user_id = ? ORDER BY created_at DESC',
+            [req.userId]
+        );
+
+        res.render('filter_rules', {
+            rules,
+            loggedIn: req.loggedIn,
+            pageIndicator: 'filter-rules'
+        });
+    } catch (error) {
+        console.error('Error loading Filter Rules page:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Route to save a new filter rule
+app.post('/filter-rules/save', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const { field, value, action } = req.body;
+
+    try {
+        await pool.query(
+            'INSERT INTO filter_rules (user_id, field, value, status) VALUES (?, ?, ?, ?)',
+            [req.userId, field, value, action]
+        );
+
+        res.status(200).json({ message: 'Filter rule saved successfully' });
+    } catch (error) {
+        console.error('Error saving filter rule:', error);
+        res.status(500).json({ message: 'Error saving filter rule' });
+    }
+});
+
+// Route to delete a filter rule
+app.post('/filter-rules/delete', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(401).redirect('/login');
+    }
+
+    const { ruleId } = req.body;
+
+    try {
+        await pool.query('DELETE FROM filter_rules WHERE id = ? AND user_id = ?', [ruleId, req.userId]);
+        res.redirect('/filter-rules');
+    } catch (error) {
+        console.error('Error deleting filter rule:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
