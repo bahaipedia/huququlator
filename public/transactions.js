@@ -23,13 +23,31 @@ async function categorizeTransaction(transactionId, status) {
 async function previewFilter() {
     const filterField = document.getElementById("filterField").value;
     const filterValue = document.getElementById("filterValue").value;
-    const filterAction = document.getElementById("filterAction").value;
+    const pageIndicator = document.getElementById("page-indicator").value;
+
+    // Convert pageIndicator to status for filtering
+    let status;
+    switch (pageIndicator) {
+        case 'necessary-expenses':
+            status = 'ne';
+            break;
+        case 'unnecessary-expenses':
+            status = 'un';
+            break;
+        case 'hidden':
+            status = 'hi';
+            break;
+        default:
+            console.error(`Unrecognized page indicator: ${pageIndicator}`);
+            alert('Error: Unrecognized page. Please try again or contact support.');
+            return;  // Exit the function without proceeding
+    }
 
     try {
         const response = await fetch('/transactions/preview-filter', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ field: filterField, value: filterValue, action: filterAction })
+            body: JSON.stringify({ field: filterField, value: filterValue, status: status })
         });
 
         if (response.ok) {
