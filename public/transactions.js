@@ -1,4 +1,4 @@
-// Function to categorize transactions via AJAX using status
+// Function to categorize transactions via AJAX
 async function categorizeTransaction(transactionId, status) {
     try {
         const response = await fetch(`/transactions/categorize`, {
@@ -11,9 +11,8 @@ async function categorizeTransaction(transactionId, status) {
             const updatedTransaction = await response.json();
             const pageIndicator = document.getElementById('page-indicator').value;
 
-            // If on the Unnecessary Expenses page and "Remove" was clicked
-            if (pageIndicator === 'unnecessary-expenses' && status === 'un') {
-                // Remove the transaction row from the table on the Unnecessary Expenses page
+            // Remove the transaction row if it's marked unnecessary on the "Unnecessary Expenses" page
+            if (pageIndicator === 'unnecessary-expenses' && status === 'ne') {
                 document.getElementById(`transaction-${transactionId}`).remove();
             } else {
                 // Update the "Actions" cell to show the correct button based on the status
