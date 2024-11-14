@@ -37,7 +37,9 @@
                 <option value="ne">Necessary</option>
                 <option value="un">Unnecessary</option>
             </select>
-            <button onclick="applyFilter()">Apply</button>
+            <button id="previewButton" onclick="previewFilter()">Preview</button>
+            <button id="applyButton" onclick="applyFilter()">Apply</button>
+            <button id="cancelButton" onclick="cancelPreview()" style="display: none;">Cancel</button>
         </div>
 
         <!-- Transactions Table -->
