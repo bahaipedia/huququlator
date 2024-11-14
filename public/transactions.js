@@ -8,21 +8,8 @@ async function categorizeTransaction(transactionId, status) {
         });
 
         if (response.ok) {
-            const updatedTransaction = await response.json();
-            const pageIndicator = document.getElementById('page-indicator').value;
-
-            // Remove the transaction row if it's marked unnecessary on the "Unnecessary Expenses" page
-            if (pageIndicator === 'unnecessary-expenses' && status === 'ne') {
-                document.getElementById(`transaction-${transactionId}`).remove();
-            } else {
-                // Update the "Actions" cell to show the correct button based on the status
-                const actionsCell = document.getElementById(`actions-${transactionId}`);
-                if (actionsCell) {
-                    actionsCell.innerHTML = status === 'ne'
-                        ? `<button onclick="categorizeTransaction(${transactionId}, 'un')">Mark as Unnecessary</button>`
-                        : `<button onclick="categorizeTransaction(${transactionId}, 'ne')">Undo</button>`;
-                }
-            }
+            // Remove the transaction row from the table
+            document.getElementById(`transaction-${transactionId}`).remove();
         } else {
             alert('Error updating transaction. Please try again.');
         }
