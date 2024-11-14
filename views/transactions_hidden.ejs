@@ -31,6 +31,7 @@
                     <th>Category</th>
                     <th>Tags</th>
                     <th>Amount</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,6 +43,9 @@
                     <td><%= transaction.category %></td>
                     <td><%= transaction.tags %></td>
                     <td><%= transaction.amount %></td>
+                    <td id="actions-<%= transaction.id %>">
+                        <button onclick="categorizeTransaction(<%= transaction.id %>, 'ne')">Remove from Hidden</button>
+                    </td>
                 </tr>
                 <% }); %>
             </tbody>
