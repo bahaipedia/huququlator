@@ -397,20 +397,20 @@ app.post('/transactions/preview-filter', checkLoginStatus, async (req, res) => {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const { field, value, action } = req.body;
+    const { field, value } = req.body;
     let query, params;
 
     try {
         if (field === 'description') {
-            query = `SELECT * FROM transactions WHERE user_id = ? AND description LIKE ? AND status = ?`;
-            params = [req.userId, `%${value}%`, action];
+            query = `SELECT * FROM transactions WHERE user_id = ? AND description LIKE ?`;
+            params = [req.userId, `%${value}%`];
         } else {
-            query = `SELECT * FROM transactions WHERE user_id = ? AND ${field} = ? AND status = ?`;
-            params = [req.userId, value, action];
+            query = `SELECT * FROM transactions WHERE user_id = ? AND ${field} = ?`;
+            params = [req.userId, value];
         }
 
         const [transactions] = await pool.query(query, params);
-        res.json(transactions); // Send previewed transactions back to client
+        res.status(200).json(transactions);
     } catch (error) {
         console.error('Error previewing filter:', error);
         res.status(500).json({ message: 'Error previewing filter' });
