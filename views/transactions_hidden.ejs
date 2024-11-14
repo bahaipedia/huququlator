@@ -5,20 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hidden Transactions</title>
     <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/transactions.css">
 </head>
 <body>
     <input type="hidden" id="page-indicator" value="hidden">
     <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
 
     <div class="content">
-        <h1>Hidden Transactions</h1>
-
+        <p>This page lists all transactions marked as hidden. Placeholder text for a short description of this page’s purpose.</p>
         <!-- Tabs Navigation -->
         <div class="tab-container">
             <a class="tab" href="/transactions">Necessary Expenses</a>
             <a class="tab" href="/transactions/unnecessary">Unnecessary Expenses</a>
             <a class="tab active" href="/transactions/hidden">Hidden Transactions</a>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <label for="filterField">Mark all</label>
+            <select id="filterField">
+                <option value="date">Date</option>
+                <option value="account">Account</option>
+                <option value="description">Description</option>
+                <option value="category" selected>Category</option>
+                <option value="tags">Tags</option>
+                <option value="amount">Amount</option>
+            </select>
+            <label for="filterValue">transactions matching</label>
+            <input type="text" id="filterValue" placeholder="Enter value">
+            <label for="filterAction">as</label>
+            <select id="filterAction">
+                <option value="ne">Necessary</option>
+                <option value="un">Unnecessary</option>
+            </select>
+            <button onclick="applyFilter()">Apply</button>
         </div>
 
         <!-- Transactions Table -->
