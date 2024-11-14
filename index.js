@@ -200,6 +200,7 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), (req, res) => {
     fs.createReadStream(filePath)
         .pipe(csv())
         .on('data', (row) => {
+            const amount = parseFloat(row.Amount.replace(/,/g, ''));
             const transaction = {
                 user_id: userId,
                 date: new Date(row.Date),
@@ -207,9 +208,8 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), (req, res) => {
                 description: row.Description,
                 category: row.Category,
                 tags: row.Tags || null,
-                amount: parseFloat(row.Amount.replace(/,/g, '')),
-                necessity: 1,  // Mark as necessary by default
-                hidden: parseFloat(row.Amount.replace(/,/g, '')) > 0 ? 1 : 0  // Mark positive transactions as hidden
+                amount: amount,
+                status: amount > 0 ? 'hi' : 'ne' 
             };
             transactions.push(transaction);
         })
@@ -223,8 +223,8 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), (req, res) => {
 
                 for (const transaction of transactions) {
                     await pool.query(
-                        'INSERT INTO transactions (user_id, date, account, description, category, tags, amount, necessity, hidden, upload_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                        [transaction.user_id, transaction.date, transaction.account, transaction.description, transaction.category, transaction.tags, transaction.amount, transaction.necessity, transaction.hidden, uploadId]
+                        'INSERT INTO transactions (user_id, date, account, description, category, tags, amount, status, upload_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                        [transaction.user_id, transaction.date, transaction.account, transaction.description, transaction.category, transaction.tags, transaction.amount, transaction.status, uploadId]
                     );
                     rowsImported++;
                 }
@@ -268,16 +268,16 @@ app.post('/upload/delete', checkLoginStatus, async (req, res) => {
     }
 });
 
-// Display all transactions
+// Display all necessary transactions
 app.get('/transactions', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.redirect('/login');
     }
 
     try {
-        // Query for necessary transactions
+        // Query for necessary transactions (status = 'ne')
         const [transactions] = await pool.query(
-            'SELECT * FROM transactions WHERE user_id = ? AND necessity = 1 AND hidden = 0 ORDER BY date DESC',
+            'SELECT * FROM transactions WHERE user_id = ? AND status = "ne" ORDER BY date DESC',
             [req.userId]
         );
 
@@ -306,9 +306,9 @@ app.get('/transactions/unnecessary', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        // Query for unnecessary transactions
+        // Query for unnecessary transactions (status = 'un')
         const [transactions] = await pool.query(
-            'SELECT * FROM transactions WHERE user_id = ? AND necessity = 0 AND amount < 0 ORDER BY date DESC',
+            'SELECT * FROM transactions WHERE user_id = ? AND status = "un" ORDER BY date DESC',
             [req.userId]
         );
 
@@ -337,9 +337,9 @@ app.get('/transactions/hidden', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        // Fetch all transactions marked as hidden, regardless of the amount
+        // Fetch all transactions with status 'hi' for hidden
         const [transactions] = await pool.query(
-            'SELECT * FROM transactions WHERE user_id = ? AND hidden = 1 ORDER BY date DESC',
+            'SELECT * FROM transactions WHERE user_id = ? AND status = "hi" ORDER BY date DESC',
             [req.userId]
         );
 
@@ -360,13 +360,18 @@ app.post('/transactions/categorize', checkLoginStatus, async (req, res) => {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const { transactionId, necessity } = req.body;
+    const { transactionId, action: status } = req.body; // Using 'status' directly
+
+    // Validate the status
+    if (!['ne', 'un', 'hi'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid action' });
+    }
 
     try {
-        // Update the necessity status of the specified transaction
+        // Update the status of the specified transaction
         await pool.query(
-            'UPDATE transactions SET necessity = ? WHERE id = ? AND user_id = ?',
-            [necessity ? 1 : 0, transactionId, req.userId]
+            'UPDATE transactions SET status = ? WHERE id = ? AND user_id = ?',
+            [status, transactionId, req.userId]
         );
 
         // Fetch the updated transaction to return it to the client
@@ -381,7 +386,7 @@ app.post('/transactions/categorize', checkLoginStatus, async (req, res) => {
 
         res.status(200).json(updatedTransaction[0]);
     } catch (error) {
-        console.error('Error updating transaction necessity:', error);
+        console.error('Error updating transaction status:', error);
         res.status(500).json({ message: 'Error updating transaction' });
     }
 });
@@ -396,25 +401,18 @@ app.post('/transactions/filter', checkLoginStatus, async (req, res) => {
     let query, params;
 
     try {
-        if (action === 'hidden') {
-            // Mark transactions as hidden
-            if (field === 'description') {
-                query = `UPDATE transactions SET hidden = 1 WHERE user_id = ? AND description LIKE ?`;
-                params = [req.userId, `%${value}%`];
-            } else {
-                query = `UPDATE transactions SET hidden = 1 WHERE user_id = ? AND ${field} = ?`;
-                params = [req.userId, value];
-            }
+        // Set status based directly on action
+        const status = action; // Expecting action to be one of 'ne', 'un', or 'hi'
+
+        // Construct query based on field and status
+        if (field === 'description') {
+            // Use wildcard matching for description
+            query = `UPDATE transactions SET status = ? WHERE user_id = ? AND description LIKE ?`;
+            params = [status, req.userId, `%${value}%`];
         } else {
-            // Update necessity based on the action ('necessary' or 'unnecessary')
-            const necessityValue = action === 'unnecessary' ? 0 : 1;
-            if (field === 'description') {
-                query = `UPDATE transactions SET necessity = ? WHERE user_id = ? AND description LIKE ?`;
-                params = [necessityValue, req.userId, `%${value}%`];
-            } else {
-                query = `UPDATE transactions SET necessity = ? WHERE user_id = ? AND ${field} = ?`;
-                params = [necessityValue, req.userId, value];
-            }
+            // Use exact matching for other fields
+            query = `UPDATE transactions SET status = ? WHERE user_id = ? AND ${field} = ?`;
+            params = [status, req.userId, value];
         }
 
         await pool.query(query, params);
