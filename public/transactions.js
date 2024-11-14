@@ -88,6 +88,13 @@ async function applyFilter() {
     const filterValue = document.getElementById("filterValue").value;
     const filterAction = document.getElementById("filterAction").value;
     const originStatus = document.getElementById('page-indicator').value;
+    const pageIndicator = document.getElementById('page-indicator').value;
+    const pageContext = {
+    'necessary-expenses': 'Necessary Expenses',
+    'unnecessary-expenses': 'Unnecessary Expenses',
+    'hidden': 'Hidden Transactions'
+     };
+    const currentPage = pageContext[pageIndicator] || 'Unknown Page';
 
     try {
         const response = await fetch('/transactions/filter', {
@@ -105,9 +112,7 @@ async function applyFilter() {
             // After applying the filter, prompt to save the rule
             document.getElementById('saveRulePrompt').style.display = 'block';
             document.getElementById('saveRulePrompt').innerHTML = `
-                Would you like all future <span id="filterFieldText">${filterField}</span> transactions matching "<span id="filterValueText">${filterValue}</span>"
-                on the <strong>${originStatus === 'ne' ? 'Necessary Expenses' : originStatus === 'un' ? 'Unnecessary Expenses' : 'Hidden Transactions'}</strong> 
-                page to be marked as <span id="filterActionText">${filterAction}</span>?
+                <p>Would you like all future ${filterField} transactions matching "${filterValue}" on the ${currentPage} page to be marked as ${filterAction}?</p>
                 <button onclick="saveFilterRule()">Yes</button>
                 <button onclick="document.getElementById('saveRulePrompt').style.display = 'none'">No</button>
             `;
