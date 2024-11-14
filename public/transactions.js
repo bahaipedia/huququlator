@@ -8,10 +8,18 @@ async function categorizeTransaction(transactionId, status) {
         });
 
         if (response.ok) {
-            // Check if the transaction row is present before trying to remove it
-            const transactionRow = document.getElementById(`transaction-${transactionId}`);
-            if (transactionRow) {
-                transactionRow.remove();  // Remove the transaction row only if it's found in the DOM
+            // Check if the page is in preview mode by looking for the 'Cancel' button
+            const isPreviewMode = document.getElementById('cancelButton').style.display === 'inline';
+
+            if (isPreviewMode) {
+                // Re-run the preview filter to refresh the list
+                previewFilter();
+            } else {
+                // Otherwise, remove the transaction row from the table in regular mode
+                const transactionRow = document.getElementById(`transaction-${transactionId}`);
+                if (transactionRow) {
+                    transactionRow.remove();
+                }
             }
         } else {
             alert('Error updating transaction. Please try again.');
