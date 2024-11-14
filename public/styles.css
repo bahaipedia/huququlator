@@ -83,6 +83,8 @@ th {
 }
 /* Filter Section Styling */
 .filter-section {
+    position: sticky;
+    top: 0;
     padding: 15px;
     margin-bottom: 20px;
     border: 1px solid #ddd;
@@ -136,7 +138,11 @@ th {
     font-size: 14px;
     color: #333;
 }
-
 .info-box strong {
     color: #0073e6;
+}
+/* Sticky Table Header Row */
+.sticky-header tr {
+    position: sticky;
+    top: 61px;
 }
