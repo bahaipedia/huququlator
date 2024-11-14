@@ -391,6 +391,32 @@ app.post('/transactions/categorize', checkLoginStatus, async (req, res) => {
     }
 });
 
+// Route for previewing transactions based on filter criteria
+app.post('/transactions/preview-filter', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const { field, value, action } = req.body;
+    let query, params;
+
+    try {
+        if (field === 'description') {
+            query = `SELECT * FROM transactions WHERE user_id = ? AND description LIKE ? AND status = ?`;
+            params = [req.userId, `%${value}%`, action];
+        } else {
+            query = `SELECT * FROM transactions WHERE user_id = ? AND ${field} = ? AND status = ?`;
+            params = [req.userId, value, action];
+        }
+
+        const [transactions] = await pool.query(query, params);
+        res.json(transactions); // Send previewed transactions back to client
+    } catch (error) {
+        console.error('Error previewing filter:', error);
+        res.status(500).json({ message: 'Error previewing filter' });
+    }
+});
+
 // Route to apply a filter to a transaction
 app.post('/transactions/filter', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
