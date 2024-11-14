@@ -12,7 +12,7 @@
     <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
 
     <div class="content">
-        <h1>Unnecessary Expenses</h1>
+        <p>This page lists all expenses marked as unnecessary. Placeholder text for a short description of this page’s purpose.</p>
         <div class="info-box">
             <p><strong>Number of Transactions:</strong> <%= transactionCount %></p>
             <p><strong>Total Amount:</strong> $<%= totalAmount.toFixed(2) %></p>
@@ -23,6 +23,27 @@
             <a class="tab" href="/transactions">Necessary Expenses</a>
             <a class="tab active" href="/transactions/unnecessary">Unnecessary Expenses</a>
             <a class="tab" href="/transactions/hidden">Hidden Transactions</a>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <label for="filterField">Mark all</label>
+            <select id="filterField">
+                <option value="date">Date</option>
+                <option value="account">Account</option>
+                <option value="description">Description</option>
+                <option value="category" selected>Category</option>
+                <option value="tags">Tags</option>
+                <option value="amount">Amount</option>
+            </select>
+            <label for="filterValue">transactions matching</label>
+            <input type="text" id="filterValue" placeholder="Enter value">
+            <label for="filterAction">as</label>
+            <select id="filterAction">
+                <option value="ne">Necessary</option>
+                <option value="hi">Hidden</option>
+            </select>
+            <button onclick="applyFilter()">Apply</button>
         </div>
 
         <!-- Transactions Table -->
