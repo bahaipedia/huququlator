@@ -14,18 +14,20 @@
         <table>
             <thead>
                 <tr>
+                    <th>Status</th>
                     <th>Field</th>
                     <th>Value</th>
-                    <th>Status</th>
+                    <th>Mark as</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <% rules.forEach(rule => { %>
                     <tr>
+                        <td><%= rule.origin_status %></td>
                         <td><%= rule.field %></td>
                         <td><%= rule.value %></td>
-                        <td><%= rule.status %></td>
+                        <td><%= rule.mark_as %></td>
                         <td>
                             <form action="/filter-rules/delete" method="POST">
                                 <input type="hidden" name="ruleId" value="<%= rule.id %>">
