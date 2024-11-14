@@ -104,6 +104,13 @@ async function applyFilter() {
         if (response.ok) {
             // After applying the filter, prompt to save the rule
             document.getElementById('saveRulePrompt').style.display = 'block';
+            document.getElementById('saveRulePrompt').innerHTML = `
+                Would you like all future <span id="filterFieldText">${filterField}</span> transactions matching "<span id="filterValueText">${filterValue}</span>"
+                on the <strong>${originStatus === 'ne' ? 'Necessary Expenses' : originStatus === 'un' ? 'Unnecessary Expenses' : 'Hidden Transactions'}</strong> 
+                page to be marked as <span id="filterActionText">${filterAction}</span>?
+                <button onclick="saveFilterRule()">Yes</button>
+                <button onclick="document.getElementById('saveRulePrompt').style.display = 'none'">No</button>
+            `;
         } else {
             alert('Error applying filter. Please try again.');
         }
