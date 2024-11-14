@@ -130,7 +130,25 @@ async function saveFilterRule() {
     const filterField = document.getElementById("filterField").value;
     const filterValue = document.getElementById("filterValue").value;
     const filterAction = document.getElementById("filterAction").value;
+    const pageIndicator = document.getElementById('page-indicator').value;
 
+    // Convert pageIndicator to originStatus
+    let originStatus;
+    switch (pageIndicator) {
+        case 'necessary-expenses':
+            originStatus = 'ne';
+            break;
+        case 'unnecessary-expenses':
+            originStatus = 'un';
+            break;
+        case 'hidden':
+            originStatus = 'hi';
+            break;
+        default:
+            console.error('Unrecognized page indicator:', pageIndicator);
+            return; // Exit if page indicator is unrecognized
+    }
+    
     try {
         const response = await fetch('/filter-rules/save', {
             method: 'POST',
