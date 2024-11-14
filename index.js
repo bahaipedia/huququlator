@@ -494,12 +494,12 @@ app.post('/filter-rules/save', checkLoginStatus, async (req, res) => {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const { field, value, action } = req.body;
+    const { field, value, action, originStatus } = req.body;
 
     try {
         await pool.query(
-            'INSERT INTO filter_rules (user_id, field, value, status) VALUES (?, ?, ?, ?)',
-            [req.userId, field, value, action]
+            'INSERT INTO filter_rules (user_id, field, value, origin_status, mark_as) VALUES (?, ?, ?, ?, ?)',
+            [req.userId, field, value, originStatus, action]
         );
 
         res.status(200).json({ message: 'Filter rule saved successfully' });
