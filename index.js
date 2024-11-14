@@ -185,7 +185,7 @@ app.get('/upload/history-data', checkLoginStatus, async (req, res) => {
     }
 });
 
-app.post('/upload', checkLoginStatus, upload.single('csvFile'), (req, res) => {
+app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res) => {
     if (!req.loggedIn) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -196,6 +196,19 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), (req, res) => {
     const transactions = [];
     let rowsImported = 0;
     let status = 'success';
+
+    // Retrieve filter rules for this user
+    let filterRules = [];
+    try {
+        const [rules] = await pool.query(
+            'SELECT origin_status, field, value, mark_as FROM filter_rules WHERE user_id = ?',
+            [userId]
+        );
+        filterRules = rules;
+    } catch (error) {
+        console.error('Error retrieving filter rules:', error);
+        return res.status(500).json({ message: 'Error retrieving filter rules' });
+    }
 
     fs.createReadStream(filePath)
         .pipe(csv())
@@ -211,6 +224,19 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), (req, res) => {
                 amount: amount,
                 status: amount > 0 ? 'hi' : 'ne' 
             };
+
+            // Apply filter rules to modify status based on conditions
+            filterRules.forEach(rule => {
+                if (transaction.status === rule.origin_status) {
+                    const fieldValue = transaction[rule.field.toLowerCase()];
+                    const ruleValue = rule.value.toLowerCase();
+
+                    if (fieldValue && typeof fieldValue === 'string' && fieldValue.toLowerCase().includes(ruleValue)) {
+                        transaction.status = rule.mark_as;
+                    }
+                }
+            });
+
             transactions.push(transaction);
         })
         .on('end', async () => {
