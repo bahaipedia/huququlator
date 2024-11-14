@@ -354,27 +354,27 @@ app.get('/transactions/hidden', checkLoginStatus, async (req, res) => {
     }
 });
 
-// Route for categorizing transactions
+// Route for categorizing transactions based on status
 app.post('/transactions/categorize', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const { transactionId, action: status } = req.body; // Using 'status' directly
+    const { transactionId, status } = req.body;
 
-    // Validate the status
-    if (!['ne', 'un', 'hi'].includes(status)) {
-        return res.status(400).json({ message: 'Invalid action' });
+    // Validate that `transactionId` is a number and `status` is one of the expected values
+    if (!transactionId || !['ne', 'un', 'hi'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid transaction ID or status' });
     }
 
     try {
-        // Update the status of the specified transaction
+        // Update the transaction's status in the database
         await pool.query(
             'UPDATE transactions SET status = ? WHERE id = ? AND user_id = ?',
             [status, transactionId, req.userId]
         );
 
-        // Fetch the updated transaction to return it to the client
+        // Fetch the updated transaction to return to the client
         const [updatedTransaction] = await pool.query(
             'SELECT * FROM transactions WHERE id = ? AND user_id = ?',
             [transactionId, req.userId]
