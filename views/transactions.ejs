@@ -45,6 +45,11 @@
             <button id="previewButton" onclick="previewFilter()">Preview</button>
             <button id="applyButton" onclick="applyFilter()">Apply</button>
             <button id="cancelButton" onclick="cancelPreview()" style="display: none;">Cancel</button>
+            <div id="saveRulePrompt" style="display: none;">
+                <p>Would you like all future <span id="filterFieldText"></span> transactions matching "<span id="filterValueText"></span>" to be marked as <span id="filterActionText"></span>?</p>
+                <button onclick="saveFilterRule()">Yes</button>
+                <button onclick="document.getElementById('saveRulePrompt').style.display = 'none'">No</button>
+            </div>
         </div>
 
         <!-- Transactions Table -->
