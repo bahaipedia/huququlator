@@ -11,7 +11,11 @@
     <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
 
     <div class="content">
-        <br><br><br>
+        <div class="date-display-section">
+            <% if (startDate && endDate) { %>
+                <p>Showing transactions between <%= startDate %> and <%= endDate %></p>
+            <% } %>
+        </div>
         <!-- Tabs Navigation -->
         <div class="tab-container">
             <a class="tab" href="/transactions">Necessary Expenses</a>
