@@ -129,8 +129,8 @@ th {
     background-color: #f9f9f9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 70px;
+    right: 27px;
     width: 200px;
 }
 .info-box p {
@@ -152,19 +152,17 @@ th {
     align-items: center;
     justify-content: flex-start;
     gap: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 66px;
     padding: 10px;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .date-filter-section label {
     font-weight: bold;
     color: #333;
 }
-
 .date-filter-section input[type="date"] {
     padding: 5px 10px;
     border: 1px solid #ddd;
@@ -173,7 +171,6 @@ th {
     background-color: #fff;
     color: #333;
 }
-
 .date-filter-section button {
     padding: 5px 15px;
     font-size: 14px;
@@ -182,21 +179,17 @@ th {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-
 .date-filter-section button:hover {
     background-color: #0073e6;
     color: #fff;
 }
-
 .date-filter-section button:last-child {
     background-color: #f44336;
     color: white;
 }
-
 .date-filter-section button:last-child:hover {
     background-color: #d32f2f;
 }
-
 /* Style for Date Range Display */
 .date-range-display {
     margin-bottom: 15px;
