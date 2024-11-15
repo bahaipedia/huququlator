@@ -32,10 +32,11 @@
 </div>
 <div class="rules-section">
     <h2>Rules to Apply</h2>
-    <form id="rulesForm">
+    <% if (rules.length > 0) { %>
         <table>
             <thead>
                 <tr>
+                    <th>Origin</th>
                     <th>Field</th>
                     <th>Value</th>
                     <th>Mark as</th>
@@ -43,22 +44,22 @@
                 </tr>
             </thead>
             <tbody>
-                <% filterRules.forEach(rule => { %>
+                <% rules.forEach(rule => { %>
                     <tr>
+                        <td><%= statusLabels[rule.origin_status] %></td>
                         <td><%= rule.field %></td>
                         <td><%= rule.value %></td>
+                        <td><%= statusLabels[rule.mark_as] %></td>
                         <td>
-                            <% const statusLabels = { 'ne': 'Necessary', 'un': 'Unnecessary', 'hi': 'Hidden' }; %>
-                            <%= statusLabels[rule.mark_as] || rule.mark_as %>
-                        </td>
-                        <td>
-                            <input type="checkbox" name="applyRule" value="<%= rule.id %>" checked>
+                            <input type="checkbox" name="selectedRules" value="<%= rule.id %>" checked>
                         </td>
                     </tr>
                 <% }); %>
             </tbody>
         </table>
-    </form>
+    <% } else { %>
+        <p>No rules available to apply.</p>
+    <% } %>
 </div>
 
         <!-- Upload History Table -->
