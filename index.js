@@ -481,22 +481,27 @@ app.post('/transactions/filter', checkLoginStatus, async (req, res) => {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const { field, value, action } = req.body;
+    const { field, value, action, originStatus } = req.body; // Include originStatus
     let query, params;
 
     try {
-        // Set status based directly on action
-        const status = action; // Expecting action to be one of 'ne', 'un', or 'hi'
+        const status = action;
 
-        // Construct query based on field and status
+        // Construct query to respect originStatus
         if (field === 'description') {
-            // Use wildcard matching for description
-            query = `UPDATE transactions SET status = ? WHERE user_id = ? AND description LIKE ?`;
-            params = [status, req.userId, `%${value}%`];
+            query = `
+                UPDATE transactions 
+                SET status = ? 
+                WHERE user_id = ? AND description LIKE ? AND status = ?
+            `;
+            params = [status, req.userId, `%${value}%`, originStatus];
         } else {
-            // Use exact matching for other fields
-            query = `UPDATE transactions SET status = ? WHERE user_id = ? AND ${field} = ?`;
-            params = [status, req.userId, value];
+            query = `
+                UPDATE transactions 
+                SET status = ? 
+                WHERE user_id = ? AND ${field} = ? AND status = ?
+            `;
+            params = [status, req.userId, value, originStatus];
         }
 
         await pool.query(query, params);
