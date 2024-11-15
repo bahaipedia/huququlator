@@ -188,10 +188,6 @@ async function applyFilterAndCreateRule() {
         });
 
         if (response.ok) {
-            // Save the filter rule
-            await saveFilterRule();
-
-            // Refresh the transactions dynamically
             await refreshTransactions();
         } else {
             alert('Error applying filter. Please try again.');
