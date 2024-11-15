@@ -147,6 +147,12 @@ app.get('/upload', checkLoginStatus, async (req, res) => {
         return res.redirect('/login');
     }
 
+    const statusLabels = {
+    ne: 'Necessary',
+    un: 'Unnecessary', // Will not appear in upload rules
+    hi: 'Hidden'
+    };
+
     try {
         const [uploadHistory] = await pool.query(
             'SELECT * FROM upload_history WHERE user_id = ? ORDER BY upload_date DESC',
@@ -159,8 +165,9 @@ app.get('/upload', checkLoginStatus, async (req, res) => {
         );
 
         res.render('upload', {
-            uploadHistory,
-            filterRules,
+            uploadHistory: uploadHistory[0],
+            rules: rules[0],
+            statusLabels,
             loggedIn: req.loggedIn
         });
     } catch (error) {
