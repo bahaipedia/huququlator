@@ -437,24 +437,36 @@ app.post('/transactions/categorize', checkLoginStatus, async (req, res) => {
     }
 });
 
-// Route for previewing transactions based on filter criteria
+// Route for previewing transactions based on filter criteria and date range
 app.post('/transactions/preview-filter', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const { field, value, status } = req.body;
-    let query, params;
+    const { field, value, status, startDate, endDate } = req.body;
+    let query = `SELECT * FROM transactions WHERE user_id = ? AND status = ?`;
+    let params = [req.userId, status];
+
+    // Adjust query based on filter field and value
+    if (field === 'description') {
+        query += ` AND description LIKE ?`;
+        params.push(`%${value}%`);
+    } else {
+        query += ` AND ${field} = ?`;
+        params.push(value);
+    }
+
+    // Apply date range filtering if startDate and/or endDate are provided
+    if (startDate) {
+        query += ` AND date >= ?`;
+        params.push(startDate);
+    }
+    if (endDate) {
+        query += ` AND date <= ?`;
+        params.push(endDate);
+    }
 
     try {
-        if (field === 'description') {
-            query = `SELECT * FROM transactions WHERE user_id = ? AND description LIKE ? AND status = ?`;
-            params = [req.userId, `%${value}%`, status];
-        } else {
-            query = `SELECT * FROM transactions WHERE user_id = ? AND ${field} = ? AND status = ?`;
-            params = [req.userId, value, status];
-        }
-
         const [transactions] = await pool.query(query, params);
         res.status(200).json(transactions);
     } catch (error) {
