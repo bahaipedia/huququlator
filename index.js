@@ -148,18 +148,19 @@ app.get('/upload', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        const uploadHistory = await pool.query(
+        const [uploadHistory] = await pool.query(
             'SELECT * FROM upload_history WHERE user_id = ? ORDER BY upload_date DESC',
             [req.userId]
         );
-        const transactions = await pool.query(
-            'SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC',
+
+        const [filterRules] = await pool.query(
+            'SELECT * FROM filter_rules WHERE user_id = ? ORDER BY created_at DESC',
             [req.userId]
         );
 
         res.render('upload', {
-            uploadHistory: uploadHistory[0],
-            transactions: transactions[0],
+            uploadHistory,
+            filterRules,
             loggedIn: req.loggedIn
         });
     } catch (error) {
@@ -193,18 +194,24 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
     const userId = req.userId;
     const filePath = path.join(__dirname, req.file.path);
     const filename = req.file.originalname;
+    const selectedRuleIds = req.body.selectedRules || []; // Get selected rule IDs from the form
     const transactions = [];
     let rowsImported = 0;
     let status = 'success';
 
-    // Retrieve filter rules for this user
+    // Retrieve only selected filter rules for this user
     let filterRules = [];
     try {
-        const [rules] = await pool.query(
-            'SELECT origin_status, field, value, mark_as FROM filter_rules WHERE user_id = ?',
-            [userId]
-        );
-        filterRules = rules;
+        if (selectedRuleIds.length > 0) {
+            const placeholders = selectedRuleIds.map(() => '?').join(','); // Prepare placeholders
+            const [rules] = await pool.query(
+                `SELECT origin_status, field, value, mark_as 
+                 FROM filter_rules 
+                 WHERE user_id = ? AND id IN (${placeholders})`,
+                [userId, ...selectedRuleIds]
+            );
+            filterRules = rules;
+        }
     } catch (error) {
         console.error('Error retrieving filter rules:', error);
         return res.status(500).json({ message: 'Error retrieving filter rules' });
@@ -225,7 +232,7 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
                 status: amount > 0 ? 'hi' : 'ne' 
             };
 
-            // Apply filter rules to modify status based on conditions
+            // Apply selected filter rules to modify status based on conditions
             filterRules.forEach(rule => {
                 if (transaction.status === rule.origin_status) {
                     const fieldValue = transaction[rule.field.toLowerCase()];
