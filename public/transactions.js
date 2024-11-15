@@ -92,6 +92,23 @@ async function applyFilter() {
     const filterValue = document.getElementById("filterValue").value;
     const filterAction = document.getElementById("filterAction").value;
     const originStatus = document.getElementById('page-indicator').value;
+
+    // Convert pageIndicator to originStatus
+    let originStatus;
+    switch (pageIndicator) {
+        case 'necessary-expenses':
+            originStatus = 'ne';
+            break;
+        case 'unnecessary-expenses':
+            originStatus = 'un';
+            break;
+        case 'hidden':
+            originStatus = 'hi';
+            break;
+        default:
+            console.error('Unrecognized page indicator:', pageIndicator);
+            return; // Exit if page indicator is unrecognized
+    }
     
     try {
         const response = await fetch('/transactions/filter', {
@@ -101,12 +118,12 @@ async function applyFilter() {
                 field: filterField,
                 value: filterValue,
                 action: filterAction,
-                originStatus
+                originStatus: originStatus
             })
         });
 
         if (response.ok) {
-            alert('Filter applied successfully!');
+            await refreshTransactions();
         } else {
             alert('Error applying filter. Please try again.');
         }
@@ -149,7 +166,7 @@ async function applyFilterAndCreateRule() {
                 field: filterField,
                 value: filterValue,
                 action: filterAction,
-                originStatus
+                originStatus: originStatus
             })
         });
 
@@ -170,14 +187,61 @@ async function applyFilterAndCreateRule() {
             })
         });
 
-        if (ruleResponse.ok) {
-            alert('Filter applied and rule created successfully!');
+        if (response.ok) {
+            // Save the filter rule
+            await saveFilterRule();
+
+            // Refresh the transactions dynamically
+            await refreshTransactions();
         } else {
-            alert('Error creating rule. Please try again.');
+            alert('Error applying filter. Please try again.');
         }
     } catch (error) {
         console.error('Error applying filter and creating rule:', error);
         alert('An error occurred. Please try again.');
+    }
+}
+
+// Helper function to refresh the transactions after a filter has been applied
+async function refreshTransactions() {
+    const pageIndicator = document.getElementById('page-indicator').value;
+    let url;
+
+    // Determine the correct URL based on the page
+    switch (pageIndicator) {
+        case 'necessary-expenses':
+            url = '/transactions';
+            break;
+        case 'unnecessary-expenses':
+            url = '/transactions/unnecessary';
+            break;
+        case 'hidden':
+            url = '/transactions/hidden';
+            break;
+        default:
+            console.error('Unrecognized page indicator:', pageIndicator);
+            return;
+    }
+
+    try {
+        const response = await fetch(url);
+        if (response.ok) {
+            const html = await response.text();
+
+            // Extract the table content from the response and update the DOM
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newTableBody = doc.querySelector('tbody');
+            const tableBody = document.querySelector('tbody');
+
+            if (newTableBody && tableBody) {
+                tableBody.innerHTML = newTableBody.innerHTML;
+            }
+        } else {
+            console.error('Error refreshing transactions:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error refreshing transactions:', error);
     }
 }
 
