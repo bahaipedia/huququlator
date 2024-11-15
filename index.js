@@ -148,9 +148,9 @@ app.get('/upload', checkLoginStatus, async (req, res) => {
     }
 
     const statusLabels = {
-    ne: 'Necessary',
-    un: 'Unnecessary', // Will not appear in upload rules
-    hi: 'Hidden'
+        ne: 'Necessary',
+        un: 'Unnecessary', // Will not appear in upload rules
+        hi: 'Hidden'
     };
 
     try {
@@ -159,14 +159,14 @@ app.get('/upload', checkLoginStatus, async (req, res) => {
             [req.userId]
         );
 
-        const [filterRules] = await pool.query(
+        const [rules] = await pool.query(
             'SELECT * FROM filter_rules WHERE user_id = ? ORDER BY created_at DESC',
             [req.userId]
         );
 
         res.render('upload', {
             uploadHistory: uploadHistory[0],
-            rules: rules[0],
+            rules, // Passing rules directly
             statusLabels,
             loggedIn: req.loggedIn
         });
@@ -201,12 +201,12 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
     const userId = req.userId;
     const filePath = path.join(__dirname, req.file.path);
     const filename = req.file.originalname;
-    const selectedRuleIds = req.body.selectedRules || []; // Get selected rule IDs from the form
+    const selectedRuleIds = req.body.selectedRules || []; // Ensure this is populated
     const transactions = [];
     let rowsImported = 0;
     let status = 'success';
 
-    // Retrieve only selected filter rules for this user
+    // Retrieve only selected filter rules
     let filterRules = [];
     try {
         if (selectedRuleIds.length > 0) {
@@ -236,16 +236,14 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
                 category: row.Category,
                 tags: row.Tags || null,
                 amount: amount,
-                status: amount > 0 ? 'hi' : 'ne' 
+                status: amount > 0 ? 'hi' : 'ne' // Default statuses: 'hi' for income, 'ne' for expenses
             };
 
-            // Apply selected filter rules to modify status based on conditions
+            // Apply selected filter rules
             filterRules.forEach(rule => {
                 if (transaction.status === rule.origin_status) {
                     const fieldValue = transaction[rule.field.toLowerCase()];
-                    const ruleValue = rule.value.toLowerCase();
-
-                    if (fieldValue && typeof fieldValue === 'string' && fieldValue.toLowerCase().includes(ruleValue)) {
+                    if (fieldValue && typeof fieldValue === 'string' && fieldValue.toLowerCase().includes(rule.value.toLowerCase())) {
                         transaction.status = rule.mark_as;
                     }
                 }
