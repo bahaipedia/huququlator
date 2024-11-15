@@ -23,24 +23,9 @@
 <form id="uploadForm" onsubmit="uploadTransactions(event)" enctype="multipart/form-data">
     <label for="csvFile">Select CSV file:</label>
     <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
-    <h3>Rules to Apply</h3>
-    <div id="rulesList">
-        <% filterRules.forEach(rule => { %>
-            <div>
-                <input type="checkbox" name="selectedRules" value="<%= rule.id %>" checked>
-                <label><%= rule.field %>: <%= rule.value %> → Mark as <%= statusLabels[rule.mark_as] %></label>
-            </div>
-        <% }); %>
-    </div>
     <br>
     <button type="submit">Upload</button>
 </form>
-        <hr>
-
-        <!-- Delete All Transactions Button -->
-        <button onclick="deleteAllTransactions()">Delete All My Transactions</button>
-
-        <hr>
 <div class="rules-section">
     <h2>Rules to Apply</h2>
     <form id="rulesForm">
@@ -107,6 +92,12 @@
                 <% } %>
             </tbody>
         </table>
+        <hr>
+
+        <!-- Delete All Transactions Button -->
+        <button onclick="deleteAllTransactions()">Delete All My Transactions</button>
+
+        <hr>
     </div>
 
     <script src="/upload.js"></script>
