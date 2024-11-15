@@ -92,14 +92,7 @@ async function applyFilter() {
     const filterValue = document.getElementById("filterValue").value;
     const filterAction = document.getElementById("filterAction").value;
     const originStatus = document.getElementById('page-indicator').value;
-    const pageIndicator = document.getElementById('page-indicator').value;
-    const pageContext = {
-    'necessary-expenses': 'Necessary Expenses',
-    'unnecessary-expenses': 'Unnecessary Expenses',
-    'hidden': 'Hidden Transactions'
-     };
-    const currentPage = pageContext[pageIndicator] || 'Unknown Page';
-
+    
     try {
         const response = await fetch('/transactions/filter', {
             method: 'POST',
@@ -113,13 +106,7 @@ async function applyFilter() {
         });
 
         if (response.ok) {
-            // After applying the filter, prompt to save the rule
-            document.getElementById('saveRulePrompt').style.display = 'block';
-            document.getElementById('saveRulePrompt').innerHTML = `
-                <p>Would you like all future ${filterField} transactions matching "${filterValue}" on the ${currentPage} page to be marked as ${filterAction}?</p>
-                <button onclick="saveFilterRule()">Yes</button>
-                <button onclick="document.getElementById('saveRulePrompt').style.display = 'none'">No</button>
-            `;
+            alert('Filter applied successfully!');
         } else {
             alert('Error applying filter. Please try again.');
         }
@@ -129,8 +116,8 @@ async function applyFilter() {
     }
 }
 
-// Function to save filters for the user
-async function saveFilterRule() {
+// Function to apply and save filters for the user
+async function applyFilterAndCreateRule() {
     const filterField = document.getElementById("filterField").value;
     const filterValue = document.getElementById("filterValue").value;
     const filterAction = document.getElementById("filterAction").value;
@@ -152,9 +139,27 @@ async function saveFilterRule() {
             console.error('Unrecognized page indicator:', pageIndicator);
             return; // Exit if page indicator is unrecognized
     }
-    
+
     try {
-        const response = await fetch('/filter-rules/save', {
+        // Apply filter
+        const filterResponse = await fetch('/transactions/filter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                field: filterField,
+                value: filterValue,
+                action: filterAction,
+                originStatus
+            })
+        });
+
+        if (!filterResponse.ok) {
+            alert('Error applying filter. Please try again.');
+            return;
+        }
+
+        // Save rule
+        const ruleResponse = await fetch('/filter-rules/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -165,14 +170,13 @@ async function saveFilterRule() {
             })
         });
 
-        if (response.ok) {
-            document.getElementById('saveRulePrompt').style.display = 'none';
-            alert('Filter rule saved successfully!');
+        if (ruleResponse.ok) {
+            alert('Filter applied and rule created successfully!');
         } else {
-            alert('Error saving filter rule. Please try again.');
+            alert('Error creating rule. Please try again.');
         }
     } catch (error) {
-        console.error('Error saving filter rule:', error);
+        console.error('Error applying filter and creating rule:', error);
         alert('An error occurred. Please try again.');
     }
 }
