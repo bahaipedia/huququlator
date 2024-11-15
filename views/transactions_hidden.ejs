@@ -11,10 +11,12 @@
     <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
 
     <div class="content">
-        <div id="dateRangeDisplay" class="date-range-display">
-            <% if (startDate && endDate) { %>
-                Showing transactions between <%= startDate %> and <%= endDate %>
-            <% } %>
+        <div class="date-filter-section">
+            <label for="startDate">Filter by date:</label>
+            <input type="date" id="startDate">
+            <input type="date" id="endDate">
+            <button onclick="applyDateFilter()">Apply</button>
+            <button onclick="clearDateFilter()">Clear</button>
         </div>
         <!-- Tabs Navigation -->
         <div class="tab-container">
