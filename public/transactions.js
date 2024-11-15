@@ -91,9 +91,9 @@ async function applyFilter() {
     const filterField = document.getElementById("filterField").value;
     const filterValue = document.getElementById("filterValue").value;
     const filterAction = document.getElementById("filterAction").value;
-    const originStatus = document.getElementById('page-indicator').value;
-
+    
     // Convert pageIndicator to originStatus
+    const originStatus = document.getElementById('page-indicator').value;
     let originStatus;
     switch (pageIndicator) {
         case 'necessary-expenses':
@@ -118,7 +118,7 @@ async function applyFilter() {
                 field: filterField,
                 value: filterValue,
                 action: filterAction,
-                originStatus: originStatus
+                originStatus
             })
         });
 
@@ -138,9 +138,9 @@ async function applyFilterAndCreateRule() {
     const filterField = document.getElementById("filterField").value;
     const filterValue = document.getElementById("filterValue").value;
     const filterAction = document.getElementById("filterAction").value;
-    const pageIndicator = document.getElementById('page-indicator').value;
-
+    
     // Convert pageIndicator to originStatus
+    const pageIndicator = document.getElementById('page-indicator').value;
     let originStatus;
     switch (pageIndicator) {
         case 'necessary-expenses':
@@ -166,7 +166,7 @@ async function applyFilterAndCreateRule() {
                 field: filterField,
                 value: filterValue,
                 action: filterAction,
-                originStatus: originStatus
+                originStatus
             })
         });
 
@@ -183,7 +183,7 @@ async function applyFilterAndCreateRule() {
                 field: filterField,
                 value: filterValue,
                 action: filterAction,
-                originStatus: originStatus
+                originStatus
             })
         });
 
