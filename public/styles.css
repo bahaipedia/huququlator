@@ -186,13 +186,3 @@ th {
 .date-filter-section button:last-child:hover {
     background-color: #d32f2f;
 }
-/* Style for Date Range Display */
-.date-range-display {
-    margin-bottom: 83px;
-    padding: 10px;
-    background-color: #f0f8ff;
-    border-left: 4px solid #0073e6;
-    border-radius: 5px;
-    font-size: 14px;
-    color: #333;
-}
