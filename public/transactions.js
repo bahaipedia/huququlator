@@ -240,8 +240,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Function to redirect to a page while including the date filter as query parameters
 function redirectToPageWithDateFilter(pagePath) {
-    const startDate = localStorage.getItem('startDate');
-    const endDate = localStorage.getItem('endDate');
+    const startDate = localStorage.getItem("startDate");
+    const endDate = localStorage.getItem("endDate");
 
     let url = pagePath;
     if (startDate && endDate) {
@@ -252,9 +252,14 @@ function redirectToPageWithDateFilter(pagePath) {
 }
 
 // Use this function when navigating to other pages
+document.getElementById('necessaryLink').addEventListener('click', () => {
+    redirectToPageWithDateFilter('/transactions');
+});
+
 document.getElementById('unnecessaryLink').addEventListener('click', () => {
     redirectToPageWithDateFilter('/transactions/unnecessary');
 });
+
 document.getElementById('hiddenLink').addEventListener('click', () => {
     redirectToPageWithDateFilter('/transactions/hidden');
 });
