@@ -301,23 +301,21 @@ app.get('/transactions', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        // Query for necessary transactions (status = 'ne')
-        const [transactions] = await pool.query(
-            'SELECT * FROM transactions WHERE user_id = ? AND status = "ne" ORDER BY date DESC',
-            [req.userId]
-        );
+        const startDate = req.query.startDate || null;
+        const endDate = req.query.endDate || null;
+        const [transactions] = await getDateFilteredTransactions(req.userId, 'ne', startDate, endDate);
 
-        // Calculate the number of transactions and total amount as a positive value
         const transactionCount = transactions.length;
         const totalAmount = Math.abs(transactions.reduce((sum, transaction) => sum + Number(transaction.amount), 0));
 
-        // Render the page with additional data
         res.render('transactions', {
             transactions,
             transactionCount,
             totalAmount,
             loggedIn: req.loggedIn,
-            pageIndicator: 'necessary-expenses'
+            pageIndicator: 'necessary-expenses',
+            startDate,
+            endDate
         });
     } catch (error) {
         console.error('Error loading Necessary Transactions page:', error);
@@ -332,23 +330,21 @@ app.get('/transactions/unnecessary', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        // Query for unnecessary transactions (status = 'un')
-        const [transactions] = await pool.query(
-            'SELECT * FROM transactions WHERE user_id = ? AND status = "un" ORDER BY date DESC',
-            [req.userId]
-        );
+        const startDate = req.query.startDate || null;
+        const endDate = req.query.endDate || null;
+        const [transactions] = await getDateFilteredTransactions(req.userId, 'un', startDate, endDate);
 
-        // Calculate the number of transactions and total amount as a positive number
         const transactionCount = transactions.length;
         const totalAmount = Math.abs(transactions.reduce((sum, transaction) => sum + Number(transaction.amount), 0));
 
-        // Render the page with additional data
         res.render('transactions_unnecessary', {
             transactions,
             transactionCount,
             totalAmount,
             loggedIn: req.loggedIn,
-            pageIndicator: 'unnecessary-expenses'
+            pageIndicator: 'unnecessary-expenses',
+            startDate,
+            endDate
         });
     } catch (error) {
         console.error('Error loading Unnecessary Transactions page:', error);
@@ -363,21 +359,45 @@ app.get('/transactions/hidden', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        // Fetch all transactions with status 'hi' for hidden
-        const [transactions] = await pool.query(
-            'SELECT * FROM transactions WHERE user_id = ? AND status = "hi" ORDER BY date DESC',
-            [req.userId]
-        );
+        const startDate = req.query.startDate || null;
+        const endDate = req.query.endDate || null;
+        const [transactions] = await getDateFilteredTransactions(req.userId, 'hi', startDate, endDate);
 
         res.render('transactions_hidden', {
             transactions,
             loggedIn: req.loggedIn,
-            pageIndicator: 'hidden'
+            pageIndicator: 'hidden',
+            startDate,
+            endDate
         });
     } catch (error) {
         console.error('Error loading Hidden Transactions page:', error);
         res.status(500).send('Server Error');
     }
+});
+
+// Route to set date filter range
+app.post('/transactions/date-filter', checkLoginStatus, (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const { startDate, endDate } = req.body;
+
+    if (!startDate || !endDate) {
+        return res.status(400).json({ message: 'Start and end dates are required' });
+    }
+
+    // Store the date range in session or localStorage (to be handled client-side)
+    res.status(200).json({ message: 'Date range saved successfully' });
+});
+
+app.post('/transactions/clear-date-filter', checkLoginStatus, (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    res.status(200).json({ message: 'Date filter cleared successfully' });
 });
 
 // Route for categorizing transactions based on status
@@ -551,6 +571,20 @@ app.post('/filter-rules/delete', checkLoginStatus, async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
+// Helper function to get date-filtered transactions
+async function getDateFilteredTransactions(userId, status, startDate, endDate) {
+    let query = 'SELECT * FROM transactions WHERE user_id = ? AND status = ?';
+    const params = [userId, status];
+
+    if (startDate && endDate) {
+        query += ' AND date >= ? AND date <= ?';
+        params.push(startDate, endDate);
+    }
+
+    query += ' ORDER BY date DESC';
+    return pool.query(query, params);
+}
 
 // Start the server
 app.listen(port, () => {
