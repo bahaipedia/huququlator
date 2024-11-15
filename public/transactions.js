@@ -91,9 +91,9 @@ async function applyFilter() {
     const filterField = document.getElementById("filterField").value;
     const filterValue = document.getElementById("filterValue").value;
     const filterAction = document.getElementById("filterAction").value;
+    const originStatus = document.getElementById('page-indicator').value;
     
     // Convert pageIndicator to originStatus
-    const originStatus = document.getElementById('page-indicator').value;
     let originStatus;
     switch (pageIndicator) {
         case 'necessary-expenses':
@@ -138,19 +138,19 @@ async function applyFilterAndCreateRule() {
     const filterField = document.getElementById("filterField").value;
     const filterValue = document.getElementById("filterValue").value;
     const filterAction = document.getElementById("filterAction").value;
+    const pageIndicator = document.getElementById('page-indicator').value;
     
     // Convert pageIndicator to originStatus
-    const pageIndicator = document.getElementById('page-indicator').value;
-    let originStatus;
+    let originStatusForRule; 
     switch (pageIndicator) {
         case 'necessary-expenses':
-            originStatus = 'ne';
+            originStatusForRule = 'ne';
             break;
         case 'unnecessary-expenses':
-            originStatus = 'un';
+            originStatusForRule = 'un';
             break;
         case 'hidden':
-            originStatus = 'hi';
+            originStatusForRule = 'hi';
             break;
         default:
             console.error('Unrecognized page indicator:', pageIndicator);
@@ -166,7 +166,7 @@ async function applyFilterAndCreateRule() {
                 field: filterField,
                 value: filterValue,
                 action: filterAction,
-                originStatus
+                originStatus: originStatusForRule
             })
         });
 
@@ -183,7 +183,7 @@ async function applyFilterAndCreateRule() {
                 field: filterField,
                 value: filterValue,
                 action: filterAction,
-                originStatus
+                originStatus: originStatusForRule
             })
         });
 
