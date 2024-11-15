@@ -91,7 +91,7 @@ async function applyFilter() {
     const filterField = document.getElementById("filterField").value;
     const filterValue = document.getElementById("filterValue").value;
     const filterAction = document.getElementById("filterAction").value;
-    const originStatus = document.getElementById('page-indicator').value;
+    const pageIndicator = document.getElementById('page-indicator').value;
     
     // Convert pageIndicator to originStatus
     let originStatus;
@@ -141,16 +141,16 @@ async function applyFilterAndCreateRule() {
     const pageIndicator = document.getElementById('page-indicator').value;
     
     // Convert pageIndicator to originStatus
-    let originStatusForRule; 
+    let originStatus; 
     switch (pageIndicator) {
         case 'necessary-expenses':
-            originStatusForRule = 'ne';
+            originStatus = 'ne';
             break;
         case 'unnecessary-expenses':
-            originStatusForRule = 'un';
+            originStatus = 'un';
             break;
         case 'hidden':
-            originStatusForRule = 'hi';
+            originStatus = 'hi';
             break;
         default:
             console.error('Unrecognized page indicator:', pageIndicator);
@@ -166,7 +166,7 @@ async function applyFilterAndCreateRule() {
                 field: filterField,
                 value: filterValue,
                 action: filterAction,
-                originStatus: originStatusForRule
+                originStatus: originStatus
             })
         });
 
@@ -183,7 +183,7 @@ async function applyFilterAndCreateRule() {
                 field: filterField,
                 value: filterValue,
                 action: filterAction,
-                originStatus: originStatusForRule
+                originStatus: originStatus
             })
         });
 
