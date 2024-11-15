@@ -20,12 +20,15 @@
 <% const statusLabels = { 'ne': 'Necessary', 'un': 'Unnecessary', 'hi': 'Hidden' }; %>
 
         <!-- Upload Form with AJAX handling -->
-<form id="uploadForm" onsubmit="uploadTransactions(event)" enctype="multipart/form-data">
-    <label for="csvFile">Select CSV file:</label>
-    <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
-    <br>
-    <button type="submit">Upload</button>
-</form>
+<div class="upload-section">
+    <h2>Upload Transactions</h2>
+    <form id="uploadForm" onsubmit="uploadTransactions(event)" enctype="multipart/form-data">
+        <label for="csvFile">Select CSV file:</label>
+        <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+        <br>
+        <button type="submit">Upload</button>
+    </form>
+</div>
 <div class="rules-section">
     <h2>Rules to Apply</h2>
     <form id="rulesForm">
