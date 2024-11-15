@@ -36,6 +36,10 @@ async function previewFilter() {
     const filterValue = document.getElementById("filterValue").value;
     const pageIndicator = document.getElementById("page-indicator").value;
 
+    // Retrieve date range from localStorage
+    const startDate = localStorage.getItem("startDate") || null;
+    const endDate = localStorage.getItem("endDate") || null;
+    
     // Convert pageIndicator to status for filtering
     let status;
     switch (pageIndicator) {
@@ -58,7 +62,7 @@ async function previewFilter() {
         const response = await fetch('/transactions/preview-filter', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ field: filterField, value: filterValue, status: status })
+            body: JSON.stringify({ field: filterField, value: filterValue, status: status, startDate: startDate, endDate: endDate })
         });
 
         if (response.ok) {
@@ -199,18 +203,7 @@ function renderTransactionList(transactions) {
     });
 }
 
-// Initialize date fields from localStorage if available
-document.addEventListener("DOMContentLoaded", () => {
-    const startDate = localStorage.getItem("startDate");
-    const endDate = localStorage.getItem("endDate");
-
-    const startDateField = document.getElementById("startDate");
-    const endDateField = document.getElementById("endDate");
-
-    if (startDateField && startDate) startDateField.value = startDate;
-    if (endDateField && endDate) endDateField.value = endDate;
-});
-
+// Fucntion to apply a date filter to the transactions page
 async function applyDateFilter() {
     const startDate = document.getElementById("startDate").value;
     const endDate = document.getElementById("endDate").value;
@@ -232,6 +225,55 @@ function clearDateFilter() {
     localStorage.removeItem("endDate");
     window.location.href = '/transactions';
 }
+
+// Initialize date fields from localStorage if available
+document.addEventListener("DOMContentLoaded", () => {
+    const startDate = localStorage.getItem("startDate");
+    const endDate = localStorage.getItem("endDate");
+
+    const startDateField = document.getElementById("startDate");
+    const endDateField = document.getElementById("endDate");
+
+    if (startDateField && startDate) startDateField.value = startDate;
+    if (endDateField && endDate) endDateField.value = endDate;
+});
+
+// Function to handle the optional date filtering logic
+async function getDateFilteredTransactions(userId, status, startDate, endDate) {
+    let query = 'SELECT * FROM transactions WHERE user_id = ? AND status = ?';
+    const params = [userId, status];
+
+    if (startDate && endDate) {
+        query += ' AND date BETWEEN ? AND ?';
+        params.push(startDate, endDate);
+    }
+
+    query += ' ORDER BY date DESC';
+    const [transactions] = await pool.query(query, params);
+
+    return transactions;
+}
+
+// Function to redirect to a page while including the date filter as query parameters
+function redirectToPageWithDateFilter(pagePath) {
+    const startDate = localStorage.getItem('filterStartDate');
+    const endDate = localStorage.getItem('filterEndDate');
+
+    let url = pagePath;
+    if (startDate && endDate) {
+        url += `?startDate=${startDate}&endDate=${endDate}`;
+    }
+
+    window.location.href = url;
+}
+
+// Use this function when navigating to other pages
+document.getElementById('unnecessaryLink').addEventListener('click', () => {
+    redirectToPageWithDateFilter('/transactions/unnecessary');
+});
+document.getElementById('hiddenLink').addEventListener('click', () => {
+    redirectToPageWithDateFilter('/transactions/hidden');
+});
 
 // Helper function to generate action buttons based on the page
 function generateActionButtons(transactionId, pageIndicator) {
