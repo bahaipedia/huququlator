@@ -88,24 +88,29 @@ th {
     margin-bottom: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
 }
 .upload-section h2 {
-    margin-bottom: 10px;
-    font-size: 18px;
+    margin-bottom: 20px;
+    font-size: 22px;
     color: #333;
+    text-align: center;
+}
+/* Flex container for form elements */
+.upload-section .form-row {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers the form elements horizontally */
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+    gap: 10px; /* Spacing between elements */
 }
 .upload-section label {
-    display: block;
+    display: inline-block;
+    margin-bottom: 0;
     font-weight: bold;
-    margin-bottom: 10px;
     color: #333;
 }
 .upload-section input[type="file"] {
-    display: block;
-    margin: 10px auto;
-    padding: 8px;
+    padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -114,20 +119,13 @@ th {
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 10px 20px;
+    padding: 10px 15px;
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 .upload-section button:hover {
     background-color: #005bb5;
-}
-.upload-section .delete-button {
-    background-color: #e60000;
-    margin-top: 15px;
-}
-.upload-section .delete-button:hover {
-    background-color: #b50000;
 }
 /* Filter rules on upload Section */
 .rules-section {
