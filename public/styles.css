@@ -183,10 +183,6 @@ th {
     background-color: #0073e6;
     color: #fff;
 }
-.date-filter-section button:last-child {
-    background-color: #f44336;
-    color: white;
-}
 .date-filter-section button:last-child:hover {
     background-color: #d32f2f;
 }
