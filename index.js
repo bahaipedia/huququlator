@@ -303,7 +303,7 @@ app.get('/transactions', checkLoginStatus, async (req, res) => {
     try {
         const startDate = req.query.startDate || null;
         const endDate = req.query.endDate || null;
-        const [transactions] = await getDateFilteredTransactions(req.userId, 'ne', startDate, endDate);
+        const transactions = await getDateFilteredTransactions(req.userId, 'ne', startDate, endDate);
 
         const transactionCount = transactions.length;
         const totalAmount = Math.abs(transactions.reduce((sum, transaction) => sum + Number(transaction.amount), 0));
@@ -332,7 +332,7 @@ app.get('/transactions/unnecessary', checkLoginStatus, async (req, res) => {
     try {
         const startDate = req.query.startDate || null;
         const endDate = req.query.endDate || null;
-        const [transactions] = await getDateFilteredTransactions(req.userId, 'un', startDate, endDate);
+        const transactions = await getDateFilteredTransactions(req.userId, 'un', startDate, endDate);
 
         const transactionCount = transactions.length;
         const totalAmount = Math.abs(transactions.reduce((sum, transaction) => sum + Number(transaction.amount), 0));
@@ -361,7 +361,7 @@ app.get('/transactions/hidden', checkLoginStatus, async (req, res) => {
     try {
         const startDate = req.query.startDate || null;
         const endDate = req.query.endDate || null;
-        const [transactions] = await getDateFilteredTransactions(req.userId, 'hi', startDate, endDate);
+        const transactions = await getDateFilteredTransactions(req.userId, 'hi', startDate, endDate);
 
         res.render('transactions_hidden', {
             transactions,
@@ -590,12 +590,14 @@ async function getDateFilteredTransactions(userId, status, startDate, endDate) {
     const params = [userId, status];
 
     if (startDate && endDate) {
-        query += ' AND date >= ? AND date <= ?';
+        query += ' AND date BETWEEN ? AND ?';
         params.push(startDate, endDate);
     }
 
     query += ' ORDER BY date DESC';
-    return pool.query(query, params);
+    const [transactions] = await pool.query(query, params);
+
+    return transactions;
 }
 
 // Start the server
