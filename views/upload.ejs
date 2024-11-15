@@ -18,12 +18,21 @@
         <div id="uploadMessage"></div>
 
         <!-- Upload Form with AJAX handling -->
-        <form id="uploadForm" onsubmit="uploadTransactions(event)" enctype="multipart/form-data">
-            <label for="csvFile">Select CSV file:</label>
-            <input type="file" id="csvFile" name="csvFile" accept=".csv" required><br><br>
-            <button type="submit">Upload</button>
-        </form>
-
+<form id="uploadForm" onsubmit="uploadTransactions(event)" enctype="multipart/form-data">
+    <label for="csvFile">Select CSV file:</label>
+    <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+    <h3>Rules to Apply</h3>
+    <div id="rulesList">
+        <% filterRules.forEach(rule => { %>
+            <div>
+                <input type="checkbox" name="selectedRules" value="<%= rule.id %>" checked>
+                <label><%= rule.field %>: <%= rule.value %> → Mark as <%= statusLabels[rule.mark_as] %></label>
+            </div>
+        <% }); %>
+    </div>
+    <br>
+    <button type="submit">Upload</button>
+</form>
         <hr>
 
         <!-- Delete All Transactions Button -->
