@@ -199,6 +199,40 @@ function renderTransactionList(transactions) {
     });
 }
 
+// Initialize date fields from localStorage if available
+document.addEventListener("DOMContentLoaded", () => {
+    const startDate = localStorage.getItem("startDate");
+    const endDate = localStorage.getItem("endDate");
+
+    const startDateField = document.getElementById("startDate");
+    const endDateField = document.getElementById("endDate");
+
+    if (startDateField && startDate) startDateField.value = startDate;
+    if (endDateField && endDate) endDateField.value = endDate;
+});
+
+async function applyDateFilter() {
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+
+    if (startDate && endDate) {
+        // Save dates to localStorage
+        localStorage.setItem("startDate", startDate);
+        localStorage.setItem("endDate", endDate);
+
+        // Redirect to apply filter
+        window.location.href = `/transactions?startDate=${startDate}&endDate=${endDate}`;
+    } else {
+        alert("Please select both start and end dates.");
+    }
+}
+
+function clearDateFilter() {
+    localStorage.removeItem("startDate");
+    localStorage.removeItem("endDate");
+    window.location.href = '/transactions';
+}
+
 // Helper function to generate action buttons based on the page
 function generateActionButtons(transactionId, pageIndicator) {
     switch (pageIndicator) {
