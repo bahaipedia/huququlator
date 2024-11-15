@@ -238,26 +238,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (endDateField && endDate) endDateField.value = endDate;
 });
 
-// Function to handle the optional date filtering logic
-async function getDateFilteredTransactions(userId, status, startDate, endDate) {
-    let query = 'SELECT * FROM transactions WHERE user_id = ? AND status = ?';
-    const params = [userId, status];
-
-    if (startDate && endDate) {
-        query += ' AND date BETWEEN ? AND ?';
-        params.push(startDate, endDate);
-    }
-
-    query += ' ORDER BY date DESC';
-    const [transactions] = await pool.query(query, params);
-
-    return transactions;
-}
-
 // Function to redirect to a page while including the date filter as query parameters
 function redirectToPageWithDateFilter(pagePath) {
-    const startDate = localStorage.getItem('filterStartDate');
-    const endDate = localStorage.getItem('filterEndDate');
+    const startDate = localStorage.getItem('startDate');
+    const endDate = localStorage.getItem('endDate');
 
     let url = pagePath;
     if (startDate && endDate) {
