@@ -27,8 +27,8 @@
 }
 /* Main content area styling */
 .content {
-    margin-left: 220px; /* Space for the sidebar */
-    padding: 20px;
+    margin-left: 220px; 
+    padding: 0px 20px 20px 20px;
 }
 /* Table styling */
 table {
@@ -145,4 +145,65 @@ th {
 .sticky-header tr {
     position: sticky;
     top: 61px;
+}
+/* Style for the Date Filter Section */
+.date-filter-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.date-filter-section label {
+    font-weight: bold;
+    color: #333;
+}
+
+.date-filter-section input[type="date"] {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 14px;
+    background-color: #fff;
+    color: #333;
+}
+
+.date-filter-section button {
+    padding: 5px 15px;
+    font-size: 14px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.date-filter-section button:hover {
+    background-color: #0073e6;
+    color: #fff;
+}
+
+.date-filter-section button:last-child {
+    background-color: #f44336;
+    color: white;
+}
+
+.date-filter-section button:last-child:hover {
+    background-color: #d32f2f;
+}
+
+/* Style for Date Range Display */
+.date-range-display {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f0f8ff;
+    border-left: 4px solid #0073e6;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #333;
 }
