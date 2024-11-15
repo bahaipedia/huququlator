@@ -1,8 +1,13 @@
 // Function to handle file upload via AJAX
 async function uploadTransactions(event) {
-    event.preventDefault(); // Prevent form from submitting the traditional way
+    event.preventDefault();
 
-    const formData = new FormData(document.getElementById("uploadForm"));
+    const formData = new FormData(document.getElementById('uploadForm'));
+    const selectedRules = [...document.querySelectorAll('input[name="selectedRules"]:checked')].map(input => input.value);
+
+    // Append selected rule IDs to form data
+    formData.append('selectedRules', selectedRules);
+
     try {
         const response = await fetch('/upload', {
             method: 'POST',
@@ -10,19 +15,14 @@ async function uploadTransactions(event) {
         });
 
         if (response.ok) {
-            document.getElementById('uploadMessage').innerText = 'Transactions uploaded successfully.';
-            document.getElementById('uploadMessage').style.color = 'green';
-
-            // Refresh upload history after successful upload
-            await fetchUploadHistory();
+            alert('Transactions uploaded successfully!');
+            location.reload(); // Refresh the page to show updated data
         } else {
-            document.getElementById('uploadMessage').innerText = 'Error uploading transactions. Please try again.';
-            document.getElementById('uploadMessage').style.color = 'red';
+            alert('Error uploading transactions. Please try again.');
         }
     } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('uploadMessage').innerText = 'An error occurred. Please try again.';
-        document.getElementById('uploadMessage').style.color = 'red';
+        console.error('Error uploading transactions:', error);
+        alert('An error occurred. Please try again.');
     }
 }
 
