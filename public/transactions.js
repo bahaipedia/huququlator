@@ -252,15 +252,18 @@ function redirectToPageWithDateFilter(pagePath) {
 }
 
 // Use this function when navigating to other pages
-document.getElementById('necessaryLink').addEventListener('click', () => {
+document.getElementById('necessaryLink').addEventListener('click', (event) => {
+    event.preventDefault(); // Prevent default navigation
     redirectToPageWithDateFilter('/transactions');
 });
 
-document.getElementById('unnecessaryLink').addEventListener('click', () => {
+document.getElementById('unnecessaryLink').addEventListener('click', (event) => {
+    event.preventDefault(); // Prevent default navigation
     redirectToPageWithDateFilter('/transactions/unnecessary');
 });
 
-document.getElementById('hiddenLink').addEventListener('click', () => {
+document.getElementById('hiddenLink').addEventListener('click', (event) => {
+    event.preventDefault(); // Prevent default navigation
     redirectToPageWithDateFilter('/transactions/hidden');
 });
 
