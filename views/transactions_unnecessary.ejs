@@ -11,9 +11,9 @@
     <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
 
     <div class="content">
-        <div class="date-display-section">
+        <div id="dateRangeDisplay" class="date-range-display">
             <% if (startDate && endDate) { %>
-                <p>Showing transactions between <%= startDate %> and <%= endDate %></p>
+                Showing transactions between <%= startDate %> and <%= endDate %>
             <% } %>
         </div>
         <div class="info-box">
