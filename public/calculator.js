@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const r7 = document.getElementById("r7");
 
     // Set static help text
-    r0.textContent = "Excess wealth is total assets less any debts.";
+    r0.textContent = "Total assets less any debts.";
     r1.textContent = "These are purchases or expenditures subject to Huququllah.";
     r2.textContent = "Enter any wealth you have already paid Huququllah on.";
     r3.textContent = "This is calculated by taking today's gold rate and multiplying it by 2.225.";
