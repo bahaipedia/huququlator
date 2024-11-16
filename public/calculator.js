@@ -20,8 +20,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     r1.textContent = "These are purchases or expenditures subject to Ḥuqúqu’lláh.";
     r2.textContent = "Enter any wealth you have already paid Ḥuqúqu’lláh on.";
     r3.textContent = "Today's gold rate multiplied by 2.22456.";
-    r4.textContent = "We rounded down from the calculated value because payments are only due on whole units of Ḥuqúqu.";
-    r5.textContent = "The amount of wealth you are paying Ḥuqúqu on today. Save this number for next year.";
+    r4.textContent = "We rounded down from the calculated value because payments are only due on whole units of Ḥuqúq.";
+    r5.textContent = "The amount of wealth you are paying Ḥuqúq on today. Save this number for next year.";
     r6.textContent = "Ḥuqúqu’lláh is a 19% tax on the wealth listed above.";
 
     // Fetch today's value of 19 Mithqals in USD
