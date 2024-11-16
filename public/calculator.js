@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const a5 = document.getElementById("a5");
     const a6 = document.getElementById("a6");
     const a7 = document.getElementById("a7");
+    const r0 = document.getElementById("r0");
     const r1 = document.getElementById("r1");
     const r2 = document.getElementById("r2");
     const r3 = document.getElementById("r3");
