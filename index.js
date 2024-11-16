@@ -55,6 +55,19 @@ function checkLoginStatus(req, res, next) {
 
 app.set('view engine', 'ejs');
 
+// Get the value of 2.25 troy ounces of gold
+app.get('/api/gold-price', async (req, res) => {
+    try {
+        // Replace with actual gold price API or logic
+        const goldPrice = 2562.08; // Example: price of 1 XAU in USD
+        const mithqalPrice = goldPrice * 2.225; // Convert to 19 Mithqals
+        res.json({ value: mithqalPrice });
+    } catch (error) {
+        console.error("Error fetching gold price:", error);
+        res.status(500).json({ error: "Failed to fetch gold price" });
+    }
+});
+
 // User Registration Endpoint
 app.post('/register', async (req, res) => {
     const { username, password, confirmPassword, email } = req.body;
