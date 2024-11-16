@@ -11,7 +11,6 @@ const path = require('path');
 
 dotenv.config();
 
-
 const app = express();
 const port = 3000;
 
@@ -40,18 +39,21 @@ function checkLoginStatus(req, res, next) {
     const token = req.cookies.token;
     if (!token) {
         req.loggedIn = false;
+        req.username = null;
         return next();
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.loggedIn = true;
-        req.userId = decoded.id;
-        next();
-    } catch (error) {
+        req.username = decoded.username; // Extract username from the decoded token
+    } catch (err) {
+        console.error("JWT verification failed:", err.message);
         req.loggedIn = false;
-        next();
+        req.username = null;
     }
+
+    next();
 }
 
 app.set('view engine', 'ejs');
