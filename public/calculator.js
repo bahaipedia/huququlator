@@ -1,63 +1,48 @@
-// Function to update the calculation
-function calculateHuququllah() {
-    const a1 = parseFloat(document.getElementById("a1").value) || 0; // Excess wealth
-    const a2 = parseFloat(document.getElementById("a2").value) || 0; // Unnecessary expenditures
-    const a3 = parseFloat(document.getElementById("a3").value) || 0; // Wealth previously paid
-    const a4 = parseFloat(document.getElementById("a4").value) || 5698.89; // Value of 19 Mithqals of gold
+function updateCalculator() {
+    const a1 = parseFloat(document.getElementById('a1').value) || 0;
+    const a2 = parseFloat(document.getElementById('a2').value) || 0;
+    const a3 = parseFloat(document.getElementById('a3').value) || 0;
+    const a4 = parseFloat(document.getElementById('a4').value) || 0;
 
-    const totalWealth = a1 + a2; // Total wealth including unnecessary expenditures
-    const netWealth = totalWealth - a3; // Net wealth after previously paid amount
+    const r1 = document.getElementById('r1');
+    const r2 = document.getElementById('r2');
+    const r3 = document.getElementById('r3');
+    const r4 = document.getElementById('r4');
+    const r5 = document.getElementById('r5');
+    const r6 = document.getElementById('r6');
 
-    // Response r1: If total wealth is less than a4
-    if (totalWealth < a4) {
-        document.getElementById("r1").textContent =
-            "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold.";
-    } else {
-        document.getElementById("r1").textContent = ""; // Clear response if condition is not met
+    const totalWealth = a1 + a2;
+    const taxableUnits = Math.floor((totalWealth - a3) / a4);
+    const taxableWealth = taxableUnits * a4;
+    const taxDue = taxableWealth * 0.19;
+
+    // Update response areas only if relevant inputs have values
+    if (a1 || a2) {
+        r1.style.display = (totalWealth > a4) ? 'none' : 'inline';
+        r1.innerText = (totalWealth > a4) ? '' : "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold.";
     }
 
-    // Response r2: If net wealth is less than a4
-    if (netWealth < a4) {
-        document.getElementById("r2").textContent =
-            "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold.";
+    if (totalWealth - a3 > a4) {
+        r2.style.display = 'none';
     } else {
-        document.getElementById("r2").textContent = ""; // Clear response if condition is not met
+        r2.style.display = 'inline';
+        r2.innerText = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold.";
     }
 
-    // a5: Units of Huquq
-    const a5 = Math.floor(netWealth / a4); // Rounded down to nearest whole number
-    document.getElementById("a5").value = a5;
+    r3.style.display = 'inline';
+    r3.innerText = taxableUnits > 0 ? `We rounded down from ${(totalWealth - a3) / a4} because payments are only due on whole units of Huquq.` : '';
 
-    // Response r3: Explanation of rounding
-    if (a5 > 0) {
-        document.getElementById("r3").textContent =
-            "We rounded down from " + (netWealth / a4).toFixed(2) + " because payments are only due on whole units of Huquq.";
-    } else {
-        document.getElementById("r3").textContent = ""; // Clear response if condition is not met
-    }
+    r4.style.display = 'inline';
+    r4.innerText = `This represents the amount of wealth you are paying Huquq on.`;
 
-    // a6: Wealth to pay Huquq on
-    const a6 = a5 * a4;
-    document.getElementById("a6").value = a6;
+    r5.style.display = 'inline';
+    r5.innerText = `Huququllah is a 19% tax on the wealth listed above.`;
 
-    // Response r4: Explanation of wealth being paid on
-    document.getElementById("r4").textContent =
-        "This represents the amount of wealth you are paying Huquq on.";
+    r6.style.display = 'inline';
+    r6.innerText = `This year you owe $${taxDue.toFixed(2)} to Huququllah.`;
 
-    // a7: Huququllah amount (19% of a6)
-    const a7 = a6 * 0.19;
-    document.getElementById("a7").value = a7.toFixed(2);
-
-    // Response r5: Final amount due
-    document.getElementById("r5").textContent =
-        "This year you owe $" + a7.toFixed(2) + " to Huququllah. If you are in the United States, you can make a payment at [this URL].";
+    // Update calculated fields
+    document.getElementById('a5').value = taxableUnits > 0 ? taxableUnits : 0;
+    document.getElementById('a6').value = taxableWealth > 0 ? taxableWealth.toFixed(2) : '';
+    document.getElementById('a7').value = taxDue > 0 ? taxDue.toFixed(2) : '';
 }
-
-// Add event listeners to trigger calculation on input change
-document.getElementById("a1").addEventListener("input", calculateHuququllah);
-document.getElementById("a2").addEventListener("input", calculateHuququllah);
-document.getElementById("a3").addEventListener("input", calculateHuququllah);
-document.getElementById("a4").addEventListener("input", calculateHuququllah);
-
-// Initial calculation
-calculateHuququllah();
