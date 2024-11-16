@@ -187,10 +187,10 @@ async function applyFilterAndCreateRule() {
             })
         });
 
-        if (response.ok) {
+        if (ruleResponse.ok) {
             await refreshTransactions();
         } else {
-            alert('Error applying filter. Please try again.');
+            alert('Error saving filter rule. Please try again.');
         }
     } catch (error) {
         console.error('Error applying filter and creating rule:', error);
