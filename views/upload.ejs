@@ -17,50 +17,51 @@
         <!-- Upload success message area -->
         <div id="uploadMessage"></div>
 
-<% const statusLabels = { 'ne': 'Necessary', 'un': 'Unnecessary', 'hi': 'Hidden' }; %>
+        <% const statusLabels = { 'ne': 'Necessary', 'un': 'Unnecessary', 'hi': 'Hidden' }; %>
 
         <!-- Upload Form with AJAX handling -->
-<div class="upload-section">
-    <h2>Upload Transactions</h2>
-    <form id="uploadForm" onsubmit="uploadTransactions(event)" enctype="multipart/form-data">
-        <div class="form-row">
-            <label for="csvFile">Select CSV file:</label>
-            <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
-            <button type="submit">Upload</button>
+        <div class="upload-section">
+            <form id="uploadForm" onsubmit="uploadTransactions(event)" enctype="multipart/form-data">
+                <div class="form-row">
+                    <label for="csvFile">Select CSV file:</label>
+                    <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+                    <button type="submit">Upload</button>
+                </div>
+            </form>
         </div>
-    </form>
-</div>
-<div class="rules-section">
-    <h2>Rules to Apply</h2>
-    <% if (rules.length > 0) { %>
-        <table>
-            <thead>
-                <tr>
-                    <th>Origin</th>
-                    <th>Field</th>
-                    <th>Value</th>
-                    <th>Mark as</th>
-                    <th>Apply</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% rules.forEach(rule => { %>
-                    <tr>
-                        <td><%= statusLabels[rule.origin_status] %></td>
-                        <td><%= rule.field %></td>
-                        <td><%= rule.value %></td>
-                        <td><%= statusLabels[rule.mark_as] %></td>
-                        <td>
-                            <input type="checkbox" name="selectedRules" value="<%= rule.id %>" checked>
-                        </td>
-                    </tr>
-                <% }); %>
-            </tbody>
-        </table>
-    <% } else { %>
-        <p>No rules available to apply.</p>
-    <% } %>
-</div>
+
+        <!-- Rules Section -->
+        <div class="rules-section">
+            <h2>Rules to Apply</h2>
+            <% if (rules.length > 0) { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Origin</th>
+                            <th>Field</th>
+                            <th>Value</th>
+                            <th>Mark as</th>
+                            <th>Apply</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% rules.forEach(rule => { %>
+                            <tr>
+                                <td><%= statusLabels[rule.origin_status] %></td>
+                                <td><%= rule.field %></td>
+                                <td><%= rule.value %></td>
+                                <td><%= statusLabels[rule.mark_as] %></td>
+                                <td>
+                                    <input type="checkbox" name="selectedRules" value="<%= rule.id %>" checked>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <p>No rules available to apply.</p>
+            <% } %>
+        </div>
 
         <!-- Upload History Table -->
         <h2>Upload History</h2>
@@ -77,18 +78,18 @@
             <tbody id="uploadHistoryTableBody">
                 <% if (uploadHistory.length > 0) { %>
                     <% uploadHistory.forEach(record => { %>
-                    <tr>
-                        <td><%= record.upload_date.toISOString().split('T')[0] %></td>
-                        <td><%= record.filename %></td>
-                        <td><%= record.rows_imported %></td>
-                        <td><%= record.status %></td>
-                        <td>
-                            <form action="/upload/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this upload and its transactions?');">
-                                <input type="hidden" name="uploadId" value="<%= record.id %>">
-                                <button type="submit">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td><%= record.upload_date.toISOString().split('T')[0] %></td>
+                            <td><%= record.filename %></td>
+                            <td><%= record.rows_imported %></td>
+                            <td><%= record.status %></td>
+                            <td>
+                                <form action="/upload/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this upload and its transactions?');">
+                                    <input type="hidden" name="uploadId" value="<%= record.id %>">
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
                     <% }); %>
                 <% } else { %>
                     <tr>
@@ -99,6 +100,7 @@
         </table>
 
         <br><br>
+
         <!-- Delete All Transactions Button -->
         <h2>Delete All Transactions</h2>
         <button onclick="deleteAllTransactions()">Delete All My Transactions</button>
