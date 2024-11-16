@@ -19,45 +19,58 @@
     <p>If you don't understand any of the fields below, visit our <a href="/help">help page</a>.</p>
 
     <form id="huququlatorForm">
+        <!-- Excess wealth for the year -->
         <div class="form-group">
             <label>Excess wealth for the year:</label>
             <input type="number" id="a1" placeholder="Enter amount">
-            <span class="response" id="r1"></span>
+            <span class="response" id="r1" style="visibility: hidden;">Placeholder</span>
         </div>
 
+        <!-- Unnecessary expenditures -->
         <div class="form-group">
             <label>Unnecessary expenditures:</label>
             <input type="number" id="a2" placeholder="Enter amount">
             <span class="response" id="r2"></span>
         </div>
 
+        <!-- Wealth Huquq previously paid on -->
         <div class="form-group">
             <label>Wealth Huquq previously paid on:</label>
             <input type="number" id="a3" placeholder="Enter amount">
             <span class="response" id="r3"></span>
         </div>
 
+        <!-- Today's value of 19 Mithqals of gold -->
         <div class="form-group">
             <label>Today's value of 19 Mithqals of gold:</label>
-            <input type="number" id="a4" value="5698.89" readonly>
+            <input type="text" id="a4" value="5698.89">
+            <span class="response" style="visibility: hidden;">Placeholder</span>
         </div>
 
+        <!-- Payment due on the following units of Huquq -->
         <div class="form-group">
             <label>Payment due on the following units of Huquq:</label>
-            <input type="number" id="a5" readonly>
+            <input type="text" id="a5" readonly>
             <span class="response" id="r4"></span>
         </div>
 
+        <!-- Calculation of a4 * a5 -->
         <div class="form-group">
             <label>a4 times a5 is:</label>
-            <input type="number" id="a6" readonly>
+            <input type="text" id="a6" readonly>
             <span class="response" id="r5"></span>
         </div>
 
+        <!-- 19% of a6 -->
         <div class="form-group">
             <label>19% of a6 is:</label>
-            <input type="number" id="a7" readonly>
+            <input type="text" id="a7" readonly>
             <span class="response" id="r6"></span>
+        </div>
+
+        <!-- Final response -->
+        <div class="form-group">
+            <span class="response" id="r7" style="flex: 3;"></span>
         </div>
     </form>
 </div>
