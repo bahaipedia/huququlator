@@ -57,6 +57,16 @@
     font-weight: bold;
     color: green;
 }
+/* Remove up/down arrows for number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield; /* For Firefox */
+}
 /* Sidebar styling */
 .sidebar {
     width: 200px;
