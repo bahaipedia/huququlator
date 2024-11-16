@@ -202,7 +202,7 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
     const userId = req.userId;
     const filePath = path.join(__dirname, req.file.path);
     const filename = req.file.originalname;
-    const selectedRuleIds = req.body.selectedRules || []; // Ensure this is populated
+    const selectedRuleIds = JSON.parse(req.body.selectedRules || '[]');
     const transactions = [];
     let rowsImported = 0;
     let status = 'success';
