@@ -6,7 +6,7 @@ async function uploadTransactions(event) {
     const selectedRules = [...document.querySelectorAll('input[name="selectedRules"]:checked')].map(input => input.value);
 
     // Append selected rule IDs to form data
-    formData.append('selectedRules', selectedRules);
+    formData.append('selectedRules', JSON.stringify(selectedRules));
 
     try {
         const response = await fetch('/upload', {
