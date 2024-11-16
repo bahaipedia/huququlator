@@ -47,17 +47,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const huquqUnits = Math.floor(taxableWealth / numA4);
         a5.value = huquqUnits;
-        r3.textContent = `We rounded down from ${taxableWealth / numA4} because payments are only due on whole units of Huquq`;
+        r4.textContent = `We rounded down from ${taxableWealth / numA4} because payments are only due on whole units of Huquq`;
 
         const totalTaxable = huquqUnits * numA4;
         a6.value = totalTaxable;
-        r4.textContent = `This represents the amount of wealth you are paying Huquq on`;
+        r5.textContent = `This represents the amount of wealth you are paying Huquq on`;
 
         const huquqDue = totalTaxable * 0.19;
         a7.value = huquqDue.toFixed(2);
-        r5.textContent = `Huququllah is a 19% tax on the wealth listed above`;
+        r6.textContent = `Huququllah is a 19% tax on the wealth listed above`;
 
-        r6.textContent = `This year you owe $${a7.value} to Huququllah. If you are in the United States you can make a payment at [this url].`;
+        r7.textContent = `This year you owe $${a7.value} to Huququllah. If you are in the United States you can make a payment at [this url].`;
     }
 
     // Event Listeners
