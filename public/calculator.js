@@ -12,34 +12,44 @@ function updateCalculator() {
     const r6 = document.getElementById('r6');
 
     const totalWealth = a1 + a2;
-    const taxableUnits = Math.floor((totalWealth - a3) / a4);
+    const excessWealth = totalWealth - a3;
+    const taxableUnits = Math.floor(excessWealth / a4);
     const taxableWealth = taxableUnits * a4;
     const taxDue = taxableWealth * 0.19;
 
-    // Update response areas only if relevant inputs have values
-    if (a1 || a2) {
-        r1.style.visibility = (totalWealth > a4) ? 'hidden' : 'visible';
-        r1.innerText = (totalWealth > a4) ? '' : "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold.";
+    // Update response for r1: totalWealth compared to a4
+    if (totalWealth > a4) {
+        r1.style.visibility = 'hidden';
+        r1.innerText = '';
+    } else {
+        r1.style.visibility = 'visible';
+        r1.innerText = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold.";
     }
 
-    if (totalWealth - a3 > a4) {
+    // Update response for r2: excessWealth compared to a4
+    if (excessWealth > a4) {
         r2.style.visibility = 'hidden';
+        r2.innerText = '';
     } else {
         r2.style.visibility = 'visible';
         r2.innerText = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold.";
     }
 
+    // Update response for r3: taxable units explanation
     r3.style.visibility = 'visible';
-    r3.innerText = taxableUnits > 0 ? `We rounded down from ${(totalWealth - a3) / a4} because payments are only due on whole units of Huquq.` : '';
+    r3.innerText = taxableUnits > 0 ? `We rounded down from ${(excessWealth / a4).toFixed(2)} because payments are only due on whole units of Huquq.` : '';
 
+    // Update response for r4: taxable wealth explanation
     r4.style.visibility = 'visible';
-    r4.innerText = `This represents the amount of wealth you are paying Huquq on.`;
+    r4.innerText = taxableUnits > 0 ? `This represents the amount of wealth you are paying Huquq on.` : '';
 
+    // Update response for r5: tax explanation
     r5.style.visibility = 'visible';
-    r5.innerText = `Huququllah is a 19% tax on the wealth listed above.`;
+    r5.innerText = taxableUnits > 0 ? `Huququllah is a 19% tax on the wealth listed above.` : '';
 
+    // Update response for r6: final payment amount
     r6.style.visibility = 'visible';
-    r6.innerText = `This year you owe $${taxDue.toFixed(2)} to Huququllah.`;
+    r6.innerText = taxableUnits > 0 ? `This year you owe $${taxDue.toFixed(2)} to Huququllah.` : '';
 
     // Update calculated fields
     document.getElementById('a5').value = taxableUnits > 0 ? taxableUnits : 0;
