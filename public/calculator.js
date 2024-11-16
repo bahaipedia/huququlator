@@ -24,7 +24,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Error fetching gold price:", error);
     }
 
-    // Update calculations
+    // Initialize help text
+    r0.textContent = "Excess wealth is the total income and assets subject to Huququllah.";
+    r1.textContent = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold";
+    r2.textContent = "This value excludes wealth you have already paid Huququllah on.";
+    r3.textContent = "This is calculated by taking today's gold rate and multiplying it by 2.225.";
+    r4.textContent = "We rounded down from the calculated value because payments are only due on whole units of Huquq.";
+    r5.textContent = "This represents the amount of wealth you are paying Huquq on.";
+    r6.textContent = "Huququllah is a 19% tax on the wealth listed above.";
+    const r7 = document.createElement("span");
+    r7.id = "r7";
+    document.querySelector("form").appendChild(r7);
+
+    // Update calculations dynamically
     function calculate() {
         const numA1 = parseFloat(a1.value) || 0;
         const numA2 = parseFloat(a2.value) || 0;
@@ -45,23 +57,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             r2.textContent = "";
         }
 
-        r3.textContent = `This is calculated by taking today's gold rate and multipying it by 2.225.`;
-
         const huquqUnits = Math.floor(taxableWealth / numA4);
         a5.value = huquqUnits;
-        r4.textContent = `We rounded down from ${taxableWealth / numA4} because payments are only due on whole units of Huquq`;
+        r4.textContent = `We rounded down from ${(taxableWealth / numA4).toFixed(2)} because payments are only due on whole units of Huquq.`;
 
         const totalTaxable = huquqUnits * numA4;
         a6.value = totalTaxable;
-        r5.textContent = `This represents the amount of wealth you are paying Huquq on`;
+        r5.textContent = `This represents the amount of wealth you are paying Huquq on.`;
 
         const huquqDue = totalTaxable * 0.19;
         a7.value = huquqDue.toFixed(2);
-        r6.textContent = `Huququllah is a 19% tax on the wealth listed above`;
+        r6.textContent = `Huququllah is a 19% tax on the wealth listed above.`;
 
         r7.textContent = `This year you owe $${a7.value} to Huququllah. If you are in the United States you can make a payment at [this url].`;
     }
 
-    // Event Listeners
+    // Event Listeners for each relevant input
     [a1, a2, a3].forEach(input => input.addEventListener("input", calculate));
 });
