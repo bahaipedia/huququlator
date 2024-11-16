@@ -107,23 +107,33 @@ app.post('/register', async (req, res) => {
 // User Login Endpoint
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ message: 'Missing username or password' });
-    }
-
     try {
-        const user = await getUserByUsername(username);
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+        // Find the user in the database
+        const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+
+        if (rows.length === 0) {
+            return res.status(401).send('User not found');
         }
 
-        const token = generateAuthToken(user);
+        const user = rows[0];
+
+        // Check if the password is correct
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        if (!isPasswordMatch) {
+            return res.status(401).send('Incorrect password');
+        }
+
+        // Generate JWT token
+        const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, {
+            expiresIn: '1h',
+        });
+
+        // Save token in a cookie (or session if preferred)
         res.cookie('token', token, { httpOnly: true });
-        res.json({ redirect: '/transactions' });
+        res.redirect('/');
     } catch (error) {
-        console.error('Error in login route:', error);
-        res.status(500).json({ message: 'Server error' });
+        console.error(error);
+        res.status(500).send('Error logging in');
     }
 });
 
