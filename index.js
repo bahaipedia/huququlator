@@ -533,8 +533,10 @@ app.post('/transactions/delete-all', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        await pool.query('DELETE FROM transactions WHERE user_id = ?', [req.userId]);
-        res.status(200).json({ message: 'All transactions deleted successfully' });
+        const userId = req.userId;
+        await pool.query('DELETE FROM transactions WHERE user_id = ?', [userId]);
+        await pool.query('DELETE FROM upload_history WHERE user_id = ?', [userId]);
+        res.status(200).json({ message: 'All transactions deleted successfully.' });
     } catch (error) {
         console.error('Error deleting transactions:', error);
         res.status(500).json({ message: 'Error deleting transactions' });
