@@ -1,5 +1,6 @@
 async function handleLogin(event) {
     event.preventDefault();
+
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
@@ -14,8 +15,9 @@ async function handleLogin(event) {
             const data = await response.json();
             window.location.href = data.redirect;
         } else {
-            const errorData = await response.json();
-            alert(`Login failed: ${errorData.message}`);
+            const text = await response.text();
+            console.error('Server response:', text);
+            alert('Login failed. Please try again.');
         }
     } catch (error) {
         console.error('Error logging in:', error);
