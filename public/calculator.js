@@ -3,58 +3,63 @@ document.addEventListener("DOMContentLoaded", async () => {
     const a2 = document.getElementById("a2");
     const a3 = document.getElementById("a3");
     const a4 = document.getElementById("a4");
-
-    const helpText1 = document.getElementById("helpText1");
-    const helpText2 = document.getElementById("helpText2");
-    const helpText3 = document.getElementById("helpText3");
+    const a5 = document.getElementById("a5");
+    const a6 = document.getElementById("a6");
+    const a7 = document.getElementById("a7");
+    const r0 = document.getElementById("r0");
+    const r1 = document.getElementById("r1");
+    const r2 = document.getElementById("r2");
+    const r3 = document.getElementById("r3");
+    const r4 = document.getElementById("r4");
+    const r5 = document.getElementById("r5");
+    const r6 = document.getElementById("r6");
 
     // Fetch today's value of 19 Mithqals in USD
     try {
         const response = await fetch('/api/gold-price');
-        if (!response.ok) throw new Error("Failed to fetch gold price");
         const data = await response.json();
-        a4.value = parseFloat(data.value).toFixed(2);
+        const mithqalValue = data.value; // e.g., 5698.8918
+        a4.value = mithqalValue;
     } catch (error) {
         console.error("Error fetching gold price:", error);
-        a4.value = "5698.89"; // Fallback value
     }
 
-    // Function to show or hide help text
-    function updateHelpText(input, helpText, condition) {
-        input.addEventListener("input", () => {
-            if (condition(input.value)) {
-                helpText.classList.add("show"); // Add the 'show' class to display the help text
-            } else {
-                helpText.classList.remove("show"); // Remove the 'show' class to hide the help text
-            }
-        });
-    }
-
-    // Conditions for showing help text
-    const condition1 = (value) => value.trim() === ""; // Show help text if input is empty
-    const condition2 = (value) => parseFloat(value) < 0; // Show help text if input is negative
-    const condition3 = (value) => isNaN(parseFloat(value)); // Show help text if input is not a valid number
-
-    // Attach help text logic to inputs
-    updateHelpText(a1, helpText1, condition1);
-    updateHelpText(a2, helpText2, condition2);
-    updateHelpText(a3, helpText3, condition3);
-
-    // Function to perform calculations
+    // Update calculations
     function calculate() {
         const numA1 = parseFloat(a1.value) || 0;
         const numA2 = parseFloat(a2.value) || 0;
         const numA3 = parseFloat(a3.value) || 0;
         const numA4 = parseFloat(a4.value) || 0;
 
-        const totalWealth = numA1 + numA2 - numA3;
-        const huquqDue = totalWealth > numA4 ? totalWealth * 0.19 : 0;
+        const totalWealth = numA1 + numA2;
+        if (totalWealth <= numA4) {
+            r1.textContent = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold";
+        } else {
+            r1.textContent = "";
+        }
 
-        document.getElementById("a5").value = Math.floor(totalWealth / numA4) || 0;
-        document.getElementById("a6").value = (Math.floor(totalWealth / numA4) * numA4).toFixed(2) || 0;
-        document.getElementById("a7").value = huquqDue.toFixed(2) || 0;
+        const taxableWealth = totalWealth - numA3;
+        if (taxableWealth <= numA4) {
+            r2.textContent = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold";
+        } else {
+            r2.textContent = "";
+        }
+
+        const huquqUnits = Math.floor(taxableWealth / numA4);
+        a5.value = huquqUnits;
+        r3.textContent = `We rounded down from ${taxableWealth / numA4} because payments are only due on whole units of Huquq`;
+
+        const totalTaxable = huquqUnits * numA4;
+        a6.value = totalTaxable;
+        r4.textContent = `This represents the amount of wealth you are paying Huquq on`;
+
+        const huquqDue = totalTaxable * 0.19;
+        a7.value = huquqDue.toFixed(2);
+        r5.textContent = `Huququllah is a 19% tax on the wealth listed above`;
+
+        r6.textContent = `This year you owe $${a7.value} to Huququllah. If you are in the United States you can make a payment at [this url].`;
     }
 
-    // Attach calculation logic
-    [a1, a2, a3].forEach((input) => input.addEventListener("input", calculate));
+    // Event Listeners
+    [a1, a2, a3].forEach(input => input.addEventListener("input", calculate));
 });
