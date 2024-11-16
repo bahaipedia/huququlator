@@ -45,6 +45,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             r2.textContent = "";
         }
 
+        r3.textContent = `This is calculated by taking today's gold rate and multipying it by 2.225.`;
+
         const huquqUnits = Math.floor(taxableWealth / numA4);
         a5.value = huquqUnits;
         r4.textContent = `We rounded down from ${taxableWealth / numA4} because payments are only due on whole units of Huquq`;
