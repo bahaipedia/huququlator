@@ -6,24 +6,49 @@ document.addEventListener("DOMContentLoaded", async () => {
     const a5 = document.getElementById("a5");
     const a6 = document.getElementById("a6");
     const a7 = document.getElementById("a7");
+
+    const r0 = document.getElementById("r0");
     const r1 = document.getElementById("r1");
     const r2 = document.getElementById("r2");
     const r3 = document.getElementById("r3");
+    const r4 = document.getElementById("r4");
     const r5 = document.getElementById("r5");
     const r6 = document.getElementById("r6");
 
     // Fetch today's value of 19 Mithqals in USD
     try {
         const response = await fetch('/api/gold-price');
-        if (!response.ok) throw new Error("Network response was not ok");
+        if (!response.ok) throw new Error("Failed to fetch gold price");
         const data = await response.json();
         a4.value = parseFloat(data.value).toFixed(2);
     } catch (error) {
         console.error("Error fetching gold price:", error);
-        a4.value = "5698.89"; // Default fallback
+        a4.value = "5698.89"; // Fallback value
     }
 
-    // Update calculations
+    // Reusable function for updating help text
+    function updateHelpText(inputId, helpTextId, condition) {
+        const inputElement = document.getElementById(inputId);
+        const helpTextElement = document.getElementById(helpTextId);
+
+        inputElement.addEventListener("input", () => {
+            if (condition(inputElement.value)) {
+                helpTextElement.style.display = "block"; // Show help text
+            } else {
+                helpTextElement.style.display = "none"; // Hide help text
+            }
+        });
+    }
+
+    // Define conditions for help text
+    const condition1 = (value) => parseFloat(value) < 0; // Example: Show help if input is negative
+    const condition2 = (value) => parseFloat(value) === 0; // Show help if input is zero
+
+    // Attach help text logic to inputs
+    updateHelpText("a1", "r0", condition1);
+    updateHelpText("a2", "r1", condition2);
+
+    // Calculation function
     function calculate() {
         const numA1 = parseFloat(a1.value) || 0;
         const numA2 = parseFloat(a2.value) || 0;
@@ -57,13 +82,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         r6.textContent = `This year you owe $${a7.value} to Huququllah. If you're in the U.S., you can make payments online.`;
     }
 
-    // Add debounce function to limit rapid event triggering
-    let debounceTimeout;
-    function debounce(func, delay) {
-        clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(func, delay);
-    }
-
-    // Event Listeners for input fields
-    [a1, a2, a3].forEach(input => input.addEventListener("input", () => debounce(calculate, 300)));
+    // Attach calculation logic to inputs
+    [a1, a2, a3].forEach((input) => input.addEventListener("input", calculate));
 });
