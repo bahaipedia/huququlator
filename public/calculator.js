@@ -23,9 +23,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     function updateHelpText(input, helpText, condition) {
         input.addEventListener("input", () => {
             if (condition(input.value)) {
-                helpText.style.display = "block"; // Show help text
+                helpText.classList.add("show"); // Add the 'show' class to display the help text
             } else {
-                helpText.style.display = "none"; // Hide help text
+                helpText.classList.remove("show"); // Remove the 'show' class to hide the help text
             }
         });
     }
