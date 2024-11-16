@@ -18,27 +18,27 @@ function updateCalculator() {
 
     // Update response areas only if relevant inputs have values
     if (a1 || a2) {
-        r1.style.display = (totalWealth > a4) ? 'none' : 'inline';
+        r1.style.visibility = (totalWealth > a4) ? 'hidden' : 'visible';
         r1.innerText = (totalWealth > a4) ? '' : "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold.";
     }
 
     if (totalWealth - a3 > a4) {
-        r2.style.display = 'none';
+        r2.style.visibility = 'hidden';
     } else {
-        r2.style.display = 'inline';
+        r2.style.visibility = 'visible';
         r2.innerText = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold.";
     }
 
-    r3.style.display = 'inline';
+    r3.style.visibility = 'visible';
     r3.innerText = taxableUnits > 0 ? `We rounded down from ${(totalWealth - a3) / a4} because payments are only due on whole units of Huquq.` : '';
 
-    r4.style.display = 'inline';
+    r4.style.visibility = 'visible';
     r4.innerText = `This represents the amount of wealth you are paying Huquq on.`;
 
-    r5.style.display = 'inline';
+    r5.style.visibility = 'visible';
     r5.innerText = `Huququllah is a 19% tax on the wealth listed above.`;
 
-    r6.style.display = 'inline';
+    r6.style.visibility = 'visible';
     r6.innerText = `This year you owe $${taxDue.toFixed(2)} to Huququllah.`;
 
     // Update calculated fields
