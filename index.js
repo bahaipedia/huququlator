@@ -107,33 +107,23 @@ app.post('/register', async (req, res) => {
 // User Login Endpoint
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
+
     try {
-        // Find the user in the database
         const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
 
-        if (rows.length === 0) {
-            return res.status(401).send('User not found');
+        if (rows.length === 0 || !(await bcrypt.compare(password, rows[0].password))) {
+            return res.status(401).json({ message: 'Invalid username or password' });
         }
 
-        const user = rows[0];
+        const token = jwt.sign({ userId: rows[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        // Check if the password is correct
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
-        if (!isPasswordMatch) {
-            return res.status(401).send('Incorrect password');
-        }
-
-        // Generate JWT token
-        const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, {
-            expiresIn: '1h',
-        });
-
-        // Save token in a cookie (or session if preferred)
         res.cookie('token', token, { httpOnly: true });
-        res.redirect('/');
+
+        // Redirect to the authenticated user's dashboard
+        res.status(200).json({ redirect: '/transactions' });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error logging in');
+        console.error('Error logging in:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
