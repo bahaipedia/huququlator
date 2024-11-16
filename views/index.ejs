@@ -9,11 +9,6 @@
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-    </nav>
-
-    <nav class="navbar">
         <% if (loggedIn) { %>
             <span>Welcome, <%= username %></span>
             <a href="/logout">Log out</a>
