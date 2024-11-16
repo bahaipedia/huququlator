@@ -34,20 +34,23 @@
     gap: 10px;
 }
 .main-page label {
-    flex: 1;
+    flex: 2;
     font-weight: bold;
     text-align: right;
 }
 .main-page input {
-    flex: 2;
-    padding: 10px;
+    flex: 1;
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    width: 120px;
+    max-width: 100%; 
 }
 .main-page .response {
     flex: 1;
     color: #ff6f61;
     font-size: 14px;
+    text-align: left;
 }
 .main-page .final-response {
     margin-top: 15px;
