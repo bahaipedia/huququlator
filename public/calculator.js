@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             a7.value = huquqDue.toFixed(2);
 
             r4.textContent = `We rounded down from ${(taxableWealth / numA4).toFixed(2)} because payments are only due on whole units of Huquq.`;
-            r7.textContent = `This year you owe $${a7.value} to Huququllah. If you are in the United States you can make a payment at [this url].`;
+            r7.textContent = `This year you owe $${a7.value} to Huququllah.`;
         }
     }
 
