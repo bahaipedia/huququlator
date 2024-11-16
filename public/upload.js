@@ -56,31 +56,29 @@ async function fetchUploadHistory() {
     }
 }
 
-// Function to delete all transactions via AJAX
+// Function to delete all transactions and upload history via AJAX
 async function deleteAllTransactions() {
-    if (!confirm('Are you sure you want to delete all transactions? This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to delete all transactions and upload history? This action cannot be undone.')) {
         return;
     }
 
     try {
         const response = await fetch('/transactions/delete-all', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' }
         });
 
         if (response.ok) {
-            document.getElementById('uploadMessage').innerText = 'All transactions deleted successfully.';
+            document.getElementById('uploadMessage').innerText = 'All transactions and upload history deleted successfully.';
             document.getElementById('uploadMessage').style.color = 'green';
 
-            // Refresh the upload history after deletion
-            await fetchUploadHistory();
+            // Clear upload history and transactions on the page
+            document.getElementById('uploadHistoryTableBody').innerHTML = '<tr><td colspan="5">No upload history available.</td></tr>';
         } else {
-            alert('Error deleting transactions. Please try again.');
+            alert('Error deleting transactions and upload history. Please try again.');
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error deleting transactions and upload history:', error);
         alert('An error occurred. Please try again.');
     }
 }
