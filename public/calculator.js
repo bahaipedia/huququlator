@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Initialize help text
     r0.textContent = "Excess wealth is the total income and assets subject to Huququllah.";
-    r1.textContent = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold";
+    r1.textContent = "Your excess wealth must exceed one unit of 19 Mithqals of gold for Huquq to be payable";
     r2.textContent = "This value excludes wealth you have already paid Huququllah on.";
     r3.textContent = "This is calculated by taking today's gold rate and multiplying it by 2.225.";
     r4.textContent = "We rounded down from the calculated value because payments are only due on whole units of Huquq.";
