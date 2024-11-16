@@ -13,8 +13,18 @@
         <a href="/register">Register</a>
     </nav>
 
+    <nav class="navbar">
+        <% if (loggedIn) { %>
+            <span>Welcome, <%= username %></span>
+            <a href="/logout">Log out</a>
+        <% } else { %>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        <% } %>
+    </nav>
+
     <!-- Main Content -->
-<div class="main-page">
+    <div class="main-page">
     <h1>Welcome, Huququlator is a calculator for Ḥuqúqu’lláh</h1>
     <p>If you don't understand any of the fields below, visit our <a href="/help">help page</a>.</p>
 
