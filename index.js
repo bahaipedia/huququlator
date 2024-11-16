@@ -158,6 +158,7 @@ app.get('/upload', checkLoginStatus, async (req, res) => {
             'SELECT * FROM upload_history WHERE user_id = ? ORDER BY upload_date DESC',
             [req.userId]
         );
+        const safeUploadHistory = uploadHistory || [];
 
         const [rules] = await pool.query(
             'SELECT * FROM filter_rules WHERE user_id = ? ORDER BY created_at DESC',
@@ -165,8 +166,8 @@ app.get('/upload', checkLoginStatus, async (req, res) => {
         );
 
         res.render('upload', {
-            uploadHistory: uploadHistory[0],
-            rules, // Passing rules directly
+            uploadHistory: safeUploadHistory,
+            rules: rules || [],
             statusLabels,
             loggedIn: req.loggedIn
         });
