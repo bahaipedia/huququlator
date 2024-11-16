@@ -8,17 +8,22 @@ Roadmap:
 
 Installation on a new server. 
 
+```bash
 sudo apt install -y nodejs npm
 sudo apt install -y mysql-server
 sudo apt install -y git curl build-essential
+```
 
+```bash
 cd /path/to/your/project
 git clone https://github.com/bahaipedia/huququlator.git
 npm install
-
-nano .env with Database credentials (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, JWT_SECRET).
+nano .env (Database credentials: DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, JWT_SECRET).
+```
 
 Create a database, then these tables:
+
+```bash
 CREATE TABLE transactions (
     id INT(11) NOT NULL AUTO_INCREMENT,
     user_id INT(11) DEFAULT NULL,
@@ -61,4 +66,4 @@ CREATE TABLE users (
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
-
+```
