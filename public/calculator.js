@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Error fetching gold price:", error);
     }
 
-    // Update calculations
+    // Function to calculate responses specific to inputs
     function calculate() {
         const numA1 = parseFloat(a1.value) || 0;
         const numA2 = parseFloat(a2.value) || 0;
@@ -32,34 +32,47 @@ document.addEventListener("DOMContentLoaded", async () => {
         const numA4 = parseFloat(a4.value) || 0;
 
         const totalWealth = numA1 + numA2;
-        if (totalWealth <= numA4) {
-            r1.textContent = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold";
-        } else {
-            r1.textContent = "";
-        }
-
         const taxableWealth = totalWealth - numA3;
-        if (taxableWealth <= numA4) {
-            r2.textContent = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold";
-        } else {
-            r2.textContent = "";
+        const huquqUnits = Math.floor(taxableWealth / numA4);
+        const totalTaxable = huquqUnits * numA4;
+        const huquqDue = totalTaxable * 0.19;
+
+        // Update dependent fields
+        a5.value = huquqUnits;
+        a6.value = totalTaxable;
+        a7.value = huquqDue.toFixed(2);
+
+        // Update responses based on input relevance
+        if (numA1 || numA2) {
+            if (totalWealth <= numA4) {
+                r1.style.visibility = "visible";
+                r1.textContent = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold";
+            } else {
+                r1.style.visibility = "hidden";
+            }
         }
 
-        const huquqUnits = Math.floor(taxableWealth / numA4);
-        a5.value = huquqUnits;
-        r3.textContent = `We rounded down from ${taxableWealth / numA4} because payments are only due on whole units of Huquq`;
+        if (numA1 || numA2 || numA3) {
+            if (taxableWealth <= numA4) {
+                r2.style.visibility = "visible";
+                r2.textContent = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold";
+            } else {
+                r2.style.visibility = "hidden";
+            }
+        }
 
-        const totalTaxable = huquqUnits * numA4;
-        a6.value = totalTaxable;
-        r4.textContent = `This represents the amount of wealth you are paying Huquq on`;
-
-        const huquqDue = totalTaxable * 0.19;
-        a7.value = huquqDue.toFixed(2);
-        r5.textContent = `Huququllah is a 19% tax on the wealth listed above`;
-
-        r6.textContent = `This year you owe $${a7.value} to Huququllah. If you are in the United States you can make a payment at [this url].`;
+        if (numA1 || numA2 || numA3) {
+            r3.style.visibility = "visible";
+            r3.textContent = `We rounded down from ${(taxableWealth / numA4).toFixed(2)} because payments are only due on whole units of Huquq`;
+            r4.style.visibility = "visible";
+            r4.textContent = `This represents the amount of wealth you are paying Huquq on`;
+            r5.style.visibility = "visible";
+            r5.textContent = `Huququllah is a 19% tax on the wealth listed above`;
+            r6.style.visibility = "visible";
+            r6.textContent = `This year you owe $${a7.value} to Huququllah. If you are in the United States you can make a payment at [this url].`;
+        }
     }
 
-    // Event Listeners
+    // Event Listeners for each relevant input
     [a1, a2, a3].forEach(input => input.addEventListener("input", calculate));
 });
