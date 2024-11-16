@@ -17,32 +17,37 @@
     font-size: 16px;
 }
 .main-page form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     background: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
 }
 .main-page .form-group {
-    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
 }
 .main-page label {
-    display: block;
+    flex: 1;
     font-weight: bold;
-    margin-bottom: 5px;
+    text-align: right;
 }
 .main-page input {
-    width: 100%;
+    flex: 2;
     padding: 10px;
-    margin-top: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 .main-page .response {
+    flex: 1;
     color: #ff6f61;
     font-size: 14px;
-    margin-top: 5px;
 }
 .main-page .final-response {
     margin-top: 15px;
