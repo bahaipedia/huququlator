@@ -108,22 +108,22 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    try {
-        const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Missing username or password' });
+    }
 
-        if (rows.length === 0 || !(await bcrypt.compare(password, rows[0].password))) {
-            return res.status(401).json({ message: 'Invalid username or password' });
+    try {
+        const user = await getUserByUsername(username);
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ userId: rows[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
+        const token = generateAuthToken(user);
         res.cookie('token', token, { httpOnly: true });
-
-        // Redirect to the authenticated user's dashboard
-        res.status(200).json({ redirect: '/transactions' });
+        res.json({ redirect: '/transactions' });
     } catch (error) {
-        console.error('Error logging in:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error('Error in login route:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
