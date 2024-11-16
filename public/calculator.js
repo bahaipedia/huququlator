@@ -17,12 +17,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Set static help text
     r0.textContent = "Total assets less any debts.";
-    r1.textContent = "These are purchases or expenditures subject to Huququllah.";
-    r2.textContent = "Enter any wealth you have already paid Huququllah on.";
-    r3.textContent = "This is calculated by taking today's gold rate and multiplying it by 2.225.";
-    r4.textContent = "We rounded down from the calculated value because payments are only due on whole units of Huquq.";
-    r5.textContent = "The amount of wealth you are paying Huquq on today. Save this number for next year.";
-    r6.textContent = "Huququllah is a 19% tax on the wealth listed above.";
+    r1.textContent = "These are purchases or expenditures subject to Ḥuqúqu’lláh.";
+    r2.textContent = "Enter any wealth you have already paid Ḥuqúqu’lláh on.";
+    r3.textContent = "Today's gold rate multiplied by 2.22456.";
+    r4.textContent = "We rounded down from the calculated value because payments are only due on whole units of Ḥuqúqu.";
+    r5.textContent = "The amount of wealth you are paying Ḥuqúqu on today. Save this number for next year.";
+    r6.textContent = "Ḥuqúqu’lláh is a 19% tax on the wealth listed above.";
 
     // Fetch today's value of 19 Mithqals in USD
     try {
