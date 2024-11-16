@@ -1,30 +1,69 @@
-<!-- views/index.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ḥuqúqu’lláh Calculator - Home</title>
-  <link rel="stylesheet" href="/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huququlator</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <!-- Include the sidebar partial -->
-  <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+    </nav>
 
-  <!-- Main content area -->
-  <div class="content">
-    <h1>Welcome to the Ḥuqúqu’lláh Calculator</h1>
-    <% if (!loggedIn) { %>
-      <p>This is a work-in-progress page. Please <a href="/login">Login</a> or <a href="/register">Register</a> to get started.</p>
-    <% } else { %>
-      <p>Welcome, <%= username %>! Here are the features available to you:</p>
-      <ul>
-        <li><a href="/upload">Upload Transactions</a></li>
-        <li><a href="/transactions">View Transactions</a></li>
-        <!-- Add other features as needed -->
-        <li><a href="/logout">Logout</a></li>
-      </ul>
-    <% } %>
-  </div>
+    <!-- Main Content -->
+    <div class="main-page">
+        <h1>Welcome to the Huququlator</h1>
+        <p>If you don't understand any of the fields below, visit our <a href="/help">help page</a>.</p>
+
+        <!-- Calculator -->
+        <form id="huququlatorForm">
+            <div class="form-group">
+                <label for="a1">Excess wealth for the year</label>
+                <input type="number" id="a1" placeholder="Enter amount in USD">
+                <div id="r1" class="response"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="a2">Unnecessary expenditures</label>
+                <input type="number" id="a2" placeholder="Enter amount in USD">
+            </div>
+
+            <div class="form-group">
+                <label for="a3">Wealth Huquq previously paid on</label>
+                <input type="number" id="a3" placeholder="Enter amount in USD">
+                <div id="r2" class="response"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="a4">Today's value of 19 Mithqals of gold</label>
+                <input type="number" id="a4" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="a5">Payment due on the following units of Huquq</label>
+                <input type="number" id="a5" readonly>
+                <div id="r3" class="response"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="a6">Wealth to pay Huquq on</label>
+                <input type="number" id="a6" readonly>
+                <div id="r4" class="response"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="a7">19% of Huquq</label>
+                <input type="number" id="a7" readonly>
+                <div id="r5" class="response"></div>
+            </div>
+
+            <div id="r6" class="final-response"></div>
+        </form>
+    </div>
+    
+    <script src="/scripts.js"></script>
 </body>
 </html>
