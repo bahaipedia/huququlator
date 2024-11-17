@@ -9,6 +9,10 @@ const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const cache = {
+    goldPrice: null, 
+    timestamp: null 
+};
 
 dotenv.config();
 
@@ -74,11 +78,19 @@ app.get('/', checkLoginStatus, (req, res) => {
 // Get the value of 2.25 troy ounces of gold
 app.get('/api/gold-price', async (req, res) => {
     try {
-        // Replace YOUR_API_KEY with your actual API key
-        const apiKey = 'goldapi-1j8fzysm3lx549e-io';
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+        // If the cached value exists and is less than 24 hours old, return it
+        if (cache.goldPrice && cache.timestamp && now - cache.timestamp < oneDay) {
+            console.log("Serving gold price from cache.");
+            return res.json({ value: cache.goldPrice });
+        }
+
+        // Fetch fresh gold price from the API
+        const apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
         const apiUrl = 'https://www.goldapi.io/api/XAU/USD';
 
-        // Fetch gold price from the API
         const response = await axios.get(apiUrl, {
             headers: {
                 'x-access-token': apiKey,
@@ -86,14 +98,16 @@ app.get('/api/gold-price', async (req, res) => {
             }
         });
 
-        // Extract the gold price in USD
+        // Extract the gold price and calculate Mithqal value
         const goldPrice = response.data.price; // Price of 1 XAU in USD
+        const mithqalPrice = goldPrice * 2.22456;
 
-        // Convert gold price to 19 Mithqals
-        const mithqalPrice = goldPrice * 2.22456; 
+        // Store the value in the cache
+        cache.goldPrice = mithqalPrice;
+        cache.timestamp = now;
 
-        // Send the result as JSON
-        res.json({ value: mithqalPrice });
+        console.log("Fetched fresh gold price and cached it.");
+        return res.json({ value: mithqalPrice });
     } catch (error) {
         console.error("Error fetching gold price:", error.response?.data || error.message);
         res.status(500).json({ error: "Failed to fetch gold price" });
