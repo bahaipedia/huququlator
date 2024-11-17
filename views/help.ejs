@@ -10,8 +10,10 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <% if (loggedIn) { %>
+            <!-- Logged-in view -->
             <span>Welcome, <%= username %></span>
             <div class="navbar-right">
+                <a href="/help">Calculator</a> 
                 <a href="/dashboard">Dashboard</a>
                 <a href="/upload">Upload Transactions</a>
                 <a href="/filter-rules">Categorization rules</a>
@@ -19,6 +21,11 @@
                 <a href="/logout">Log out</a>
             </div>
         <% } else { %>
+            <!-- Logged-out view -->
+            <div class="navbar-left">
+                <a href="/">Calculator</a>
+                <a href="/about">About Huququlator</a>
+            </div>
             <div class="navbar-right">
                 <a href="/login">Login</a>
                 <a href="/register">Register</a>
