@@ -3,34 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Debug Information</title>
-    <link rel="stylesheet" href="/styles.css">
+    <title>Test Debug Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        pre {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <body>
-    <h1>Debug Information</h1>
-    <h2>Request Headers</h2>
-    <pre><%= JSON.stringify(headers, null, 2) %></pre>
+    <h1>Test Debug Page</h1>
 
-    <h2>Cookies</h2>
-    <pre><%= JSON.stringify(cookies, null, 2) %></pre>
+    <div class="section">
+        <h2>1. Input Parameters</h2>
+        <pre><%= JSON.stringify(debug.params, null, 2) %></pre>
+    </div>
 
-    <h2>Session Data (if applicable)</h2>
-    <pre><%= JSON.stringify(session, null, 2) %></pre>
+    <div class="section">
+        <h2>2. SQL Query and Parameters</h2>
+        <p><strong>Query:</strong></p>
+        <pre><%= debug.query %></pre>
+        <p><strong>Parameters:</strong></p>
+        <pre><%= JSON.stringify(debug.queryParams, null, 2) %></pre>
+    </div>
 
-    <h2>User Data</h2>
-    <% if (user) { %>
-        <p><strong>ID:</strong> <%= user.id %></p>
-        <p><strong>Username:</strong> <%= user.username %></p>
-        <p><strong>Logged In:</strong> <%= loggedIn %></p>
-    <% } else { %>
-        <p>No user data found.</p>
-    <% } %>
+    <div class="section">
+        <h2>3. Raw Transactions from Database</h2>
+        <% if (debug.transactions.length > 0) { %>
+            <pre><%= JSON.stringify(debug.transactions, null, 2) %></pre>
+        <% } else { %>
+            <p>No transactions fetched.</p>
+        <% } %>
+    </div>
 
-    <h2>Decoded JWT</h2>
-    <% if (decodedToken) { %>
-        <pre><%= JSON.stringify(decodedToken, null, 2) %></pre>
-    <% } else { %>
-        <p>No decoded token available.</p>
-    <% } %>
+    <div class="section">
+        <h2>4. Error (if any)</h2>
+        <% if (debug.error) { %>
+            <pre><%= debug.error %></pre>
+        <% } else { %>
+            <p>No errors encountered.</p>
+        <% } %>
+    </div>
 </body>
 </html>
