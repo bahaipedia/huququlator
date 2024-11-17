@@ -5,28 +5,46 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
-const csv = require('csv-parser');
+const { parse } = require('fast-csv');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
-const cache = {
-    goldPrice: null, 
-    timestamp: null 
-};
+const axiosRetry = require('axios-retry');
+const { body, validationResult } = require('express-validator');
+const winston = require('winston');
 
 dotenv.config();
 
+// Initialize Express
 const app = express();
 const port = 3000;
 
 // Configure multer for file uploads
 const upload = multer({ dest: 'uploads/' });
 
+// Logger setup using Winston
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'combined.log' })
+    ]
+});
+
+// Configure Axios with retry logic
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+
+const cache = {
+    goldPrice: null,
+    timestamp: null
+};
+
 // Middleware to parse JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-app.use(cookieParser()); // Use cookie-parser
+app.use(cookieParser());
 
 // Create a MariaDB connection pool
 const pool = mysql.createPool({
@@ -50,18 +68,29 @@ function checkLoginStatus(req, res, next) {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log("Decoded Token:", decoded); // Log the decoded token
         req.loggedIn = true;
-        req.userId = decoded.id; // Attach user ID
-        req.username = decoded.username; // Attach username
-        next();
+        req.userId = decoded.id;
+        req.username = decoded.username;
     } catch (error) {
-        console.error("Error verifying token:", error);
+        logger.error('JWT verification failed', { error });
         req.loggedIn = false;
-        next();
     }
+    next();
 }
 
+// Helper function to validate user inputs
+function validateInputs(validations) {
+    return async (req, res, next) => {
+        await Promise.all(validations.map(validation => validation.run(req)));
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    };
+}
+
+// Routes
 app.set('view engine', 'ejs');
 
 // Basic routes
@@ -75,13 +104,11 @@ app.get('/api/gold-price', async (req, res) => {
         const now = Date.now();
         const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-        // If the cached value exists and is less than 24 hours old, return it
         if (cache.goldPrice && cache.timestamp && now - cache.timestamp < oneDay) {
-            console.log("Serving gold price from cache.");
+            logger.info('Serving gold price from cache.');
             return res.json({ value: cache.goldPrice });
         }
 
-        // Fetch fresh gold price from the API
         const apiKey = process.env.GOLD_API_KEY;
         const apiUrl = 'https://www.goldapi.io/api/XAU/USD';
 
@@ -92,19 +119,17 @@ app.get('/api/gold-price', async (req, res) => {
             }
         });
 
-        // Extract the gold price and calculate Mithqal value
         const goldPrice = response.data.price; // Price of 1 XAU in USD
         const mithqalPrice = goldPrice * 2.22456;
 
-        // Store the value in the cache
         cache.goldPrice = mithqalPrice;
         cache.timestamp = now;
 
-        console.log("Fetched fresh gold price and cached it.");
+        logger.info('Fetched fresh gold price and cached it.');
         return res.json({ value: mithqalPrice });
     } catch (error) {
-        console.error("Error fetching gold price:", error.response?.data || error.message);
-        res.status(500).json({ error: "Failed to fetch gold price" });
+        logger.error('Error fetching gold price', { error });
+        res.status(500).json({ value: 0, error: 'Gold price unavailable' });
     }
 });
 
@@ -126,71 +151,57 @@ app.get('/logout', (req, res) => {
 });
 
 // User Registration Endpoint
-app.post('/register', async (req, res) => {
-    const { username, password, confirmPassword, email } = req.body;
+app.post(
+    '/register',
+    [
+        body('username').isAlphanumeric().withMessage('Username must be alphanumeric'),
+        body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+        body('email').isEmail().withMessage('Must be a valid email')
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).render('register', { errors: errors.array(), loggedIn: false });
+        }
 
-    // Validate passwords match
-    if (password !== confirmPassword) {
-        return res.render('register', {
-            errorMessage: 'Passwords do not match. Please re-enter.',
-            loggedIn: false
-        });
+        const { username, password, email } = req.body;
+
+        try {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await pool.query('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [username, hashedPassword, email]);
+            res.redirect('/login');
+        } catch (error) {
+            logger.error('Error during registration', { error });
+            res.status(500).render('register', {
+                errorMessage: 'An error occurred during registration. Please try again.',
+                loggedIn: false
+            });
+        }
     }
-
-    // Validate email format
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(email)) {
-        return res.render('register', {
-            errorMessage: 'Invalid email format. Please enter a valid email address.',
-            loggedIn: false
-        });
-    }
-
-    try {
-        // Hash the password and store the new user in the database
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await pool.query('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [username, hashedPassword, email]);
-
-        res.redirect('/login');
-    } catch (error) {
-        console.error('Error during registration:', error);
-        res.render('register', {
-            errorMessage: 'An error occurred during registration. Please try again.',
-            loggedIn: false
-        });
-    }
-});
+);
 
 // User Login Endpoint
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    try {
-        // Find the user in the database
-        const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
 
+    try {
+        const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
         if (rows.length === 0) {
-            return res.status(401).send('User not found');
+            return res.status(401).render('login', { errorMessage: 'User not found', loggedIn: false });
         }
 
         const user = rows[0];
-
-        // Check if the password is correct
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
-            return res.status(401).send('Incorrect password');
+            return res.status(401).render('login', { errorMessage: 'Incorrect password', loggedIn: false });
         }
 
-        // Generate JWT token
-        const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, {
-            expiresIn: '1h',
-        });
-
-        // Save token in a cookie (or session if preferred)
-        res.cookie('token', token, { httpOnly: true });
+        const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'Strict' });
         res.redirect('/');
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error logging in');
+        logger.error('Error during login', { error });
+        res.status(500).render('login', { errorMessage: 'An error occurred during login.', loggedIn: false });
     }
 });
 
@@ -252,18 +263,17 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
     }
 
     const userId = req.userId;
-    const filePath = path.join(__dirname, req.file.path);
+    const filePath = req.file.path;
     const filename = req.file.originalname;
     const selectedRuleIds = JSON.parse(req.body.selectedRules || '[]');
     const transactions = [];
     let rowsImported = 0;
-    let status = 'success';
 
-    // Retrieve only selected filter rules
+    // Retrieve selected filter rules
     let filterRules = [];
     try {
         if (selectedRuleIds.length > 0) {
-            const placeholders = selectedRuleIds.map(() => '?').join(','); // Prepare placeholders
+            const placeholders = selectedRuleIds.map(() => '?').join(','); // Prepare placeholders for query
             const [rules] = await pool.query(
                 `SELECT origin_status, field, value, mark_as 
                  FROM filter_rules 
@@ -273,69 +283,90 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
             filterRules = rules;
         }
     } catch (error) {
-        console.error('Error retrieving filter rules:', error);
+        logger.error('Error retrieving filter rules', { error });
         return res.status(500).json({ message: 'Error retrieving filter rules' });
     }
 
-    fs.createReadStream(filePath)
-        .pipe(csv())
-        .on('data', (row) => {
-            const amount = parseFloat(row.Amount.replace(/,/g, ''));
-            const transaction = {
-                user_id: userId,
-                date: new Date(row.Date),
-                account: row.Account,
-                description: row.Description,
-                category: row.Category,
-                tags: row.Tags || null,
-                amount: amount,
-                status: amount > 0 ? 'hi' : 'ne' // Default statuses: 'hi' for income, 'ne' for expenses
-            };
+    // Process CSV file
+    try {
+        await new Promise((resolve, reject) => {
+            fs.createReadStream(filePath)
+                .pipe(parse({ headers: true }))
+                .on('data', row => {
+                    const amount = parseFloat(row.Amount.replace(/,/g, ''));
+                    const transaction = {
+                        user_id: userId,
+                        date: new Date(row.Date),
+                        account: row.Account,
+                        description: row.Description,
+                        category: row.Category,
+                        tags: row.Tags || null,
+                        amount: amount,
+                        status: amount > 0 ? 'hi' : 'ne' // Default status: 'hi' for income, 'ne' for expenses
+                    };
 
-            // Apply selected filter rules
-            filterRules.forEach(rule => {
-                if (transaction.status === rule.origin_status) {
-                    const fieldValue = transaction[rule.field.toLowerCase()];
-                    if (fieldValue && typeof fieldValue === 'string' && fieldValue.toLowerCase().includes(rule.value.toLowerCase())) {
-                        transaction.status = rule.mark_as;
-                    }
-                }
-            });
+                    // Apply selected filter rules
+                    filterRules.forEach(rule => {
+                        if (transaction.status === rule.origin_status) {
+                            const fieldValue = transaction[rule.field.toLowerCase()];
+                            if (
+                                fieldValue &&
+                                typeof fieldValue === 'string' &&
+                                fieldValue.toLowerCase().includes(rule.value.toLowerCase())
+                            ) {
+                                transaction.status = rule.mark_as; // Update status based on rule
+                            }
+                        }
+                    });
 
-            transactions.push(transaction);
-        })
-        .on('end', async () => {
-            try {
-                const [uploadResult] = await pool.query(
-                    'INSERT INTO upload_history (user_id, filename, rows_imported, status) VALUES (?, ?, ?, ?)',
-                    [userId, filename, rowsImported, status]
-                );
-                const uploadId = uploadResult.insertId;
-
-                for (const transaction of transactions) {
-                    await pool.query(
-                        'INSERT INTO transactions (user_id, date, account, description, category, tags, amount, status, upload_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                        [transaction.user_id, transaction.date, transaction.account, transaction.description, transaction.category, transaction.tags, transaction.amount, transaction.status, uploadId]
-                    );
-                    rowsImported++;
-                }
-
-                await pool.query(
-                    'UPDATE upload_history SET rows_imported = ? WHERE id = ?',
-                    [rowsImported, uploadId]
-                );
-
-                fs.unlinkSync(filePath);
-                res.status(200).json({ message: 'Transactions uploaded successfully' });
-            } catch (error) {
-                console.error('Error during upload:', error);
-                await pool.query(
-                    'INSERT INTO upload_history (user_id, filename, rows_imported, status) VALUES (?, ?, ?, "error")',
-                    [userId, filename, rowsImported]
-                );
-                res.status(500).json({ message: 'Error uploading transactions' });
-            }
+                    transactions.push(transaction);
+                })
+                .on('end', resolve)
+                .on('error', reject);
         });
+
+        // Insert upload history and transactions
+        const [uploadResult] = await pool.query(
+            'INSERT INTO upload_history (user_id, filename, rows_imported, status) VALUES (?, ?, ?, ?)',
+            [userId, filename, rowsImported, 'success']
+        );
+        const uploadId = uploadResult.insertId;
+
+        for (const transaction of transactions) {
+            await pool.query(
+                'INSERT INTO transactions (user_id, date, account, description, category, tags, amount, status, upload_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [
+                    transaction.user_id,
+                    transaction.date,
+                    transaction.account,
+                    transaction.description,
+                    transaction.category,
+                    transaction.tags,
+                    transaction.amount,
+                    transaction.status,
+                    uploadId
+                ]
+            );
+            rowsImported++;
+        }
+
+        // Update upload history with the number of rows imported
+        await pool.query('UPDATE upload_history SET rows_imported = ? WHERE id = ?', [rowsImported, uploadId]);
+
+        // Delete the uploaded file after processing
+        fs.unlinkSync(filePath);
+        res.status(200).json({ message: 'Transactions uploaded successfully' });
+    } catch (error) {
+        logger.error('Error during CSV upload', { error });
+
+        // Log upload as failed
+        await pool.query(
+            'INSERT INTO upload_history (user_id, filename, rows_imported, status) VALUES (?, ?, ?, "error")',
+            [userId, filename, rowsImported]
+        );
+
+        res.status(500).json({ message: 'Error uploading transactions' });
+    }
 });
 
 app.post('/upload/delete', checkLoginStatus, async (req, res) => {
