@@ -116,10 +116,7 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    const loggedIn = req.loggedIn || false;
-    const username = req.username || null; 
-
-    res.render('login', { loggedIn, username });
+    res.render('login', { loggedIn: false });
 });
 
 app.get('/logout', (req, res) => {
