@@ -8,6 +8,11 @@ const multer = require('multer');
 const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
+const cache = {
+    goldPrice: null, 
+    timestamp: null 
+};
 
 dotenv.config();
 
@@ -39,21 +44,85 @@ function checkLoginStatus(req, res, next) {
     const token = req.cookies.token;
     if (!token) {
         req.loggedIn = false;
+        req.username = null;
         return next();
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.loggedIn = true;
-        req.userId = decoded.id;
-        next();
-    } catch (error) {
+        req.username = decoded.username; // Extract username from the decoded token
+    } catch (err) {
+        console.error("JWT verification failed:", err.message);
         req.loggedIn = false;
-        next();
+        req.username = null;
     }
+
+    next();
 }
 
 app.set('view engine', 'ejs');
+
+// Basic routes
+app.get('/', checkLoginStatus, (req, res) => {
+    res.render('index', { loggedIn: req.loggedIn, username: req.username });
+});
+
+// Get the value of 2.25 troy ounces of gold
+app.get('/api/gold-price', async (req, res) => {
+    try {
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+        // If the cached value exists and is less than 24 hours old, return it
+        if (cache.goldPrice && cache.timestamp && now - cache.timestamp < oneDay) {
+            console.log("Serving gold price from cache.");
+            return res.json({ value: cache.goldPrice });
+        }
+
+        // Fetch fresh gold price from the API
+        const apiKey = process.env.GOLD_API_KEY;
+        const apiUrl = 'https://www.goldapi.io/api/XAU/USD';
+
+        const response = await axios.get(apiUrl, {
+            headers: {
+                'x-access-token': apiKey,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Extract the gold price and calculate Mithqal value
+        const goldPrice = response.data.price; // Price of 1 XAU in USD
+        const mithqalPrice = goldPrice * 2.22456;
+
+        // Store the value in the cache
+        cache.goldPrice = mithqalPrice;
+        cache.timestamp = now;
+
+        console.log("Fetched fresh gold price and cached it.");
+        return res.json({ value: mithqalPrice });
+    } catch (error) {
+        console.error("Error fetching gold price:", error.response?.data || error.message);
+        res.status(500).json({ error: "Failed to fetch gold price" });
+    }
+});
+
+app.get('/help', checkLoginStatus, (req, res) => {
+    res.render('help', { loggedIn: req.loggedIn, username: req.username });
+});
+
+app.get('/register', (req, res) => {
+    res.render('register', { loggedIn: false });
+});
+
+app.get('/login', (req, res) => {
+    res.render('login', { loggedIn: false });
+});
+
+app.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    res.redirect('/');
+});
 
 // User Registration Endpoint
 app.post('/register', async (req, res) => {
@@ -124,42 +193,33 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// Basic route
-app.get('/', checkLoginStatus, (req, res) => {
-    res.render('index', { loggedIn: req.loggedIn, username: req.username });
-});
-
-app.get('/register', (req, res) => {
-    res.render('register', { loggedIn: false });
-});
-
-app.get('/login', (req, res) => {
-    res.render('login', { loggedIn: false });
-});
-
-app.get('/logout', (req, res) => {
-    res.clearCookie('token');
-    res.redirect('/');
-});
-
 app.get('/upload', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.redirect('/login');
     }
 
+    const statusLabels = {
+        ne: 'Necessary',
+        un: 'Unnecessary', // Will not appear in upload rules
+        hi: 'Hidden'
+    };
+
     try {
-        const uploadHistory = await pool.query(
+        const [uploadHistory] = await pool.query(
             'SELECT * FROM upload_history WHERE user_id = ? ORDER BY upload_date DESC',
             [req.userId]
         );
-        const transactions = await pool.query(
-            'SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC',
+        const safeUploadHistory = uploadHistory || [];
+
+        const [rules] = await pool.query(
+            'SELECT * FROM filter_rules WHERE user_id = ? ORDER BY created_at DESC',
             [req.userId]
         );
 
         res.render('upload', {
-            uploadHistory: uploadHistory[0],
-            transactions: transactions[0],
+            uploadHistory: safeUploadHistory,
+            rules: rules || [],
+            statusLabels,
             loggedIn: req.loggedIn
         });
     } catch (error) {
@@ -193,18 +253,24 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
     const userId = req.userId;
     const filePath = path.join(__dirname, req.file.path);
     const filename = req.file.originalname;
+    const selectedRuleIds = JSON.parse(req.body.selectedRules || '[]');
     const transactions = [];
     let rowsImported = 0;
     let status = 'success';
 
-    // Retrieve filter rules for this user
+    // Retrieve only selected filter rules
     let filterRules = [];
     try {
-        const [rules] = await pool.query(
-            'SELECT origin_status, field, value, mark_as FROM filter_rules WHERE user_id = ?',
-            [userId]
-        );
-        filterRules = rules;
+        if (selectedRuleIds.length > 0) {
+            const placeholders = selectedRuleIds.map(() => '?').join(','); // Prepare placeholders
+            const [rules] = await pool.query(
+                `SELECT origin_status, field, value, mark_as 
+                 FROM filter_rules 
+                 WHERE user_id = ? AND id IN (${placeholders})`,
+                [userId, ...selectedRuleIds]
+            );
+            filterRules = rules;
+        }
     } catch (error) {
         console.error('Error retrieving filter rules:', error);
         return res.status(500).json({ message: 'Error retrieving filter rules' });
@@ -222,16 +288,14 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
                 category: row.Category,
                 tags: row.Tags || null,
                 amount: amount,
-                status: amount > 0 ? 'hi' : 'ne' 
+                status: amount > 0 ? 'hi' : 'ne' // Default statuses: 'hi' for income, 'ne' for expenses
             };
 
-            // Apply filter rules to modify status based on conditions
+            // Apply selected filter rules
             filterRules.forEach(rule => {
                 if (transaction.status === rule.origin_status) {
                     const fieldValue = transaction[rule.field.toLowerCase()];
-                    const ruleValue = rule.value.toLowerCase();
-
-                    if (fieldValue && typeof fieldValue === 'string' && fieldValue.toLowerCase().includes(ruleValue)) {
+                    if (fieldValue && typeof fieldValue === 'string' && fieldValue.toLowerCase().includes(rule.value.toLowerCase())) {
                         transaction.status = rule.mark_as;
                     }
                 }
@@ -481,22 +545,27 @@ app.post('/transactions/filter', checkLoginStatus, async (req, res) => {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const { field, value, action } = req.body;
+    const { field, value, action, originStatus } = req.body; // Include originStatus
     let query, params;
 
     try {
-        // Set status based directly on action
-        const status = action; // Expecting action to be one of 'ne', 'un', or 'hi'
+        const status = action;
 
-        // Construct query based on field and status
+        // Construct query to respect originStatus
         if (field === 'description') {
-            // Use wildcard matching for description
-            query = `UPDATE transactions SET status = ? WHERE user_id = ? AND description LIKE ?`;
-            params = [status, req.userId, `%${value}%`];
+            query = `
+                UPDATE transactions 
+                SET status = ? 
+                WHERE user_id = ? AND description LIKE ? AND status = ?
+            `;
+            params = [status, req.userId, `%${value}%`, originStatus];
         } else {
-            // Use exact matching for other fields
-            query = `UPDATE transactions SET status = ? WHERE user_id = ? AND ${field} = ?`;
-            params = [status, req.userId, value];
+            query = `
+                UPDATE transactions 
+                SET status = ? 
+                WHERE user_id = ? AND ${field} = ? AND status = ?
+            `;
+            params = [status, req.userId, value, originStatus];
         }
 
         await pool.query(query, params);
@@ -505,21 +574,6 @@ app.post('/transactions/filter', checkLoginStatus, async (req, res) => {
     } catch (error) {
         console.error('Error applying filter:', error);
         res.status(500).json({ message: 'Error applying filter' });
-    }
-});
-
-// Route to delete all transactions
-app.post('/transactions/delete-all', checkLoginStatus, async (req, res) => {
-    if (!req.loggedIn) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-
-    try {
-        await pool.query('DELETE FROM transactions WHERE user_id = ?', [req.userId]);
-        res.status(200).json({ message: 'All transactions deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting transactions:', error);
-        res.status(500).json({ message: 'Error deleting transactions' });
     }
 });
 
