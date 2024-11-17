@@ -42,23 +42,24 @@ const pool = mysql.createPool({
 // Middleware to check if user is logged in
 function checkLoginStatus(req, res, next) {
     const token = req.cookies.token;
+
     if (!token) {
         req.loggedIn = false;
-        req.username = null;
         return next();
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log("Decoded Token:", decoded); // Log the decoded token
         req.loggedIn = true;
-        req.username = decoded.username; // Extract username from the decoded token
-    } catch (err) {
-        console.error("JWT verification failed:", err.message);
+        req.userId = decoded.id; // Attach user ID
+        req.username = decoded.username; // Attach username
+        next();
+    } catch (error) {
+        console.error("Error verifying token:", error);
         req.loggedIn = false;
-        req.username = null;
+        next();
     }
-
-    next();
 }
 
 app.set('view engine', 'ejs');
