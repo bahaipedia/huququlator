@@ -11,6 +11,10 @@
     <nav class="navbar">
         <% if (loggedIn) { %>
             <span>Welcome, <%= username %></span>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/upload">Upload Transactions</a>
+            <a href="/filter-rules">Categorization rules</a>
+            <a href="/transactions">View Transactions</a>
             <a href="/logout">Log out</a>
         <% } else { %>
             <a href="/login">Login</a>
