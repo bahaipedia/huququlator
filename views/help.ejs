@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - Huququlator</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <% if (loggedIn) { %>
+            <span>Welcome, <%= username %></span>
+            <div class="navbar-right">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/upload">Upload Transactions</a>
+                <a href="/filter-rules">Categorization rules</a>
+                <a href="/transactions">View Transactions</a>
+                <a href="/logout">Log out</a>
+            </div>
+        <% } else { %>
+            <div class="navbar-right">
+                <a href="/login">Login</a>
+                <a href="/register">Register</a>
+            </div>
+        <% } %>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1>Help and Frequently Asked Questions</h1>
+        <p>Below are answers to common questions and explanations for each section of the calculator.</p>
+
+        <div class="faq-section">
+            <!-- Question 1 -->
+            <div class="faq-item">
+                <h2>What is "Excess wealth for the year"?</h2>
+                <p>Placeholder explanation: This field represents the total income and assets subject to Huququllah for the year.</p>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="faq-item">
+                <h2>What are "Unnecessary expenditures"?</h2>
+                <p>Placeholder explanation: This field includes expenditures that can be added back to calculate your total excess wealth.</p>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="faq-item">
+                <h2>What does "Wealth Huquq previously paid on" mean?</h2>
+                <p>Placeholder explanation: This refers to wealth that you have already paid Huququllah on, which is excluded from the current calculation.</p>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="faq-item">
+                <h2>How is "Today's value of 19 Mithqals of gold" calculated?</h2>
+                <p>Placeholder explanation: The calculator uses the current market price of gold to determine the value of 19 Mithqals (equivalent to 2.225 troy ounces).</p>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="faq-item">
+                <h2>Why is Huququllah calculated as 19%?</h2>
+                <p>Placeholder explanation: Huququllah is a 19% payment on the wealth specified above, as outlined in the Bahá'í laws.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
