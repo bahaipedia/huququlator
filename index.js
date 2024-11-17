@@ -8,6 +8,7 @@ const multer = require('multer');
 const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 
 dotenv.config();
 
@@ -73,12 +74,28 @@ app.get('/', checkLoginStatus, (req, res) => {
 // Get the value of 2.25 troy ounces of gold
 app.get('/api/gold-price', async (req, res) => {
     try {
-        // Replace with actual gold price API or logic
-        const goldPrice = 2562.63; // Price of 1 XAU in USD
-        const mithqalPrice = goldPrice * 2.22456; // Convert to 19 Mithqals
+        // Replace YOUR_API_KEY with your actual API key
+        const apiKey = 'goldapi-1j8fzysm3lx549e-io';
+        const apiUrl = 'https://www.goldapi.io/api/XAU/USD';
+
+        // Fetch gold price from the API
+        const response = await axios.get(apiUrl, {
+            headers: {
+                'x-access-token': apiKey,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Extract the gold price in USD
+        const goldPrice = response.data.price; // Price of 1 XAU in USD
+
+        // Convert gold price to 19 Mithqals
+        const mithqalPrice = goldPrice * 2.22456; 
+
+        // Send the result as JSON
         res.json({ value: mithqalPrice });
     } catch (error) {
-        console.error("Error fetching gold price:", error);
+        console.error("Error fetching gold price:", error.response?.data || error.message);
         res.status(500).json({ error: "Failed to fetch gold price" });
     }
 });
