@@ -58,17 +58,47 @@ function checkLoginStatus(req, res, next) {
 
 app.set('view engine', 'ejs');
 
+// Basic routes
+app.get('/', checkLoginStatus, (req, res) => {
+    let username = req.username;
+    if (username) {
+        // Capitalize the first letter of the username
+        username = username.charAt(0).toUpperCase() + username.slice(1);
+    }
+    res.render('index', { 
+        loggedIn: req.loggedIn, 
+        username 
+    });
+});
+
 // Get the value of 2.25 troy ounces of gold
 app.get('/api/gold-price', async (req, res) => {
     try {
         // Replace with actual gold price API or logic
-        const goldPrice = 2562.08; // Example: price of 1 XAU in USD
-        const mithqalPrice = goldPrice * 2.225; // Convert to 19 Mithqals
+        const goldPrice = 2562.63; // Price of 1 XAU in USD
+        const mithqalPrice = goldPrice * 2.22456; // Convert to 19 Mithqals
         res.json({ value: mithqalPrice });
     } catch (error) {
         console.error("Error fetching gold price:", error);
         res.status(500).json({ error: "Failed to fetch gold price" });
     }
+});
+
+app.get('/help', checkLoginStatus, (req, res) => {
+    res.render('help', { loggedIn: req.loggedIn, username: req.username });
+});
+
+app.get('/register', (req, res) => {
+    res.render('register', { loggedIn: false });
+});
+
+app.get('/login', (req, res) => {
+    res.render('login', { loggedIn: false });
+});
+
+app.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    res.redirect('/');
 });
 
 // User Registration Endpoint
@@ -138,32 +168,6 @@ app.post('/login', async (req, res) => {
         console.error(error);
         res.status(500).send('Error logging in');
     }
-});
-
-// Basic route
-app.get('/', checkLoginStatus, (req, res) => {
-    let username = req.username;
-    if (username) {
-        // Capitalize the first letter of the username
-        username = username.charAt(0).toUpperCase() + username.slice(1);
-    }
-    res.render('index', { 
-        loggedIn: req.loggedIn, 
-        username 
-    });
-});
-
-app.get('/register', (req, res) => {
-    res.render('register', { loggedIn: false });
-});
-
-app.get('/login', (req, res) => {
-    res.render('login', { loggedIn: false });
-});
-
-app.get('/logout', (req, res) => {
-    res.clearCookie('token');
-    res.redirect('/');
 });
 
 app.get('/upload', checkLoginStatus, async (req, res) => {
