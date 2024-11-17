@@ -9,7 +9,7 @@ const { parse } = require('fast-csv');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
-const axiosRetry = require('axios-retry');
+const axiosRetry = require('axios-retry').default;
 const { body, validationResult } = require('express-validator');
 const winston = require('winston');
 
