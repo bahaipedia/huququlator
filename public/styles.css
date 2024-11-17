@@ -136,9 +136,6 @@ input[type="number"] {
     font-family: Arial, sans-serif;
     line-height: 1.6;
 }
-.faq-section {
-    margin-top: 30px;
-}
 .faq-item {
     margin-bottom: 20px;
     padding: 15px;
@@ -146,16 +143,43 @@ input[type="number"] {
     border-radius: 8px;
     background-color: #f9f9f9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    cursor: pointer;
 }
 .faq-item h2 {
-    margin-top: 0;
     font-size: 18px;
     color: #0073e6;
+    margin: 0;
+    cursor: pointer;
 }
-.faq-item p {
-    margin: 10px 0 0;
+.faq-content {
+    display: none;
+    padding: 10px 0;
     font-size: 16px;
     color: #333;
+    line-height: 1.6;
+}
+.faq-item.expanded .faq-content {
+    display: block;
+}
+.faq-item.expanded {
+    padding-bottom: 40px;
+}
+.view-more {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.view-more:hover {
+    background-color: #005bb5;
 }
 /* Main content area styling */
 .content {
