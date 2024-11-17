@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Set static help text
     r0.textContent = "Total assets less any debts.";
     r1.textContent = "These are purchases or expenditures subject to Ḥuqúqu’lláh.";
-    r2.textContent = "Enter any wealth you have already paid Ḥuqúqu’lláh on.";
+    r2.textContent = "If you only know past payments, multiply those by (100/19).";
     r3.textContent = "Today's gold rate multiplied by 2.22456.";
     r4.textContent = "We rounded down from the calculated value because payments are only due on whole units of Ḥuqúq.";
     r5.textContent = "The amount of wealth you are paying Ḥuqúq on today. Save this number for next year.";
