@@ -62,7 +62,6 @@ app.set('view engine', 'ejs');
 app.get('/', checkLoginStatus, (req, res) => {
     let username = req.username;
     if (username) {
-        // Capitalize the first letter of the username
         username = username.charAt(0).toUpperCase() + username.slice(1);
     }
     res.render('index', { 
@@ -85,7 +84,11 @@ app.get('/api/gold-price', async (req, res) => {
 });
 
 app.get('/help', checkLoginStatus, (req, res) => {
-    res.render('help', { loggedIn: req.loggedIn, username: req.username });
+    let username = req.username;
+    if (username) {
+        username = username.charAt(0).toUpperCase() + username.slice(1);
+    }
+    res.render('help', { loggedIn: req.loggedIn, username });
 });
 
 app.get('/register', (req, res) => {
