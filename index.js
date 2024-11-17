@@ -540,10 +540,17 @@ app.post('/transactions/preview-filter', checkLoginStatus, async (req, res) => {
     }
 
     const { field, value, status, startDate, endDate } = req.body;
+
+    // Validate free-text input field
+    if (typeof value !== 'string' || value.trim() === '') {
+        return res.status(400).json({ message: 'Invalid input value.' });
+    }
+
+    // Start query construction
     let query = `SELECT * FROM transactions WHERE user_id = ? AND status = ?`;
     let params = [req.userId, status];
 
-    // Adjust query based on filter field and value
+    // Adjust query based on the field
     if (field === 'description') {
         query += ` AND description LIKE ?`;
         params.push(`%${value}%`);
@@ -577,12 +584,16 @@ app.post('/transactions/filter', checkLoginStatus, async (req, res) => {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const { field, value, action, originStatus } = req.body; // Include originStatus
+    const { field, value, action, originStatus } = req.body;
+
+    // Validate free-text input field
+    if (typeof value !== 'string' || value.trim() === '') {
+        return res.status(400).json({ message: 'Invalid input value.' });
+    }
+
     let query, params;
 
     try {
-        const status = action;
-
         // Construct query to respect originStatus
         if (field === 'description') {
             query = `
@@ -590,22 +601,27 @@ app.post('/transactions/filter', checkLoginStatus, async (req, res) => {
                 SET status = ? 
                 WHERE user_id = ? AND description LIKE ? AND status = ?
             `;
-            params = [status, req.userId, `%${value}%`, originStatus];
+            params = [action, req.userId, `%${value}%`, originStatus];
         } else {
             query = `
                 UPDATE transactions 
                 SET status = ? 
                 WHERE user_id = ? AND ${field} = ? AND status = ?
             `;
-            params = [status, req.userId, value, originStatus];
+            params = [action, req.userId, value, originStatus]; 
         }
 
-        await pool.query(query, params);
+        const [result] = await pool.query(query, params);
 
-        res.status(200).json({ message: 'Filter applied successfully' });
+        // Check if any rows were affected
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'No transactions matched the filter criteria.' });
+        }
+
+        res.status(200).json({ message: 'Filter applied successfully.' });
     } catch (error) {
         console.error('Error applying filter:', error);
-        res.status(500).json({ message: 'Error applying filter' });
+        res.status(500).json({ message: 'Error applying filter.' });
     }
 });
 
