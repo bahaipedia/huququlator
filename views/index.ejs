@@ -8,23 +8,30 @@
 </head>
 <body class="main-page-body">
     <!-- Navigation Bar -->
-    <nav class="navbar">
-        <% if (loggedIn) { %>
-            <span>Welcome, <%= username %></span>
-            <div class="navbar-right">
-                <a href="/dashboard">Dashboard</a>
-                <a href="/upload">Upload Transactions</a>
-                <a href="/filter-rules">Categorization rules</a>
-                <a href="/transactions">View Transactions</a>
-                <a href="/logout">Log out</a>
-            </div>
-        <% } else { %>
-            <div class="navbar-right">
-                <a href="/login">Login</a>
-                <a href="/register">Register</a>
-            </div>
-        <% } %>
-    </nav>
+<nav class="navbar">
+    <% if (loggedIn) { %>
+        <!-- Logged-in view -->
+        <span>Welcome, <%= username %></span>
+        <div class="navbar-right">
+            <a href="/help">Help</a> 
+            <a href="/dashboard">Dashboard</a>
+            <a href="/upload">Upload Transactions</a>
+            <a href="/filter-rules">Categorization rules</a>
+            <a href="/transactions">View Transactions</a>
+            <a href="/logout">Log out</a>
+        </div>
+    <% } else { %>
+        <!-- Logged-out view -->
+        <div class="navbar-left">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+        </div>
+        <div class="navbar-right">
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </div>
+    <% } %>
+</nav>
 
     <!-- Main Content -->
     <div class="main-page">
