@@ -142,7 +142,15 @@ app.post('/login', async (req, res) => {
 
 // Basic route
 app.get('/', checkLoginStatus, (req, res) => {
-    res.render('index', { loggedIn: req.loggedIn, username: req.username });
+    let username = req.username;
+    if (username) {
+        // Capitalize the first letter of the username
+        username = username.charAt(0).toUpperCase() + username.slice(1);
+    }
+    res.render('index', { 
+        loggedIn: req.loggedIn, 
+        username 
+    });
 });
 
 app.get('/register', (req, res) => {
