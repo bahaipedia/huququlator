@@ -166,7 +166,7 @@ app.post('/login', async (req, res) => {
 
         // Save token in a cookie (or session if preferred)
         res.cookie('token', token, { httpOnly: true });
-        res.redirect('/transactions');
+        res.redirect('/');
     } catch (error) {
         console.error(error);
         res.status(500).send('Error logging in');
