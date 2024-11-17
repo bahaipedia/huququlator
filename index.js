@@ -124,6 +124,28 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
+app.get('/test', checkLoginStatus, (req, res) => {
+    let decodedToken = null;
+
+    // Decode the JWT if the token exists
+    if (req.cookies.token) {
+        try {
+            decodedToken = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
+        } catch (err) {
+            console.error('Error decoding JWT:', err);
+        }
+    }
+
+    res.render('test', {
+        headers: req.headers,
+        cookies: req.cookies,
+        session: req.session || {}, // Include session data if using express-session
+        user: { id: req.userId, username: req.username },
+        loggedIn: req.loggedIn,
+        decodedToken,
+    });
+});
+
 // User Registration Endpoint
 app.post('/register', async (req, res) => {
     const { username, password, confirmPassword, email } = req.body;
