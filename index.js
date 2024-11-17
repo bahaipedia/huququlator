@@ -65,14 +65,7 @@ app.set('view engine', 'ejs');
 
 // Basic routes
 app.get('/', checkLoginStatus, (req, res) => {
-    let username = req.username;
-    if (username) {
-        username = username.charAt(0).toUpperCase() + username.slice(1);
-    }
-    res.render('index', { 
-        loggedIn: req.loggedIn, 
-        username 
-    });
+    res.render('index', { loggedIn: req.loggedIn, username: req.username });
 });
 
 // Get the value of 2.25 troy ounces of gold
@@ -115,11 +108,7 @@ app.get('/api/gold-price', async (req, res) => {
 });
 
 app.get('/help', checkLoginStatus, (req, res) => {
-    let username = req.username;
-    if (username) {
-        username = username.charAt(0).toUpperCase() + username.slice(1);
-    }
-    res.render('help', { loggedIn: req.loggedIn, username });
+    res.render('help', { loggedIn: req.loggedIn, username: req.username });
 });
 
 app.get('/register', (req, res) => {
