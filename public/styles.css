@@ -58,6 +58,10 @@
     font-weight: bold;
     margin-top: 10px;
 }
+body {
+    margin: 0; 
+    padding: 0;
+}
 /* Remove up/down arrows for number inputs */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
@@ -96,13 +100,6 @@ input[type="number"] {
 .navbar .navbar-right {
     display: flex;
     gap: 10px; 
-}
-.navbar a:last-child {
-    margin-right: 0; 
-}
-body {
-    margin: 0; 
-    padding: 0;
 }
 /* Sidebar styling */
 .sidebar {
