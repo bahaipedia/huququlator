@@ -8,11 +8,6 @@ const multer = require('multer');
 const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
-const cache = {
-    goldPrice: null, 
-    timestamp: null 
-};
 
 dotenv.config();
 
@@ -63,65 +58,17 @@ function checkLoginStatus(req, res, next) {
 
 app.set('view engine', 'ejs');
 
-// Basic routes
-app.get('/', checkLoginStatus, (req, res) => {
-    res.render('index', { loggedIn: req.loggedIn, username: req.username });
-});
-
 // Get the value of 2.25 troy ounces of gold
 app.get('/api/gold-price', async (req, res) => {
     try {
-        const now = Date.now();
-        const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-
-        // If the cached value exists and is less than 24 hours old, return it
-        if (cache.goldPrice && cache.timestamp && now - cache.timestamp < oneDay) {
-            console.log("Serving gold price from cache.");
-            return res.json({ value: cache.goldPrice });
-        }
-
-        // Fetch fresh gold price from the API
-        const apiKey = process.env.GOLD_API_KEY;
-        const apiUrl = 'https://www.goldapi.io/api/XAU/USD';
-
-        const response = await axios.get(apiUrl, {
-            headers: {
-                'x-access-token': apiKey,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        // Extract the gold price and calculate Mithqal value
-        const goldPrice = response.data.price; // Price of 1 XAU in USD
-        const mithqalPrice = goldPrice * 2.22456;
-
-        // Store the value in the cache
-        cache.goldPrice = mithqalPrice;
-        cache.timestamp = now;
-
-        console.log("Fetched fresh gold price and cached it.");
-        return res.json({ value: mithqalPrice });
+        // Replace with actual gold price API or logic
+        const goldPrice = 2562.08; // Example: price of 1 XAU in USD
+        const mithqalPrice = goldPrice * 2.225; // Convert to 19 Mithqals
+        res.json({ value: mithqalPrice });
     } catch (error) {
-        console.error("Error fetching gold price:", error.response?.data || error.message);
+        console.error("Error fetching gold price:", error);
         res.status(500).json({ error: "Failed to fetch gold price" });
     }
-});
-
-app.get('/help', checkLoginStatus, (req, res) => {
-    res.render('help', { loggedIn: req.loggedIn, username: req.username });
-});
-
-app.get('/register', (req, res) => {
-    res.render('register', { loggedIn: false });
-});
-
-app.get('/login', (req, res) => {
-    res.render('login', { loggedIn: false });
-});
-
-app.get('/logout', (req, res) => {
-    res.clearCookie('token');
-    res.redirect('/');
 });
 
 // User Registration Endpoint
@@ -186,11 +133,29 @@ app.post('/login', async (req, res) => {
 
         // Save token in a cookie (or session if preferred)
         res.cookie('token', token, { httpOnly: true });
-        res.redirect('/');
+        res.redirect('/transactions');
     } catch (error) {
         console.error(error);
         res.status(500).send('Error logging in');
     }
+});
+
+// Basic route
+app.get('/', checkLoginStatus, (req, res) => {
+    res.render('index', { loggedIn: req.loggedIn, username: req.username });
+});
+
+app.get('/register', (req, res) => {
+    res.render('register', { loggedIn: false });
+});
+
+app.get('/login', (req, res) => {
+    res.render('login', { loggedIn: false });
+});
+
+app.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    res.redirect('/');
 });
 
 app.get('/upload', checkLoginStatus, async (req, res) => {
