@@ -68,6 +68,37 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
     -moz-appearance: textfield; /* For Firefox */
 }
+/* Navigation bar across top of screen */
+.navbar {
+    background-color: #333; /* Dark background */
+    overflow: hidden; /* Ensures proper alignment */
+    padding: 10px 20px;
+    display: flex; /* Flexbox layout for horizontal alignment */
+    justify-content: space-between; /* Space out items */
+    align-items: center; /* Center items vertically */
+}
+.navbar a {
+    color: white; /* White text for links */
+    text-decoration: none; /* Remove underlines */
+    padding: 8px 16px; /* Add some padding for clickability */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+.navbar a:hover {
+    background-color: #575757; /* Highlight on hover */
+    border-radius: 5px; /* Rounded corners on hover */
+}
+.navbar span {
+    color: #ffcc00; /* Golden color for the "Welcome, username" */
+    font-weight: bold;
+    font-size: 16px; /* Adjust the font size */
+}
+.navbar .navbar-right {
+    display: flex;
+    gap: 10px; /* Space between links */
+}
+.navbar a:last-child {
+    margin-right: 0; /* Remove extra spacing on the last item */
+}
 /* Sidebar styling */
 .sidebar {
     width: 200px;
