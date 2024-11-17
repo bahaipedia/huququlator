@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Information</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <h1>Debug Information</h1>
+    <h2>Request Headers</h2>
+    <pre><%= JSON.stringify(headers, null, 2) %></pre>
+
+    <h2>Cookies</h2>
+    <pre><%= JSON.stringify(cookies, null, 2) %></pre>
+
+    <h2>Session Data (if applicable)</h2>
+    <pre><%= JSON.stringify(session, null, 2) %></pre>
+
+    <h2>User Data</h2>
+    <% if (user) { %>
+        <p><strong>ID:</strong> <%= user.id %></p>
+        <p><strong>Username:</strong> <%= user.username %></p>
+        <p><strong>Logged In:</strong> <%= loggedIn %></p>
+    <% } else { %>
+        <p>No user data found.</p>
+    <% } %>
+
+    <h2>Decoded JWT</h2>
+    <% if (decodedToken) { %>
+        <pre><%= JSON.stringify(decodedToken, null, 2) %></pre>
+    <% } else { %>
+        <p>No decoded token available.</p>
+    <% } %>
+</body>
+</html>
