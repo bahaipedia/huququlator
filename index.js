@@ -615,7 +615,7 @@ app.post('/transactions/filter', checkLoginStatus, async (req, res) => {
 
         // Check if any rows were affected
         if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'No transactions matched the filter criteria.' });
+            return res.status(200).json({ message: 'No transactions matched the filter' });
         }
 
         res.status(200).json({ message: 'Filter applied successfully.' });
