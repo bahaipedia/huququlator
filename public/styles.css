@@ -58,8 +58,8 @@
     font-weight: bold;
     margin-top: 10px;
 }
-body {
-    margin: 0; 
+body.main-page-body {
+    margin: 0;
     padding: 0;
 }
 /* Remove up/down arrows for number inputs */
