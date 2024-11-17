@@ -125,37 +125,6 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-app.get('/test', checkLoginStatus, async (req, res) => {
-    let debug = {
-        params: { userId: req.userId, status: 'ne', startDate: req.query.startDate, endDate: req.query.endDate },
-        query: '',
-        queryParams: [],
-        transactions: [],
-        error: null,
-    };
-
-    try {
-        // Construct SQL query and parameters
-        debug.query = 'SELECT * FROM transactions WHERE user_id = ? AND status = ?';
-        debug.queryParams = [req.userId, 'ne'];
-
-        if (req.query.startDate && req.query.endDate) {
-            debug.query += ' AND date BETWEEN ? AND ?';
-            debug.queryParams.push(req.query.startDate, req.query.endDate);
-        }
-
-        debug.query += ' ORDER BY date DESC';
-
-        // Execute query
-        const [transactions] = await pool.query(debug.query, debug.queryParams);
-        debug.transactions = transactions;
-    } catch (error) {
-        debug.error = error.stack || error.toString();
-    }
-
-    res.render('test', { debug });
-});
-
 // User Registration Endpoint
 app.post('/register', async (req, res) => {
     const { username, password, confirmPassword, email } = req.body;
