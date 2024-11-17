@@ -116,14 +116,25 @@ input[type="number"] {
     flex-direction: column;
     gap: 15px; 
 }
+.form-container .form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px; 
+}
+.form-container label {
+    width: 100px; 
+    font-weight: bold;
+    text-align: right; 
+}
 .form-container input[type="text"],
 .form-container input[type="password"],
 .form-container input[type="email"] {
-    padding: 10px;
+    flex: 1; 
+    padding: 8px;
     font-size: 14px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    width: 100%;
     box-sizing: border-box;
 }
 .form-container button {
@@ -135,6 +146,7 @@ input[type="number"] {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    width: 100%; 
 }
 .form-container button:hover {
     background-color: #005bb5;
