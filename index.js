@@ -88,7 +88,7 @@ app.get('/api/gold-price', async (req, res) => {
         }
 
         // Fetch fresh gold price from the API
-        const apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
+        const apiKey = process.env.GOLD_API_KEY;
         const apiUrl = 'https://www.goldapi.io/api/XAU/USD';
 
         const response = await axios.get(apiUrl, {
