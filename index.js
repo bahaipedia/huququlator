@@ -272,6 +272,20 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
     const transactions = [];
     let rowsImported = 0;
 
+    // Define column mapping for flexible CSV formats
+    const columnMapping = {
+        "Date": "date",
+        "Transaction Date": "date",
+        "Description": "description",
+        "Amount": "amount",
+        "Transaction Type": "transaction_type",
+        "Category": "category",
+        "Account": "account",
+        "Account Name": "account",
+        "Tags": "tags",
+        "Labels": "tags"
+    };
+
     // Retrieve selected filter rules
     let filterRules = [];
     try {
@@ -296,17 +310,32 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
             fs.createReadStream(filePath)
                 .pipe(parse({ headers: true }))
                 .on('data', row => {
-                    const amount = parseFloat(row.Amount.replace(/,/g, ''));
-                    const transaction = {
-                        user_id: userId,
-                        date: new Date(row.Date),
-                        account: row.Account,
-                        description: row.Description,
-                        category: row.Category,
-                        tags: row.Tags || null,
-                        amount: amount,
-                        status: amount > 0 ? 'hi' : 'ne' // Default status: 'hi' for income, 'ne' for expenses
-                    };
+                    const transaction = {};
+
+                    // Map CSV fields to transaction object
+                    for (const [csvColumn, field] of Object.entries(columnMapping)) {
+                        if (row[csvColumn] !== undefined) {
+                            transaction[field] = row[csvColumn];
+                        }
+                    }
+
+                    // Parse and process fields
+                    transaction.date = new Date(transaction.date); // Convert to Date
+                    transaction.amount = parseFloat(transaction.amount?.replace(/,/g, '') || '0'); // Parse Amount
+
+                    // Skip rows with amount = 0
+                    if (transaction.amount === 0) {
+                        return; // Skip this row silently
+                    }
+
+                    // Determine transaction status
+                    if (transaction.transaction_type) {
+                        // Use Transaction Type for Format 1
+                        transaction.status = transaction.transaction_type.toLowerCase() === 'credit' ? 'hi' : 'ne';
+                    } else {
+                        // Default status logic for Format 2
+                        transaction.status = transaction.amount > 0 ? 'hi' : 'ne';
+                    }
 
                     // Apply selected filter rules
                     filterRules.forEach(rule => {
@@ -322,7 +351,17 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
                         }
                     });
 
-                    transactions.push(transaction);
+                    // Add valid transaction to the array
+                    transactions.push({
+                        user_id: userId,
+                        date: transaction.date,
+                        account: transaction.account,
+                        description: transaction.description,
+                        category: transaction.category,
+                        tags: transaction.tags || null,
+                        amount: transaction.amount,
+                        status: transaction.status
+                    });
                 })
                 .on('end', resolve)
                 .on('error', reject);
@@ -343,8 +382,8 @@ app.post('/upload', checkLoginStatus, upload.single('csvFile'), async (req, res)
                     transaction.date,
                     transaction.account,
                     transaction.description,
-                    transaction.category,
-                    transaction.tags,
+                    transaction.category || null,
+                    transaction.tags || null,
                     transaction.amount,
                     transaction.status,
                     uploadId
