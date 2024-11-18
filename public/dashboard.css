@@ -23,11 +23,11 @@ body {
 
 .dashboard-table,
 .summary-table {
-    width: 100%;
-    max-width: 800px;
+    width: auto;
     border-collapse: collapse;
     border: 1px solid #ccc;
     margin-bottom: 20px;
+    table-layout: fixed;
 }
 
 .dashboard-table th,
