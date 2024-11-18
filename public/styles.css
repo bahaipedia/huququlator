@@ -1,4 +1,15 @@
 /* Navigation bar across top of screen */
+body .content .info-box {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 70px;
+    right: 27px;
+    width: 200px;
+}
 .navbar {
     background-color: #3f5a72;
     color: white;
