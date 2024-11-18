@@ -1,4 +1,6 @@
-An experimental Huququllah calculator. It's primary functions are categorizing expenses as necessary or unnecessary. 
+A Huququllah calculator, still in the process of being created. Available here: https://huququlator.com/
+
+It's primary functions are categorizing expenses as necessary or unnecessary. 
 
 Roadmap:
 - Tracking of changes in assets over time
@@ -6,7 +8,7 @@ Roadmap:
 
 
 
-Installation on a new server. 
+Steps to install this project on a new ubuntu server. 
 
 ```bash
 sudo apt install -y nodejs npm
@@ -18,10 +20,18 @@ sudo apt install -y git curl build-essential
 cd /path/to/your/project
 git clone https://github.com/bahaipedia/huququlator.git
 npm install
-nano .env (Database credentials: DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, JWT_SECRET).
+cp .env.example .env
 ```
 
-Create a database, then these tables:
+Log in to mysql:
+
+```bash
+CREATE DATABASE project_database;
+CREATE USER 'project_user'@'localhost' IDENTIFIED BY 'strong_password_here';
+GRANT ALL PRIVILEGES ON project_database.* TO 'project_user'@'localhost';
+FLUSH PRIVILEGES;
+USE project_database_name;
+```
 
 ```bash
 CREATE TABLE transactions (
@@ -67,3 +77,11 @@ CREATE TABLE users (
     PRIMARY KEY (id)
 );
 ```
+
+In the project directory
+
+```bash
+npm start
+```
+
+Navigate to: http://localhost:3000
