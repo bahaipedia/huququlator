@@ -14,10 +14,8 @@ body {
 }
 
 .table-container {
-    display: flex;
-    flex-direction: column;
-    width: auto;
-    margin-bottom: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .dashboard-table,
@@ -79,6 +77,8 @@ body {
 }
 
 .add-year-button-wrapper {
+    display: flex;
+    justify-content: flex-start;
     margin-top: 20px;
 }
 
