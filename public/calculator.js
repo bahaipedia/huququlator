@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     r2.textContent = "If you only know past payments, multiply those by (100/19).";
     r3.textContent = "Today's gold rate multiplied by 2.22456.";
     r4.textContent = "We rounded down from the calculated value because payments are only due on whole units of Ḥuqúq.";
-    r5.textContent = "The amount of wealth you are paying Ḥuqúq on today. Save this number for next year.";
+    r5.textContent = "Today's gold rate multiplied by full units of Ḥuqúq.";
     r6.textContent = "Ḥuqúqu’lláh is a 19% tax on the wealth listed above.";
 
     // Fetch today's value of 19 Mithqals in USD
