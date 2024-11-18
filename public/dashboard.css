@@ -10,13 +10,12 @@
     font-size: 2rem;
     color: #333333;
     margin-bottom: 20px;
-    text-align: center;
 }
 
 /* Dashboard Table Wrapper */
 .dashboard-table-wrapper {
-    max-width: 800px; /* Restrict maximum width */
-    margin: 0 auto; /* Center table horizontally */
+    width: auto; /* Content-driven width */
+    margin-left: 0; /* Left-align content */
     background-color: #ffffff;
     border-radius: 8px;
     padding: 15px;
@@ -25,9 +24,8 @@
 
 /* Dashboard Table */
 .dashboard-table {
-    width: auto; /* Remove 100% width, let the content decide */
+    width: auto; /* Let table content decide its width */
     border-collapse: collapse;
-    margin: 0 auto; /* Center table content */
 }
 
 .dashboard-table th {
@@ -67,7 +65,7 @@
 /* Add Year Button */
 .add-year-button-wrapper {
     display: flex;
-    justify-content: center; /* Center button relative to the table */
+    justify-content: flex-start; /* Align button with table */
     margin-top: 20px;
 }
 
@@ -87,8 +85,8 @@
 
 /* Summary Section */
 .summary-section-wrapper {
-    max-width: 800px; /* Match table width */
-    margin: 30px auto; /* Center and add spacing above */
+    width: auto; /* Match table width */
+    margin-top: 30px; /* Add spacing above */
     padding: 15px;
     background-color: #ffffff;
     border-radius: 8px;
@@ -99,13 +97,11 @@
     font-size: 1.5rem;
     color: #555555;
     margin-bottom: 10px;
-    text-align: center;
 }
 
 .summary-table {
-    width: 100%;
+    width: 100%; /* Summary table uses full width */
     border-collapse: collapse;
-    margin: 0 auto;
 }
 
 .summary-table td {
