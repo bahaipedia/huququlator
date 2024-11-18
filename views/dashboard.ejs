@@ -170,21 +170,30 @@
     </div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const inputs = document.querySelectorAll('.dashboard-table tbody input');
+        const debtInputs = document.querySelectorAll('.dashboard-table tbody input');
 
-        inputs.forEach(input => {
-            input.addEventListener('input', () => {
-                const value = parseFloat(input.value);
+        debtInputs.forEach(input => {
+            // Check if the input belongs to a debt row
+            if (input.closest('tr').previousElementSibling?.classList.contains('section-title') &&
+                input.closest('tr').previousElementSibling.textContent.trim() === 'Debts') {
+                formatDebtInput(input); // Format existing value on page load
 
-                if (!isNaN(value) && value < 0) {
-                    input.style.color = 'red';
-                    input.value = `(${Math.abs(value).toFixed(2)})`;
-                } else {
-                    input.style.color = '';
-                    input.value = input.value.replace(/[()]/g, ''); // Remove parentheses
-                }
-            });
+                input.addEventListener('input', () => {
+                    formatDebtInput(input);
+                });
+            }
         });
+
+        function formatDebtInput(input) {
+            const value = parseFloat(input.value.replace(/[^0-9.]/g, '')); // Strip formatting
+            if (!isNaN(value)) {
+                input.style.color = 'red';
+                input.value = `(${value.toLocaleString()})`; // Add parentheses and format with commas
+            } else {
+                input.style.color = '';
+                input.value = '';
+            }
+        }
     });
 </script>
 </body>
