@@ -1,93 +1,80 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+/* Page Container */
+.dashboard-page-container {
+    padding: 20px;
+    margin-left: 250px; /* Adjust for sidebar width */
     background-color: #f5f5f5;
 }
 
-.dashboard-container {
-    padding: 20px;
-    margin-left: 200px; /* Adjust for sidebar width */
-    background-color: #ffffff;
-}
-
-h1, h2 {
+/* Header */
+.dashboard-header {
+    font-size: 2rem;
     color: #333333;
-}
-
-.sections-container {
     margin-bottom: 20px;
 }
 
-.section {
-    margin-bottom: 30px;
-    border: 1px solid #ccc;
+/* Accounts Container */
+.accounts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: #ffffff;
     border-radius: 8px;
-    background-color: #f9f9f9;
     padding: 15px;
+    border: 1px solid #ccc;
 }
 
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Account Section */
+.account-section {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.account-section-header {
+    font-size: 1.5rem;
+    color: #555555;
     margin-bottom: 10px;
 }
 
-.section-header h2 {
+/* Account List */
+.account-list {
+    list-style-type: none;
+    padding: 0;
     margin: 0;
-    font-size: 1.5em;
 }
 
-.add-account-btn,
-.add-section-btn,
-.add-column-btn {
+.account-item {
+    font-size: 1rem;
+    color: #333333;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.account-item:last-child {
+    border-bottom: none;
+}
+
+/* Add Buttons */
+.add-account-section-button,
+.add-year-button {
     background-color: #007BFF;
     color: white;
     border: none;
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 1rem;
 }
 
-.add-account-btn:hover,
-.add-section-btn:hover,
-.add-column-btn:hover {
+.add-account-section-button:hover,
+.add-year-button:hover {
     background-color: #0056b3;
 }
 
-.section-table,
-.summary-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.section-table th,
-.section-table td,
-.summary-table td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: left;
-}
-
-.section-table th {
-    background-color: #007BFF;
-    color: white;
-}
-
-.summary-section {
-    margin-top: 30px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-}
-
-.summary-table td {
-    padding: 10px;
-    border: none;
-}
-
-.summary-table tr:nth-child(odd) td {
-    background-color: #f2f2f2;
+/* Add Year Container */
+.add-year-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
 }
