@@ -17,7 +17,6 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 20px;
 }
 
 /* Accounts List Section */
@@ -27,6 +26,7 @@
     border-radius: 8px;
     padding: 15px;
     border: 1px solid #ccc;
+    flex-grow: 1; /* Allows list to expand slightly */
 }
 
 .account-section {
@@ -76,12 +76,32 @@
     background-color: #0056b3;
 }
 
+/* Add Year Button */
+.add-year-container {
+    margin-left: 20px; /* Space from the account list */
+    align-self: flex-start; /* Align with top of columns */
+}
+
+.add-year-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.add-year-button:hover {
+    background-color: #218838;
+}
+
 /* Summary Section */
 .summary-container {
-    flex-grow: 1; /* Allow summary to take the rest of the space */
+    margin-top: 30px; /* Place the summary at the bottom */
+    padding: 15px;
     background-color: #ffffff;
     border-radius: 8px;
-    padding: 15px;
     border: 1px solid #ccc;
 }
 
@@ -103,25 +123,4 @@
 
 .summary-table tr:last-child td {
     border-bottom: none;
-}
-
-/* Add Year Button */
-.add-year-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.add-year-button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.add-year-button:hover {
-    background-color: #218838;
 }
