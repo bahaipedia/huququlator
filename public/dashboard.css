@@ -21,6 +21,12 @@ body {
     gap: 20px;
 }
 
+.dashboard-table-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
 .dashboard-table,
 .summary-table {
     width: 400px;
