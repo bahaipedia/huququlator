@@ -1,13 +1,7 @@
-
 /* General Styles */
-body {
-    font-family: Arial, sans-serif;
-}
-
 .dashboard-page-wrapper {
     padding: 20px;
-    margin-left: 250px; /* Adjust for sidebar width */
-    background-color: #f5f5f5;
+    margin-left: 250px; 
 }
 
 .dashboard-title {
@@ -24,24 +18,37 @@ body {
 }
 
 /* Table Styles */
-.dashboard-table {
+.dashboard-table,
+.summary-table {
+    width: 100%;
     border-collapse: collapse;
-    width: auto;
     border: 1px solid #ccc;
+    margin-bottom: 20px; 
 }
 
-.dashboard-table th {
-    background-color: #007BFF;
+.dashboard-table th,
+.summary-table th {
+    background-color: #4A4A4A;
     color: white;
-    padding: 10px;
+    font-weight: bold;
     text-align: left;
+    padding: 10px;
+    border-bottom: 2px solid #333; 
 }
 
-.dashboard-table td {
+.dashboard-table td,
+.summary-table td {
     padding: 10px;
+    border-bottom: 1px solid #ccc;
     vertical-align: middle;
 }
 
+.dashboard-table tr:last-child td,
+.summary-table tr:last-child td {
+    border-bottom: none; 
+}
+
+/* Section Rows */
 .section-row {
     background-color: #f2f2f2;
     font-weight: bold;
@@ -61,7 +68,7 @@ body {
     font-size: 0.8rem;
     background-color: transparent;
     border: 1px solid #ccc;
-    padding: 5px 10px; 
+    padding: 5px 10px;
     border-radius: 4px;
     cursor: pointer;
 }
@@ -71,27 +78,13 @@ body {
     border-color: #bbb;
 }
 
-/* Section-Specific Button Styles */
-.asset-button:hover {
-    background-color: #0056b3;
-}
-.debt-button:hover {
-    background-color: #C4411E;
-}
-.property-button:hover {
-    background-color: #D4A200;
-}
-.expense-button:hover {
-    background-color: #4E5B64;
-}
-
 /* Add Year Button */
 .add-year-button-wrapper {
     margin-top: 20px;
 }
 
 .add-year-button {
-    background-color: #17A2B8;
+    background-color: #4A4A4A;
     color: white;
     border: none;
     padding: 10px 15px;
@@ -101,7 +94,7 @@ body {
 }
 
 .add-year-button:hover {
-    background-color: #117A8B;
+    background-color: #333; 
 }
 
 /* Summary Section */
@@ -111,30 +104,19 @@ body {
     padding: 15px;
 }
 
-.summary-table {
-    width: auto;
-    border-collapse: collapse;
+/* Summary Table Styles */
+.summary-table input {
+    width: 100px;
+    text-align: right;
     border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
 }
 
-.summary-table th {
-    text-align: left;
-    padding: 10px;
-    font-weight: bold;
-    border-bottom: 1px solid #ddd;
-}
-
-.summary-table td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.summary-table tr:last-child td {
-    border-bottom: none;
-}
 .debt-value {
     color: red;
 }
+
 .debt-input-wrapper, .debt-input-wrapper input {
     color: red;
 }
