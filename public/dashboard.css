@@ -56,21 +56,18 @@ body {
 
 /* Add Item Buttons */
 .add-item-button {
-    display: block;
-    margin: 5px auto;
-    font-size: 1rem;
-    color: white;
-    background-color: #28a745;
-    border: none;
-    padding: 10px 15px;
+    float: right;
+    font-size: 0.8rem;
+    background-color: transparent;
+    border: 1px solid #ccc;
+    padding: 5px 10px; 
     border-radius: 4px;
     cursor: pointer;
-    width: 100%;
-    text-align: center;
 }
 
 .add-item-button:hover {
-    background-color: #218838;
+    background-color: #f0f0f0;
+    border-color: #bbb;
 }
 
 /* Section-Specific Button Styles */
