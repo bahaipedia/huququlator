@@ -153,6 +153,10 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
+app.get('/dashboard', checkLoginStatus, (req, res) => {
+    res.render('dashboard', { loggedIn: req.loggedIn, username: req.username });
+});
+
 // User Registration Endpoint
 app.post(
     '/register',
