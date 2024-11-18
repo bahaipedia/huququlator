@@ -99,7 +99,8 @@ body {
     background-color: #333;
 }
 
-.summary-table input {
+.summary-table input,
+.dashboard-table input {
     width: 80px;
     text-align: left;
     border: 1px solid #ccc;
