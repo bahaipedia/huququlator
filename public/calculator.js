@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const r6 = document.getElementById("r6");
     const r7 = document.getElementById("r7");
 
+    let isCustomMithqalValue = false;
+
     // Set static help text
     r0.textContent = "Total assets less any debts.";
     r1.textContent = "These are purchases or expenditures subject to Ḥuqúqu’lláh.";
@@ -29,9 +31,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         const response = await fetch('/api/gold-price');
         const data = await response.json();
         const mithqalValue = data.value; // e.g., 5698.8918
-        a4.value = mithqalValue;
+        if (!isCustomMithqalValue) {
+            a4.value = mithqalValue.toFixed(2); // Round for display
+        }
     } catch (error) {
         console.error("Error fetching gold price:", error);
+    }
+
+    // Utility functions for rounding
+    function roundDown(value, decimals = 2) {
+        const factor = Math.pow(10, decimals);
+        return Math.floor(value * factor) / factor;
+    }
+
+    function roundUp(value, decimals = 2) {
+        const factor = Math.pow(10, decimals);
+        return Math.ceil(value * factor) / factor;
     }
 
     // Update final response based on user input
@@ -51,15 +66,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             a5.value = huquqUnits;
 
             const totalTaxable = huquqUnits * numA4;
-            a6.value = totalTaxable;
+            a6.value = roundDown(totalTaxable); // Rounded down for display
 
             const huquqDue = totalTaxable * 0.19;
-            a7.value = huquqDue.toFixed(2);
+            a7.value = roundUp(huquqDue).toFixed(2); // Rounded up for display
 
             r4.textContent = `We rounded down from ${(taxableWealth / numA4).toFixed(2)} because payments are only due on whole units of Huquq.`;
             r7.textContent = `This year you owe $${a7.value} to Huququllah.`;
         }
     }
+
+    // Track custom Mithqal input
+    a4.addEventListener("input", () => {
+        isCustomMithqalValue = true;
+        calculate();
+    });
 
     // Event Listeners for user input
     [a1, a2, a3].forEach(input => input.addEventListener("input", calculate));
