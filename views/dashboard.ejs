@@ -8,49 +8,49 @@
 </head>
 <body>
     <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
-    <div class="dashboard-page-container">
-        <h1 class="dashboard-header">Financial Transactions Dashboard</h1>
+    <div class="dashboard-page-wrapper">
+        <h1 class="dashboard-title">Financial Transactions Dashboard</h1>
 
-        <div class="main-content">
-            <!-- Accounts List Section -->
-            <div class="accounts-list-container">
+        <div class="dashboard-content-wrapper">
+            <!-- Accounts Section -->
+            <div class="accounts-section-wrapper">
                 <!-- Pre-populated account sections -->
-                <div class="account-section">
-                    <h2 class="account-section-header">Crypto</h2>
-                    <ul class="account-list">
-                        <li class="account-item">Bitcoin</li>
-                        <li class="account-item">Ethereum</li>
+                <div class="accounts-category">
+                    <h2 class="accounts-category-title">Crypto</h2>
+                    <ul class="accounts-list">
+                        <li class="account-entry">Bitcoin</li>
+                        <li class="account-entry">Ethereum</li>
                     </ul>
                 </div>
 
-                <div class="account-section">
-                    <h2 class="account-section-header">Checking Accounts</h2>
-                    <ul class="account-list">
-                        <li class="account-item">Chase</li>
-                        <li class="account-item">Wells Fargo</li>
+                <div class="accounts-category">
+                    <h2 class="accounts-category-title">Checking Accounts</h2>
+                    <ul class="accounts-list">
+                        <li class="account-entry">Chase</li>
+                        <li class="account-entry">Wells Fargo</li>
                     </ul>
                 </div>
 
-                <div class="account-section">
-                    <h2 class="account-section-header">Credit Card Debt</h2>
-                    <ul class="account-list">
-                        <li class="account-item">American Express</li>
+                <div class="accounts-category">
+                    <h2 class="accounts-category-title">Credit Card Debt</h2>
+                    <ul class="accounts-list">
+                        <li class="account-entry">American Express</li>
                     </ul>
                 </div>
 
                 <!-- Add new section button -->
-                <button class="add-account-section-button">Add New Section</button>
+                <button class="add-category-button">Add New Section</button>
             </div>
 
             <!-- Add Year Button -->
-            <div class="add-year-container">
+            <div class="add-year-button-wrapper">
                 <button class="add-year-button">Add a New Year</button>
             </div>
         </div>
 
         <!-- Summary Section -->
-        <div class="summary-container">
-            <h2 class="summary-header">Summary</h2>
+        <div class="summary-section-wrapper">
+            <h2 class="summary-section-title">Summary</h2>
             <table class="summary-table">
                 <tr>
                     <td>Total Assets:</td>
