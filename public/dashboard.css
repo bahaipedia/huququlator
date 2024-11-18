@@ -135,6 +135,6 @@ body {
 .debt-value {
     color: red;
 }
-.debt-input-wrapper {
+.debt-input-wrapper, .debt-input-wrapper input {
     color: red;
 }
