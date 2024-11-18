@@ -15,87 +15,94 @@
         <!-- Table Container -->
         <div class="table-container">
             <!-- Dashboard Table -->
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Accounts</th>
-                        <th>Year 2021</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Assets Section -->
-                    <tr class="section-row">
-                        <td colspan="2" class="section-title">Assets</td>
-                    </tr>
-                    <tr>
-                        <td>Bitcoin</td>
-                        <td><input type="text" value="8833.22"></td>
-                    </tr>
-                    <tr>
-                        <td>Ethereum</td>
-                        <td><input type="text" value="3113.92"></td>
-                    </tr>
-                    <tr>
-                        <td>Chase Checking</td>
-                        <td><input type="text" value="3408.25"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <button class="add-item-button asset-button">Add a New Asset</button>
-                        </td>
-                    </tr>
+            <div class="dashboard-table-wrapper">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Accounts</th>
+                            <th>Year 2021</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Assets Section -->
+                        <tr class="section-row">
+                            <td colspan="2" class="section-title">Assets</td>
+                        </tr>
+                        <tr>
+                            <td>Bitcoin</td>
+                            <td><input type="text" value="8833.22"></td>
+                        </tr>
+                        <tr>
+                            <td>Ethereum</td>
+                            <td><input type="text" value="3113.92"></td>
+                        </tr>
+                        <tr>
+                            <td>Chase Checking</td>
+                            <td><input type="text" value="3408.25"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <button class="add-item-button asset-button">Add a New Asset</button>
+                            </td>
+                        </tr>
 
-                    <!-- Debts Section -->
-                    <tr class="section-row">
-                        <td colspan="2" class="section-title">Debts</td>
-                    </tr>
-                    <tr>
-                        <td>American Express</td>
-                        <td class="debt-input-wrapper">(<input type="text" value="-18.97">)</td>
-                    </tr>
-                    <tr>
-                        <td>Student Loan</td>
-                        <td class="debt-input-wrapper">(<input type="text" value="20000">)</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <button class="add-item-button debt-button">Add a New Debt</button>
-                        </td>
-                    </tr>
+                        <!-- Debts Section -->
+                        <tr class="section-row">
+                            <td colspan="2" class="section-title">Debts</td>
+                        </tr>
+                        <tr>
+                            <td>American Express</td>
+                            <td class="debt-input-wrapper">(<input type="text" value="-18.97">)</td>
+                        </tr>
+                        <tr>
+                            <td>Student Loan</td>
+                            <td class="debt-input-wrapper">(<input type="text" value="20000">)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <button class="add-item-button debt-button">Add a New Debt</button>
+                            </td>
+                        </tr>
 
-                    <!-- Property Section -->
-                    <tr class="section-row">
-                        <td colspan="2" class="section-title">Property</td>
-                    </tr>
-                    <tr>
-                        <td>Rental Apartment</td>
-                        <td><input type="text" value="120000"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <button class="add-item-button property-button">Add a New Property</button>
-                        </td>
-                    </tr>
+                        <!-- Property Section -->
+                        <tr class="section-row">
+                            <td colspan="2" class="section-title">Property</td>
+                        </tr>
+                        <tr>
+                            <td>Rental Apartment</td>
+                            <td><input type="text" value="120000"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <button class="add-item-button property-button">Add a New Property</button>
+                            </td>
+                        </tr>
 
-                    <!-- Unnecessary Expenses Section -->
-                    <tr class="section-row">
-                        <td colspan="2" class="section-title">Unnecessary Expenses</td>
-                    </tr>
-                    <tr>
-                        <td>Streaming Subscriptions</td>
-                        <td><input type="text" value="120"></td>
-                    </tr>
-                    <tr>
-                        <td>Coffee Shop Visits</td>
-                        <td><input type="text" value="300"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <button class="add-item-button expense-button">Add a New Expense</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        <!-- Unnecessary Expenses Section -->
+                        <tr class="section-row">
+                            <td colspan="2" class="section-title">Unnecessary Expenses</td>
+                        </tr>
+                        <tr>
+                            <td>Streaming Subscriptions</td>
+                            <td><input type="text" value="120"></td>
+                        </tr>
+                        <tr>
+                            <td>Coffee Shop Visits</td>
+                            <td><input type="text" value="300"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <button class="add-item-button expense-button">Add a New Expense</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add Year Button -->
+            <div class="add-year-button-wrapper">
+                <button class="add-year-button">Add a New Year</button>
+            </div>
 
             <!-- Summary Table -->
             <table class="summary-table">
