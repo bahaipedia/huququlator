@@ -4,16 +4,17 @@
 }
 
 .dashboard-title {
-    font-size: 2rem;
-    color: #333333;
+    font-size: 1.8rem;
+    color: #222;
     margin-bottom: 20px;
+    font-weight: bold;
 }
 
 .table-container {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: auto;
+    width: 100%;
     gap: 20px;
 }
 
@@ -25,27 +26,31 @@
 
 .dashboard-table,
 .summary-table {
-    width: 400px;
+    width: 100%;
+    max-width: 400px; /* Ensures uniform width */
     border-collapse: collapse;
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     margin-bottom: 20px;
 }
 
 .dashboard-table th,
 .summary-table th {
-    background-color: #4A4A4A;
-    color: white;
-    font-weight: bold;
+    background-color: #f8f9fa; /* Neutral light background */
+    color: #222; /* Dark text for better readability */
+    font-weight: 600;
     text-align: left;
-    padding: 5px;
-    border-bottom: 2px solid #333;
+    padding: 10px;
+    border-bottom: 2px solid #ccc;
+    font-size: 1rem;
 }
 
 .dashboard-table td,
 .summary-table td {
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
+    padding: 8px 10px;
+    border-bottom: 1px solid #ddd;
     vertical-align: middle;
+    font-size: 0.9rem;
+    color: #444; /* Subtle text color */
 }
 
 .dashboard-table tr:last-child td,
@@ -54,31 +59,31 @@
 }
 
 .section-row {
-    background-color: #f2f2f2;
+    background-color: #f1f3f5;
     font-weight: bold;
 }
 
 .section-title {
     padding: 10px;
     text-align: left;
-    font-size: 1.2rem;
-    background-color: #e9ecef;
-    color: #333;
+    font-size: 1rem;
+    background-color: #f0f0f0;
+    color: #444;
 }
 
 .add-item-button {
     float: right;
-    font-size: 0.8rem;
-    background-color: #dcdcdc;
-    border: 1px solid #ccc;
-    padding: 5px 5px;
-    border-radius: 4px;
+    font-size: 0.85rem;
+    background-color: #ffffff;
+    border: 1px solid #bbb;
+    padding: 5px 8px;
+    border-radius: 3px;
     cursor: pointer;
 }
 
 .add-item-button:hover {
-    background-color: #f0f0f0;
-    border-color: #bbb;
+    background-color: #f8f9fa;
+    border-color: #aaa;
 }
 
 .add-year-button-wrapper {
@@ -87,17 +92,17 @@
 }
 
 .add-year-button {
-    background-color: #4A4A4A;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
+    background-color: #f8f9fa;
+    color: #444;
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    border-radius: 3px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 .add-year-button:hover {
-    background-color: #333;
+    background-color: #e9ecef;
 }
 
 .summary-table input,
@@ -105,12 +110,15 @@
     width: 80px;
     text-align: left;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 3px;
     padding: 5px;
+    font-size: 0.85rem;
+    color: #333;
 }
 
 .debt-value {
     color: red;
+    font-style: italic;
 }
 
 .debt-input-wrapper, .debt-input-wrapper input {
