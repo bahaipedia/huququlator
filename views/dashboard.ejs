@@ -11,50 +11,52 @@
     <div class="dashboard-page-wrapper">
         <h1 class="dashboard-title">Financial Transactions Dashboard</h1>
 
-        <!-- Dashboard Columns -->
-        <div class="dashboard-columns-wrapper">
-            <!-- First Column: Accounts -->
-            <div class="accounts-section-wrapper">
-                <div class="accounts-category">
-                    <h2 class="accounts-category-title">Crypto</h2>
-                    <ul class="accounts-list">
-                        <li class="account-entry">Bitcoin</li>
-                        <li class="account-entry">Ethereum</li>
-                    </ul>
-                </div>
+        <!-- Dashboard Table -->
+        <div class="dashboard-table-wrapper">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Accounts</th>
+                        <th>Year 2021</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row for Crypto Section -->
+                    <tr class="section-row">
+                        <td colspan="2" class="section-title">Crypto</td>
+                    </tr>
+                    <tr>
+                        <td>Bitcoin</td>
+                        <td><input type="text" placeholder="Enter value"></td>
+                    </tr>
+                    <tr>
+                        <td>Ethereum</td>
+                        <td><input type="text" placeholder="Enter value"></td>
+                    </tr>
 
-                <div class="accounts-category">
-                    <h2 class="accounts-category-title">Checking Accounts</h2>
-                    <ul class="accounts-list">
-                        <li class="account-entry">Chase</li>
-                        <li class="account-entry">Wells Fargo</li>
-                    </ul>
-                </div>
+                    <!-- Row for Checking Accounts Section -->
+                    <tr class="section-row">
+                        <td colspan="2" class="section-title">Checking Accounts</td>
+                    </tr>
+                    <tr>
+                        <td>Chase</td>
+                        <td><input type="text" placeholder="Enter value"></td>
+                    </tr>
+                    <tr>
+                        <td>Wells Fargo</td>
+                        <td><input type="text" placeholder="Enter value"></td>
+                    </tr>
 
-                <div class="accounts-category">
-                    <h2 class="accounts-category-title">Credit Card Debt</h2>
-                    <ul class="accounts-list">
-                        <li class="account-entry">American Express</li>
-                    </ul>
-                </div>
-
-                <!-- Add new section button -->
-                <button class="add-category-button">Add New Section</button>
-            </div>
-
-            <!-- Second Column: Data Input -->
-            <div class="values-section-wrapper">
-                <div class="values-column">
-                    <h2 class="values-column-title">Year 2021</h2>
-                    <ul class="values-list">
-                        <li class="value-entry"><input type="text" placeholder="Value for Bitcoin"></li>
-                        <li class="value-entry"><input type="text" placeholder="Value for Ethereum"></li>
-                        <li class="value-entry"><input type="text" placeholder="Value for Chase"></li>
-                        <li class="value-entry"><input type="text" placeholder="Value for Wells Fargo"></li>
-                        <li class="value-entry"><input type="text" placeholder="Value for American Express"></li>
-                    </ul>
-                </div>
-            </div>
+                    <!-- Row for Credit Card Debt Section -->
+                    <tr class="section-row">
+                        <td colspan="2" class="section-title">Credit Card Debt</td>
+                    </tr>
+                    <tr>
+                        <td>American Express</td>
+                        <td><input type="text" placeholder="Enter value"></td>
+                    </tr>
+                </tbody>
+            </table>
 
             <!-- Add Year Button -->
             <div class="add-year-button-wrapper">
