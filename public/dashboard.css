@@ -33,7 +33,6 @@ body {
     border-collapse: collapse;
     border: 1px solid #ccc;
     margin-bottom: 20px;
-    table-layout: fixed;
 }
 
 .dashboard-table th,
