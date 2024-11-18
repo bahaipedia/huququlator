@@ -33,12 +33,15 @@
 
 .dashboard-table th,
 .summary-table th {
-    background-color: #4A4A4A;
-    color: white;
+    background-color: #545454;
+    color: #ffffff; 
     font-weight: bold;
     text-align: left;
-    padding: 5px;
+    padding: 10px; 
     border-bottom: 2px solid #333;
+    font-size: 1.1rem;
+    text-transform: uppercase; 
+    box-shadow: inset 0 -2px 5px rgba(0, 0, 0, 0.1); 
 }
 
 .dashboard-table td,
