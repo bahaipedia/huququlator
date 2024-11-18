@@ -15,7 +15,10 @@ body {
 
 .table-container {
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
+    width: auto;
+    gap: 20px;
 }
 
 .dashboard-table,
@@ -23,7 +26,7 @@ body {
     width: auto;
     border-collapse: collapse;
     border: 1px solid #ccc;
-    margin-right: 20px;
+    margin-bottom: 20px;
 }
 
 .dashboard-table th,
