@@ -4,12 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financial Dashboard</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/dashboard.css">
 </head>
 <body>
     <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
-    <div class="content">
-        <!-- Blank content area for future details -->
+    <div class="dashboard-container">
+        <h1>Financial Transactions Dashboard</h1>
+        <div class="sections-container">
+            <!-- Section template -->
+            <div class="section">
+                <div class="section-header">
+                    <h2><!-- Section title (e.g., Crypto, Checking Accounts) --></h2>
+                    <button class="add-account-btn">Add Account</button>
+                </div>
+                <table class="section-table">
+                    <thead>
+                        <tr>
+                            <th>Accounts</th>
+                            <th>Date Range 1</th>
+                            <th>Date Range 2</th>
+                            <th>Date Range 3</th>
+                            <!-- Add more columns as needed -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows for accounts -->
+                        <tr>
+                            <td><!-- Account name --></td>
+                            <td><!-- Data for Date Range 1 --></td>
+                            <td><!-- Data for Date Range 2 --></td>
+                            <td><!-- Data for Date Range 3 --></td>
+                            <!-- Add more columns as needed -->
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- End Section template -->
+
+            <!-- Add a new section button -->
+            <button class="add-section-btn">Add New Section</button>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <h2>Summary</h2>
+            <table class="summary-table">
+                <tr>
+                    <td>Total Assets:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+                <tr>
+                    <td>Total Debts:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+                <tr>
+                    <td>Unnecessary Expenses:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+                <tr>
+                    <td>Previous Years Huquq Payments:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+                <tr>
+                    <td>Summary:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+                <tr>
+                    <td>Gold Rate:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+                <tr>
+                    <td>Units of Huquq:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+                <tr>
+                    <td>Rounded Units:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+                <tr>
+                    <td>Payment Due On:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+                <tr>
+                    <td>Huquq Payment Owed:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+                <tr>
+                    <td>Huquq Payments Made:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+                <tr>
+                    <td>Remainder Due:</td>
+                    <td><!-- Placeholder --></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Add new column button -->
+        <button class="add-column-btn">Add New Column</button>
     </div>
 </body>
 </html>
