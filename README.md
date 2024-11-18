@@ -81,6 +81,7 @@ CREATE TABLE users (
 In the project directory
 
 ```bash
+nano .env (modify with your values)
 npm start
 ```
 
