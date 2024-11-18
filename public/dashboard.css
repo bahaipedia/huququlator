@@ -23,7 +23,7 @@ body {
 
 .dashboard-table,
 .summary-table {
-    width: auto;
+    width: 400px;
     border-collapse: collapse;
     border: 1px solid #ccc;
     margin-bottom: 20px;
