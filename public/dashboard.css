@@ -134,3 +134,19 @@ body {
 .debt-value {
     color: red;
 }
+.debt-input-wrapper {
+    color: red;
+    display: inline-block;
+}
+
+.debt-input-wrapper input {
+    border: none;
+    color: inherit; /* Inherit red color */
+    width: 100px; /* Adjust width as needed */
+    text-align: right; /* Align text inside the input */
+}
+
+.debt-input-wrapper input:focus {
+    outline: none;
+    border-bottom: 1px solid red; /* Optional visual feedback */
+}
