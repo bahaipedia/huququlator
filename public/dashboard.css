@@ -106,7 +106,28 @@ body {
 /* Summary Section */
 .summary-section-wrapper {
     margin-top: 30px;
-    background-color: #ffffff;
     border-radius: 8px;
     padding: 15px;
+}
+
+.summary-table {
+    width: auto;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+}
+
+.summary-table th {
+    text-align: left;
+    padding: 10px;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+}
+
+.summary-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.summary-table tr:last-child td {
+    border-bottom: none;
 }
