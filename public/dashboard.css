@@ -1,13 +1,10 @@
-/* General Styles */
-.table-container {
-    display: flex;
-    flex-direction: column;
-    width: auto; /* Container width adapts to content */
-    margin-bottom: 20px;
+body {
+    font-family: Arial, sans-serif;
 }
+
 .dashboard-page-wrapper {
     padding: 20px;
-    margin-left: 250px; 
+    margin-left: 250px;
 }
 
 .dashboard-title {
@@ -16,14 +13,13 @@
     margin-bottom: 20px;
 }
 
-/* Dashboard Layout */
-.dashboard-layout-wrapper {
+.table-container {
     display: flex;
-    align-items: flex-start;
-    gap: 20px;
+    flex-direction: column;
+    width: auto;
+    margin-bottom: 20px;
 }
 
-/* Table Styles */
 .dashboard-table,
 .summary-table {
     width: 100%;
@@ -46,14 +42,14 @@
 .summary-table td {
     padding: 10px;
     border-bottom: 1px solid #ccc;
+    vertical-align: middle;
 }
 
 .dashboard-table tr:last-child td,
 .summary-table tr:last-child td {
-    border-bottom: none; 
+    border-bottom: none;
 }
 
-/* Section Rows */
 .section-row {
     background-color: #f2f2f2;
     font-weight: bold;
@@ -67,7 +63,6 @@
     color: #333;
 }
 
-/* Add Item Buttons */
 .add-item-button {
     float: right;
     font-size: 0.8rem;
@@ -83,7 +78,6 @@
     border-color: #bbb;
 }
 
-/* Add Year Button */
 .add-year-button-wrapper {
     margin-top: 20px;
 }
@@ -99,17 +93,9 @@
 }
 
 .add-year-button:hover {
-    background-color: #333; 
+    background-color: #333;
 }
 
-/* Summary Section */
-.summary-section-wrapper {
-    margin-top: 30px;
-    border-radius: 8px;
-    padding: 15px;
-}
-
-/* Summary Table Styles */
 .summary-table input {
     width: 100px;
     text-align: right;
