@@ -38,7 +38,7 @@
                         </tr>
                         <tr>
                             <td>Chase Checking</td>
-                            <td><input type="text" value="3408.25"></td>
+                            <td>(<input type="text" value="3408.25">)</td>
                         </tr>
                         <tr>
                             <td colspan="2">
@@ -172,33 +172,5 @@
     </table>
         </div>
     </div>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const debtInputs = document.querySelectorAll('.dashboard-table tbody input');
-
-        debtInputs.forEach(input => {
-            // Check if the input belongs to a debt row
-            if (input.closest('tr').previousElementSibling?.classList.contains('section-title') &&
-                input.closest('tr').previousElementSibling.textContent.trim() === 'Debts') {
-                formatDebtInput(input); // Format existing value on page load
-
-                input.addEventListener('input', () => {
-                    formatDebtInput(input);
-                });
-            }
-        });
-
-        function formatDebtInput(input) {
-            const value = parseFloat(input.value.replace(/[^0-9.]/g, '')); // Strip formatting
-            if (!isNaN(value)) {
-                input.style.color = 'red';
-                input.value = `(${value.toLocaleString()})`; // Add parentheses and format with commas
-            } else {
-                input.style.color = '';
-                input.value = '';
-            }
-        }
-    });
-</script>
 </body>
 </html>
