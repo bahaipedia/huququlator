@@ -341,6 +341,10 @@ th {
 .upload-section button:hover {
     background-color: #005bb5;
 }
+.guidelines-section {
+    margin: 0 auto; 
+    max-width: 800px;
+    text-align: left;
 /* Filter rules on upload Section */
 .rules-section {
     background-color: #f9f9f9;
