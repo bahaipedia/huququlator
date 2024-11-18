@@ -13,7 +13,7 @@
 .table-container {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     width: 100%;
     gap: 20px;
 }
@@ -26,11 +26,11 @@
 
 .dashboard-table,
 .summary-table {
-    width: 100%;
-    max-width: 400px; /* Ensures uniform width */
+    width: 400px;
     border-collapse: collapse;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     margin-bottom: 20px;
+    table-layout: fixed;
 }
 
 .dashboard-table th,
