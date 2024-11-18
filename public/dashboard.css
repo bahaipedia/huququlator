@@ -12,99 +12,49 @@
     margin-bottom: 20px;
 }
 
-/* Columns Wrapper */
-.dashboard-columns-wrapper {
+/* Dashboard Table */
+.dashboard-table-wrapper {
     display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
+    flex-direction: column;
     gap: 20px;
 }
 
-/* Accounts Section */
-.accounts-section-wrapper {
-    width: 300px; /* Fixed width for accounts column */
+.dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
     background-color: #ffffff;
     border-radius: 8px;
-    padding: 15px;
+    overflow: hidden;
     border: 1px solid #ccc;
 }
 
-.accounts-category {
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 5px;
-}
-
-.accounts-category-title {
-    font-size: 1.5rem;
-    color: #555555;
-    margin-bottom: 10px;
-}
-
-.accounts-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-.account-entry {
-    font-size: 1rem;
-    color: #333333;
-    padding: 5px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.account-entry:last-child {
-    border-bottom: none;
-}
-
-.add-category-button {
-    display: block;
-    margin: 10px auto 0;
+.dashboard-table th {
     background-color: #007BFF;
     color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
+    padding: 10px;
+    text-align: left;
 }
 
-.add-category-button:hover {
-    background-color: #0056b3;
+.dashboard-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: middle;
 }
 
-/* Values Section */
-.values-section-wrapper {
-    flex-grow: 1;
+.section-row {
+    background-color: #f2f2f2;
+    font-weight: bold;
 }
 
-.values-column {
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 15px;
-    border: 1px solid #ccc;
+.section-title {
+    padding: 10px;
+    text-align: left;
+    font-size: 1.2rem;
+    background-color: #e9ecef;
+    color: #333;
 }
 
-.values-column-title {
-    font-size: 1.5rem;
-    color: #555555;
-    margin-bottom: 10px;
-}
-
-.values-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-.value-entry {
-    margin-bottom: 10px;
-}
-
-.value-entry input {
+.dashboard-table input {
     width: 100%;
     padding: 8px;
     font-size: 1rem;
@@ -115,8 +65,8 @@
 /* Add Year Button */
 .add-year-button-wrapper {
     display: flex;
-    align-items: center;
-    margin-left: 20px;
+    justify-content: flex-end;
+    margin-top: 20px;
 }
 
 .add-year-button {
@@ -154,4 +104,10 @@
 }
 
 .summary-table td {
-    padding:
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-table tr:last-child td {
+    border-bottom: none;
+}
