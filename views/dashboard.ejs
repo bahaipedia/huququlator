@@ -168,5 +168,24 @@
     </table>
         </div>
     </div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const inputs = document.querySelectorAll('.dashboard-table tbody input');
+
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                const value = parseFloat(input.value);
+
+                if (!isNaN(value) && value < 0) {
+                    input.style.color = 'red';
+                    input.value = `(${Math.abs(value).toFixed(2)})`;
+                } else {
+                    input.style.color = '';
+                    input.value = input.value.replace(/[()]/g, ''); // Remove parentheses
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>
