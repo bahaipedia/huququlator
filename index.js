@@ -229,49 +229,49 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
     try {
         const userId = req.userId;
 
-        // Fetch financial summaries for the user
-const [summaries] = await pool.query(
-    `
-    SELECT 
-        id, 
-        user_id, 
-        DATE_FORMAT(end_date, '%Y-%m-%d') AS end_date, 
-        start_date, 
-        total_assets, 
-        total_debts, 
-        unnecessary_expenses, 
-        wealth_already_taxed, 
-        gold_rate, 
-        huquq_payments_made, 
-        created_at, 
-        updated_at 
-    FROM financial_summary 
-    WHERE user_id = ? 
-    ORDER BY end_date ASC
-    `,
-    [userId]
-);
+        // Fetch financial summaries for the user with normalized end_date
+        const [summaries] = await pool.query(
+            `
+            SELECT 
+                id, 
+                user_id, 
+                DATE_FORMAT(start_date, '%Y-%m-%d') AS start_date, 
+                DATE_FORMAT(end_date, '%Y-%m-%d') AS end_date, 
+                total_assets, 
+                total_debts, 
+                unnecessary_expenses, 
+                wealth_already_taxed, 
+                gold_rate, 
+                huquq_payments_made, 
+                created_at, 
+                updated_at 
+            FROM financial_summary 
+            WHERE user_id = ? 
+            ORDER BY end_date ASC
+            `,
+            [userId]
+        );
 
-        // Fetch all financial entries for the user across all reporting periods
-const [entries] = await pool.query(
-    `
-    SELECT 
-        id, 
-        user_id, 
-        category, 
-        label, 
-        value, 
-        DATE_FORMAT(reporting_date, '%Y-%m-%d') AS reporting_date, 
-        created_at, 
-        updated_at 
-    FROM financial_entries 
-    WHERE user_id = ? 
-    ORDER BY reporting_date ASC
-    `,
-    [userId]
-);
+        // Fetch all financial entries for the user with normalized reporting_date
+        const [entries] = await pool.query(
+            `
+            SELECT 
+                id, 
+                user_id, 
+                category, 
+                label, 
+                value, 
+                DATE_FORMAT(reporting_date, '%Y-%m-%d') AS reporting_date, 
+                created_at, 
+                updated_at 
+            FROM financial_entries 
+            WHERE user_id = ? 
+            ORDER BY reporting_date ASC
+            `,
+            [userId]
+        );
 
-        // Render the dashboard with all necessary data
+        // Render the dashboard with normalized data
         res.render('dashboard', {
             loggedIn: req.loggedIn,
             username: req.username,
@@ -281,31 +281,6 @@ const [entries] = await pool.query(
         });
     } catch (error) {
         console.error('Error loading Dashboard page:', error);
-        res.status(500).send('Server Error');
-    }
-});
-
-app.get('/test', checkLoginStatus, async (req, res) => {
-    if (!req.loggedIn) {
-        return res.redirect('/login');
-    }
-
-    try {
-        const userId = req.userId;
-
-        const [entries] = await pool.query(
-            'SELECT * FROM financial_entries WHERE user_id = ? ORDER BY reporting_date ASC',
-            [userId]
-        );
-
-        const [summaries] = await pool.query(
-            'SELECT * FROM financial_summary WHERE user_id = ? ORDER BY end_date ASC',
-            [userId]
-        );
-
-        res.render('test', { entries, summaries });
-    } catch (error) {
-        console.error('Error loading test page:', error);
         res.status(500).send('Server Error');
     }
 });
