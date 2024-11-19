@@ -359,6 +359,28 @@ app.put('/api/entries/:id', checkLoginStatus, async (req, res) => {
     }
 });
 
+app.delete('/api/entries/:id', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { id } = req.params;
+
+        const query = `
+            DELETE FROM financial_entries
+            WHERE id = ? AND user_id = ?
+        `;
+
+        await pool.query(query, [id, req.userId]);
+
+        res.status(200).json({ message: 'Entry deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting entry:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
 app.post('/api/summary', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
