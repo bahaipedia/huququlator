@@ -381,6 +381,32 @@ app.put('/api/summary/:id', checkLoginStatus, async (req, res) => {
     }
 });
 
+app.delete('/api/summary/:id', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { id } = req.params;
+        const userId = req.userId;
+
+        // Delete the reporting period from the database
+        const result = await pool.query(
+            'DELETE FROM financial_summary WHERE id = ? AND user_id = ?',
+            [id, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Year not found or not authorized to delete.' });
+        }
+
+        res.status(200).json({ message: 'Year deleted successfully.' });
+    } catch (error) {
+        console.error('Error deleting year:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 app.get('/upload', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.redirect('/login');
