@@ -65,10 +65,10 @@ document.querySelectorAll('.add-item-button').forEach(button => {
 
         newRow.innerHTML = `
             <td>
-                <input type="text" placeholder="Enter ${category} Name" class="new-item-label" />
+                <input type="text" placeholder="Label" class="new-item-label" />
             </td>
             <td>
-                <input type="number" placeholder="Enter Value" class="new-item-value" />
+                <input type="number" placeholder="Value" class="new-item-value" />
                 <button class="save-item-button">Save</button>
             </td>
         `;
