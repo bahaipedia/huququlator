@@ -78,7 +78,6 @@ document.querySelectorAll('.add-item-button').forEach(button => {
 
         buttonRow.parentNode.insertBefore(newRow, buttonRow);
 
-        // Save button logic remains the same
         newRow.querySelector('.save-item-button').addEventListener('click', () => {
             const label = newRow.querySelector('.new-item-label').value.trim();
             const value = parseFloat(newRow.querySelector('.new-item-value').value);
@@ -218,18 +217,6 @@ document.querySelector('.dashboard-table').addEventListener('change', (event) =>
         const entryId = event.target.dataset.id;
         const newValue = parseFloat(event.target.value);
 
-        // Ensure valid numeric input
-        if (isNaN(newValue)) {
-            alert('Please enter a valid number.');
-            event.target.value = '0.00'; // Reset to default if invalid
-            return;
-        }
-
-        if (!entryId) {
-            console.warn('New entry detected. Save manually to backend.');
-            return;
-        }
-
         // Send updated value to the backend for existing entries
         fetch(`/api/entries/${entryId}`, {
             method: 'PUT',
@@ -243,8 +230,7 @@ document.querySelector('.dashboard-table').addEventListener('change', (event) =>
                 return response.json();
             })
             .then(() => {
-                console.log('Entry updated successfully!');
-                calculateTotals(); // Recalculate totals after successful update
+                calculateTotals();
             })
             .catch(err => {
                 console.error('Error updating entry:', err);
