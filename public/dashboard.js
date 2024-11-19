@@ -111,7 +111,6 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                     return response.json();
                 })
                 .then(() => {
-                    alert(`${category} added successfully!`);
                     location.reload(); // Reload the page to reflect the new entry
                 })
                 .catch(err => {
