@@ -344,8 +344,8 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
 
         // Insert or update the financial_entries table
         const upsertQuery = `
-            INSERT INTO financial_entries (label_id, reporting_date, value)
-            VALUES (?, ?, ?)
+            INSERT INTO financial_entries (label_id, reporting_date, value, user_id)
+            VALUES (?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE value = ?
         `;
         await pool.query(upsertQuery, [labelId, reporting_date, value, value]);
