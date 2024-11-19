@@ -50,21 +50,12 @@
                             </td>
                             <% summaries.forEach(summary => { %>
                             <td>
-                                <% if (entry.reporting_date === summary.end_date) { %>
-                                    <input 
-                                        type="text" 
-                                        value="<%= entry.value %>" 
-                                        data-id="<%= entry.id %>" 
-                                        class="asset-input"
-                                    />
-                                <% } else { %>
-                                    <input 
-                                        type="text" 
-                                        value="0.00" 
-                                        data-id="" 
-                                        class="asset-input"
-                                    />
-                                <% } %>
+                                <input 
+                                    type="text" 
+                                    value="<%= entry.value %>" 
+                                    data-id="<%= entry.id %>" 
+                                    class="asset-input"
+                                />
                             </td>
                             <% }); %>
                         </tr>
@@ -92,21 +83,12 @@
                             </td>
                             <% summaries.forEach(summary => { %>
                             <td>
-                                <% if (entry.reporting_date === summary.end_date) { %>
-                                    (<input 
-                                        type="text" 
-                                        value="<%= entry.value %>" 
-                                        data-id="<%= entry.id %>" 
-                                        class="debt-input"
-                                    />)
-                                <% } else { %>
-                                    (<input 
-                                        type="text" 
-                                        value="0.00" 
-                                        data-id="" 
-                                        class="debt-input"
-                                    />)
-                                <% } %>
+                                (<input 
+                                    type="text" 
+                                    value="<%= entry.value %>" 
+                                    data-id="<%= entry.id %>" 
+                                    class="debt-input"
+                                />)
                             </td>
                             <% }); %>
                         </tr>
@@ -134,21 +116,12 @@
                             </td>
                             <% summaries.forEach(summary => { %>
                             <td>
-                                <% if (entry.reporting_date === summary.end_date) { %>
-                                    <input 
-                                        type="text" 
-                                        value="<%= entry.value %>" 
-                                        data-id="<%= entry.id %>" 
-                                        class="expense-input"
-                                    />
-                                <% } else { %>
-                                    <input 
-                                        type="text" 
-                                        value="0.00" 
-                                        data-id="" 
-                                        class="expense-input"
-                                    />
-                                <% } %>
+                                <input 
+                                    type="text" 
+                                    value="<%= entry.value %>" 
+                                    data-id="<%= entry.id %>" 
+                                    class="expense-input"
+                                />
                             </td>
                             <% }); %>
                         </tr>
