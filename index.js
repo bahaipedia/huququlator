@@ -108,7 +108,7 @@ app.get('/api/gold-price', async (req, res) => {
         const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
         const today = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Format: YYYYMMDD
 
-        const { date = today } = req.query; // Use today's date if no date is provided
+        const { date = today } = req.query; // Default to today's date
 
         // If the same date is requested and cached, return the cached value
         if (cache.goldPrice && cache.timestamp && cache.date === date && now - cache.timestamp < oneDay) {
@@ -117,7 +117,9 @@ app.get('/api/gold-price', async (req, res) => {
         }
 
         const apiKey = process.env.GOLD_API_KEY;
-        const apiUrl = `https://www.goldapi.io/api/XAU/USD/${date}`;
+        const apiUrl = date === today
+            ? `https://www.goldapi.io/api/XAU/USD` // Current price endpoint
+            : `https://www.goldapi.io/api/XAU/USD/${date}`; // Historical price endpoint
 
         const response = await axios.get(apiUrl, {
             headers: {
@@ -127,7 +129,7 @@ app.get('/api/gold-price', async (req, res) => {
         });
 
         // Ensure the response contains a valid price
-        const goldPrice = response.data.price;
+        const goldPrice = response.data.price; // Price in troy ounces
         if (!goldPrice) {
             throw new Error('Gold price is missing in the API response.');
         }
