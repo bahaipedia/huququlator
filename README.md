@@ -76,7 +76,7 @@ CREATE TABLE users (
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
-CREATE TABLE labels (
+CREATE TABLE financial_labels (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     category ENUM('Assets', 'Debts', 'Expenses') NOT NULL,
@@ -100,11 +100,12 @@ CREATE TABLE financial_summary (
 CREATE TABLE financial_entries (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    category ENUM('Assets', 'Debts', 'Expenses') NOT NULL,
+    label_id INT NOT NULL,
+    reporting_date DATE NOT NULL,
     value DECIMAL(10, 2) DEFAULT 0.00,
-    summary_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (summary_id) REFERENCES financial_summary(id)
+    FOREIGN KEY (label_id) REFERENCES financial_labels(id),
+    UNIQUE(user_id, label_id, reporting_date) 
 );
 ```
 
