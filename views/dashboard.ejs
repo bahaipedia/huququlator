@@ -144,7 +144,7 @@
                             <td>
                                 <input 
                                     type="text" 
-                                    value="<%= summary.wealth_already_taxed.toFixed(2) %>" 
+                                    value="<%= summary.wealth_already_taxed ? parseFloat(summary.wealth_already_taxed).toFixed(2) : '0.00' %>" 
                                     class="wealth-already-taxed"
                                 />
                             </td>
