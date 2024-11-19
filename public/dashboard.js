@@ -221,32 +221,25 @@ document.querySelector('.dashboard-table').addEventListener('change', (event) =>
         // Ensure valid numeric input
         if (isNaN(newValue)) {
             alert('Please enter a valid number.');
-            event.target.value = '0.00'; // Reset to default if invalid
             return;
         }
 
-        if (!entryId) {
-            console.warn('New entry detected. Save manually to backend.');
-            return;
-        }
-
-        // Send updated value to the backend for existing entries
+        // Send updated value to the backend
         fetch(`/api/entries/${entryId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ value: newValue }),
         })
-            .then(response => {
+            .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(() => {
-                console.log('Entry updated successfully!');
-                calculateTotals(); // Recalculate totals after successful update
+                alert('Entry updated successfully!');
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error('Error updating entry:', err);
                 alert('Failed to update the entry.');
             });
