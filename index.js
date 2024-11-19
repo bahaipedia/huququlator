@@ -108,8 +108,7 @@ app.get('/api/gold-price', async (req, res) => {
         const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
         const today = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Format: YYYYMMDD
 
-        // Use today's date if no date is provided
-        const { date = today } = req.query;
+        const { date = today } = req.query; // Use today's date if no date is provided
 
         // If the same date is requested and cached, return the cached value
         if (cache.goldPrice && cache.timestamp && cache.date === date && now - cache.timestamp < oneDay) {
@@ -127,8 +126,13 @@ app.get('/api/gold-price', async (req, res) => {
             },
         });
 
-        const goldPrice = response.data.price; // Price of 1 XAU in USD
-        const mithqalPrice = goldPrice * 2.22456;
+        // Ensure the response contains a valid price
+        const goldPrice = response.data.price;
+        if (!goldPrice) {
+            throw new Error('Gold price is missing in the API response.');
+        }
+
+        const mithqalPrice = goldPrice * 2.22456; // Calculate mithqal price
 
         // Update the cache
         cache.goldPrice = mithqalPrice;
@@ -139,7 +143,7 @@ app.get('/api/gold-price', async (req, res) => {
         return res.json({ value: mithqalPrice });
     } catch (error) {
         logger.error('Error fetching gold price', { error });
-        res.status(500).json({ value: 0, error: 'Gold price unavailable' });
+        res.status(500).json({ value: null, error: 'Gold price unavailable' });
     }
 });
 
