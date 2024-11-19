@@ -1,13 +1,14 @@
 /* Add a New Asset, Debt, or Expense */
-// Handle Add a New Asset
 document.querySelectorAll('.add-item-button.asset-button').forEach(button => {
     button.addEventListener('click', () => {
         const label = prompt('Enter Asset Name:');
         if (label) {
-            // Extract the date from the header, ensuring only the raw date is used
-            const reportingDate = button.closest('.dashboard-table-wrapper')
+            // Extract the date and format it as YYYY-MM-DD
+            const reportingDateRaw = button.closest('.dashboard-table-wrapper')
                 .querySelector('thead th:nth-child(2)')
                 .dataset.date;
+
+            const reportingDate = new Date(reportingDateRaw).toISOString().split('T')[0]; // Format as YYYY-MM-DD
 
             fetch('/api/entries', {
                 method: 'POST',
