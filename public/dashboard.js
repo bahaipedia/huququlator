@@ -76,13 +76,16 @@ document.querySelectorAll('.add-item-button').forEach(button => {
         // Insert the new row before the button row
         buttonRow.parentNode.insertBefore(newRow, buttonRow);
 
-        // Handle Save Button Click
+        // Handle Save Button Click (Ensure logic only triggers on Save button clicks)
         newRow.querySelector('.save-item-button').addEventListener('click', () => {
-            const label = newRow.querySelector('.new-item-label').value;
-            const value = newRow.querySelector('.new-item-value').value;
+            const labelInput = newRow.querySelector('.new-item-label');
+            const valueInput = newRow.querySelector('.new-item-value');
+            const label = labelInput.value.trim();
+            const value = parseFloat(valueInput.value);
 
+            // Ensure valid inputs
             if (!label || isNaN(value)) {
-                alert('Please enter a valid name and value.');
+                alert('Please enter a valid label and value.');
                 return;
             }
 
@@ -108,7 +111,7 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                     }
                     return response.json();
                 })
-                .then(data => {
+                .then(() => {
                     alert(`${category} added successfully!`);
                     location.reload(); // Reload the page to reflect the new entry
                 })
