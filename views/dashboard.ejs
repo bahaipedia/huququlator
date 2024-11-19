@@ -21,7 +21,14 @@
                         <tr>
                             <th>Accounts</th>
                             <% summaries.forEach(summary => { %>
-                                <th><%= new Date(summary.end_date).toLocaleDateString() %></th>
+                                <th>
+                                    <%= new Date(summary.end_date).toLocaleDateString() %>
+                                    <button 
+                                        class="delete-year-button" 
+                                        data-id="<%= summary.id %>">
+                                        Delete
+                                    </button>
+                                </th>
                             <% }); %>
                         </tr>
                     </thead>
