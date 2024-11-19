@@ -104,31 +104,40 @@ app.get('/', checkLoginStatus, (req, res) => {
 // Get the value of 2.25 troy ounces of gold
 app.get('/api/gold-price', async (req, res) => {
     try {
+        const { date } = req.query; // Expecting 'date' in the format 'YYYYMMDD'
         const now = Date.now();
         const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-        if (cache.goldPrice && cache.timestamp && now - cache.timestamp < oneDay) {
-            logger.info('Serving gold price from cache.');
+        // Ensure date is provided
+        if (!date) {
+            return res.status(400).json({ error: 'Date parameter is required' });
+        }
+
+        // If the same date is requested and cached, return the cached value
+        if (cache.goldPrice && cache.timestamp && cache.date === date && now - cache.timestamp < oneDay) {
+            logger.info(`Serving cached gold price for date: ${date}`);
             return res.json({ value: cache.goldPrice });
         }
 
         const apiKey = process.env.GOLD_API_KEY;
-        const apiUrl = 'https://www.goldapi.io/api/XAU/USD';
+        const apiUrl = `https://www.goldapi.io/api/XAU/USD/${date}`;
 
         const response = await axios.get(apiUrl, {
             headers: {
                 'x-access-token': apiKey,
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+            },
         });
 
         const goldPrice = response.data.price; // Price of 1 XAU in USD
         const mithqalPrice = goldPrice * 2.22456;
 
+        // Update the cache
         cache.goldPrice = mithqalPrice;
         cache.timestamp = now;
+        cache.date = date;
 
-        logger.info('Fetched fresh gold price and cached it.');
+        logger.info(`Fetched and cached gold price for date: ${date}`);
         return res.json({ value: mithqalPrice });
     } catch (error) {
         logger.error('Error fetching gold price', { error });
