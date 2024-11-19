@@ -53,6 +53,7 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
 });
 
 /* Add a New Asset, Debt, or Expense */
+/* Add a New Asset, Debt, or Expense */
 document.querySelectorAll('.add-item-button').forEach(button => {
     button.addEventListener('click', () => {
         const category = button.classList.contains('asset-button')
@@ -64,46 +65,32 @@ document.querySelectorAll('.add-item-button').forEach(button => {
         const buttonRow = button.closest('tr');
         const newRow = document.createElement('tr');
 
+        // Create a new row for adding a label
         newRow.innerHTML = `
             <td>
                 <input type="text" placeholder="Label" class="new-item-label" />
-            </td>
-            <td>
-                <input 
-                    type="number" 
-                    placeholder="Value" 
-                    value="0.00" 
-                    class="new-item-value" 
-                />
                 <button class="save-item-button">Save</button>
             </td>
+            <td colspan="100%"></td> <!-- Placeholder for values in reporting years -->
         `;
 
         buttonRow.parentNode.insertBefore(newRow, buttonRow);
 
+        // Handle saving the new label
         newRow.querySelector('.save-item-button').addEventListener('click', () => {
             const label = newRow.querySelector('.new-item-label').value.trim();
-            const value = parseFloat(newRow.querySelector('.new-item-value').value) || 0.00;
 
             if (!label) {
                 alert('Please enter a valid label.');
                 return;
             }
 
-            const reportingDateRaw = button.closest('.dashboard-table-wrapper')
-                .querySelector('thead th:nth-child(2)')
-                .dataset.date;
-
-            const reportingDate = new Date(reportingDateRaw).toISOString().split('T')[0];
-
-            fetch('/api/entries', {
+            fetch('/api/labels', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     category,
-                    label,
-                    value,
-                    reporting_date: reportingDate
+                    label
                 }),
             })
                 .then(response => {
@@ -113,15 +100,14 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                     return response.json();
                 })
                 .then(data => {
-                    // Update the row with the newly assigned data-id
-                    newRow.querySelector('.new-item-value').dataset.id = data.id;
+                    // Update the row with the newly assigned label ID
+                    newRow.querySelector('.new-item-label').dataset.labelId = data.labelId;
                     newRow.querySelector('.save-item-button').remove(); // Remove the save button
-                    alert(`${category} added successfully!`);
-                    calculateTotals(); // Recalculate totals dynamically
+                    alert(`${category} label added successfully!`);
                 })
                 .catch(err => {
-                    console.error(`Error adding ${category.toLowerCase()}:`, err);
-                    alert(`Failed to add the ${category.toLowerCase()}. Please try again.`);
+                    console.error(`Error adding ${category.toLowerCase()} label:`, err);
+                    alert(`Failed to add the ${category.toLowerCase()} label. Please try again.`);
                 });
         });
     });
