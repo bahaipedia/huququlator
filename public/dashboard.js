@@ -140,7 +140,12 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
                 return response.json();
             })
             .then(() => {
-                event.target.closest('tr').remove(); // Remove row from the table
+                // Remove the row from the table
+                const row = event.target.closest('tr');
+                row.remove();
+
+                // Recalculate totals dynamically
+                calculateTotals();
             })
             .catch(err => {
                 console.error('Error deleting entry:', err);
@@ -148,6 +153,34 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
             });
     }
 });
+
+// Function to recalculate totals dynamically
+function calculateTotals() {
+    let totalAssets = 0;
+    let totalDebts = 0;
+
+    // Iterate through all asset and debt input fields and sum their values
+    document.querySelectorAll('.asset-input').forEach(input => {
+        totalAssets += parseFloat(input.value) || 0;
+    });
+    document.querySelectorAll('.debt-input').forEach(input => {
+        totalDebts += parseFloat(input.value) || 0;
+    });
+
+    // Update the totals in the DOM
+    const totalAssetsElement = document.querySelector('.total-assets');
+    const totalDebtsElement = document.querySelector('.total-debts');
+
+    if (totalAssetsElement) {
+        totalAssetsElement.textContent = totalAssets.toFixed(2);
+    }
+    if (totalDebtsElement) {
+        totalDebtsElement.textContent = `(${totalDebts.toFixed(2)})`;
+    }
+
+    // Recalculate summary and related values
+    calculateSummary();
+}
 
 /* Handle Changes in the Summary Table Using Event Delegation */
 document.querySelector('.summary-table').addEventListener('change', (event) => {
