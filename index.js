@@ -421,7 +421,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        const wealthAlreadyTaxed = prevSummaries.reduce((acc, row) => acc + row.summary, 0);
+        const wealthAlreadyTaxed = prevSummaries.reduce((acc, row) => acc + row.summary, 0).toFixed(5);
 
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
