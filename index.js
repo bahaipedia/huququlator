@@ -255,6 +255,31 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
     }
 });
 
+app.get('/test', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.redirect('/login');
+    }
+
+    try {
+        const userId = req.userId;
+
+        const [entries] = await pool.query(
+            'SELECT * FROM financial_entries WHERE user_id = ? ORDER BY reporting_date ASC',
+            [userId]
+        );
+
+        const [summaries] = await pool.query(
+            'SELECT * FROM financial_summary WHERE user_id = ? ORDER BY end_date ASC',
+            [userId]
+        );
+
+        res.render('test', { entries, summaries });
+    } catch (error) {
+        console.error('Error loading test page:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
 app.post('/api/entries', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
