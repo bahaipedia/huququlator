@@ -59,11 +59,10 @@ document.querySelectorAll('.add-item-button').forEach(button => {
             ? 'Debts'
             : 'Expenses';
 
-        // Find the table body for the category
-        const tableBody = button.closest('tbody');
-
-        // Add a new row dynamically
+        // Find the row containing the button and insert the new row just above it
+        const buttonRow = button.closest('tr');
         const newRow = document.createElement('tr');
+
         newRow.innerHTML = `
             <td>
                 <input type="text" placeholder="Enter ${category} Name" class="new-item-label" />
@@ -73,7 +72,9 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                 <button class="save-item-button">Save</button>
             </td>
         `;
-        tableBody.appendChild(newRow);
+
+        // Insert the new row before the button row
+        buttonRow.parentNode.insertBefore(newRow, buttonRow);
 
         // Handle Save Button Click
         newRow.querySelector('.save-item-button').addEventListener('click', () => {
