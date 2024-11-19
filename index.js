@@ -447,7 +447,9 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        const wealthAlreadyTaxed = prevSummaries.length > 0 ? prevSummaries.reduce((acc, row) => acc + (parseFloat(row.summary) || 0), 0) : 0;
+        const wealthAlreadyTaxed = prevSummaries.length > 0
+            ? prevSummaries.reduce((acc, row) => acc + (parseFloat(row.summary) || 0), 0)
+            : 0;
         const roundedWealthAlreadyTaxed = parseFloat(wealthAlreadyTaxed.toFixed(5));
 
         // Insert a new reporting period with placeholder totals
@@ -456,6 +458,27 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             VALUES (?, ?, ?, ?, ?)
         `;
         await pool.query(insertQuery, [userId, lastEndDate, end_date, roundedWealthAlreadyTaxed, goldRate]);
+
+        // Check if entries already exist for the new reporting period
+        const [existingEntries] = await pool.query(
+            'SELECT COUNT(*) AS count FROM financial_entries WHERE user_id = ? AND reporting_date = ?',
+            [userId, end_date]
+        );
+
+        if (existingEntries[0].count === 0) {
+            // Duplicate financial_entries rows with value = 0.00 for the new reporting period
+            const duplicateEntriesQuery = `
+                INSERT INTO financial_entries (user_id, category, label, value, reporting_date, created_at, updated_at)
+                SELECT user_id, category, label, 0.00, ?, NOW(), NOW()
+                FROM financial_entries
+                WHERE user_id = ? AND reporting_date = (
+                    SELECT MAX(reporting_date)
+                    FROM financial_entries
+                    WHERE user_id = ?
+                )
+            `;
+            await pool.query(duplicateEntriesQuery, [end_date, userId, userId]);
+        }
 
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
