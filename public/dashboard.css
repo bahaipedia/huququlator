@@ -2,17 +2,20 @@
     padding: 0px 10px 15px 0px;
     margin-left: 250px;
 }
+
 .table-container {
     flex-direction: column;
     align-items: center;
     width: 100%;
     gap: 20px;
 }
+
 .dashboard-table-wrapper {
     display: flex;
     align-items: flex-start;
     gap: 20px;
 }
+
 .dashboard-table,
 .summary-table {
     width: 400px;
@@ -24,8 +27,8 @@
 
 .dashboard-table th,
 .summary-table th {
-    background-color: #f8f9fa;
-    color: #222; 
+    background-color: #f8f9fa; /* Neutral light background */
+    color: #222; /* Dark text for better readability */
     font-weight: 600;
     text-align: left;
     padding: 10px;
@@ -50,12 +53,6 @@
 .section-row {
     background-color: #f1f3f5;
     font-weight: bold;
-    border-top: 20px solid white;
-    border-bottom: 1px solid #ddd; 
-}
-
-.dashboard-table tr:not(.section-row) td {
-    border-bottom: 1px solid #ddd;
 }
 .section-title {
     padding: 10px;
@@ -64,6 +61,7 @@
     background-color: #f0f0f0;
     color: #444;
 }
+
 .add-item-button {
     font-size: 0.85rem;
     background-color: #ffffff;
@@ -72,14 +70,17 @@
     border-radius: 3px;
     cursor: pointer;
 }
+
 .add-item-button:hover {
     background-color: #f8f9fa;
     border-color: #aaa;
 }
+
 .add-year-button-wrapper {
     display: flex;
     align-items: center;
 }
+
 .add-year-button {
     background-color: #f8f9fa;
     color: #444;
@@ -89,6 +90,7 @@
     cursor: pointer;
     font-size: 0.9rem;
 }
+
 .add-year-button:hover {
     background-color: #e9ecef;
 }
@@ -108,10 +110,12 @@
     font-size: 0.85rem;
     color: #333;
 }
+
 .debt-value {
     color: red;
     font-style: italic;
 }
+
 .debt-input-wrapper, .debt-input-wrapper input {
     color: red;
 }
