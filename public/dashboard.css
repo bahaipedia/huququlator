@@ -96,11 +96,7 @@
     background-color: #e9ecef;
 }
 .delete-year-button {
-    background: none;
-    border: none;
-    color: red;
-    cursor: pointer;
-    font-size: 0.9em;
+    float:right;
 }
 .summary-table input,
 .dashboard-table input {
