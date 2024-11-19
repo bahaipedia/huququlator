@@ -54,7 +54,11 @@
     background-color: #f1f3f5;
     font-weight: bold;
 }
-
+.section-row::before {
+    content: "";
+    display: table-row;
+    height: 20px; 
+}
 .section-title {
     padding: 10px;
     text-align: left;
