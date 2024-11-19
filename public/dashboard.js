@@ -105,8 +105,8 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                 .then(data => {
                     // Update the row with the newly assigned label ID
                     newRow.querySelector('.new-item-label').dataset.labelId = data.labelId;
-                    newRow.querySelector('.save-item-button').remove(); // Remove the save button
-                    alert(`${category} label added successfully!`);
+                    newRow.remove();
+                    location.reload();
                 })
                 .catch(err => {
                     console.error(`Error adding ${category.toLowerCase()} label:`, err);
