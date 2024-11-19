@@ -39,16 +39,24 @@
                         </tr>
                         <% entries.filter(entry => entry.category === 'Assets').forEach(entry => { %>
                         <tr>
-                            <td><%= entry.label %></td>
+                            <td>
+                                <%= entry.label %>
+                                <button 
+                                    class="delete-item-button" 
+                                    data-id="<%= entry.id %>" 
+                                    style="float: right;">
+                                    [D]
+                                </button>
+                            </td>
                             <% summaries.forEach(summary => { %>
-                                <td>
-                                    <input 
-                                        type="text" 
-                                        value="<%= entry.value %>" 
-                                        data-id="<%= entry.id %>" 
-                                        class="asset-input"
-                                    />
-                                </td>
+                            <td>
+                                <input 
+                                    type="text" 
+                                    value="<%= entry.value %>" 
+                                    data-id="<%= entry.id %>" 
+                                    class="asset-input"
+                                />
+                            </td>
                             <% }); %>
                         </tr>
                         <% }); %>
@@ -64,16 +72,24 @@
                         </tr>
                         <% entries.filter(entry => entry.category === 'Debts').forEach(entry => { %>
                         <tr>
-                            <td><%= entry.label %></td>
+                            <td>
+                                <%= entry.label %>
+                                <button 
+                                    class="delete-item-button" 
+                                    data-id="<%= entry.id %>" 
+                                    style="float: right;">
+                                    [D]
+                                </button>
+                            </td>
                             <% summaries.forEach(summary => { %>
-                                <td>
-                                    (<input 
-                                        type="text" 
-                                        value="<%= entry.value %>" 
-                                        data-id="<%= entry.id %>" 
-                                        class="debt-input"
-                                    />)
-                                </td>
+                            <td>
+                                (<input 
+                                    type="text" 
+                                    value="<%= entry.value %>" 
+                                    data-id="<%= entry.id %>" 
+                                    class="debt-input"
+                                />)
+                            </td>
                             <% }); %>
                         </tr>
                         <% }); %>
@@ -89,16 +105,24 @@
                         </tr>
                         <% entries.filter(entry => entry.category === 'Expenses').forEach(entry => { %>
                         <tr>
-                            <td><%= entry.label %></td>
+                            <td>
+                                <%= entry.label %>
+                                <button 
+                                    class="delete-item-button" 
+                                    data-id="<%= entry.id %>" 
+                                    style="float: right;">
+                                    [D]
+                                </button>
+                            </td>
                             <% summaries.forEach(summary => { %>
-                                <td>
-                                    <input 
-                                        type="text" 
-                                        value="<%= entry.value %>" 
-                                        data-id="<%= entry.id %>" 
-                                        class="expense-input"
-                                    />
-                                </td>
+                            <td>
+                                <input 
+                                    type="text" 
+                                    value="<%= entry.value %>" 
+                                    data-id="<%= entry.id %>" 
+                                    class="expense-input"
+                                />
+                            </td>
                             <% }); %>
                         </tr>
                         <% }); %>
