@@ -76,23 +76,22 @@ document.querySelectorAll('.add-item-button').forEach(button => {
         // Insert the new row before the button row
         buttonRow.parentNode.insertBefore(newRow, buttonRow);
 
-        // Handle Save Button Click (Ensure logic only triggers on Save button clicks)
+        // Handle Save Button Click
         newRow.querySelector('.save-item-button').addEventListener('click', () => {
-            const labelInput = newRow.querySelector('.new-item-label');
-            const valueInput = newRow.querySelector('.new-item-value');
-            const label = labelInput.value.trim();
-            const value = parseFloat(valueInput.value);
+            const label = newRow.querySelector('.new-item-label').value.trim();
+            const value = parseFloat(newRow.querySelector('.new-item-value').value);
 
-            // Ensure valid inputs
             if (!label || isNaN(value)) {
                 alert('Please enter a valid label and value.');
                 return;
             }
 
-            // Extract the reporting date
-            const reportingDate = button.closest('.dashboard-table-wrapper')
+            // Extract and format the reporting date
+            const reportingDateRaw = button.closest('.dashboard-table-wrapper')
                 .querySelector('thead th:nth-child(2)')
                 .dataset.date;
+
+            const reportingDate = new Date(reportingDateRaw).toISOString().split('T')[0]; // Proper format YYYY-MM-DD
 
             // Send data to the backend
             fetch('/api/entries', {
@@ -101,7 +100,7 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                 body: JSON.stringify({
                     category,
                     label,
-                    value: parseFloat(value),
+                    value,
                     reporting_date: reportingDate
                 }),
             })
