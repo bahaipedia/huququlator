@@ -268,16 +268,93 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
         const { category, label, value, reporting_date } = req.body;
         const userId = req.userId;
 
-        const query = `
+        // Insert the new entry into financial_entries
+        const insertQuery = `
             INSERT INTO financial_entries (user_id, category, label, value, reporting_date)
             VALUES (?, ?, ?, ?, ?)
         `;
+        await pool.query(insertQuery, [userId, category, label, value, reporting_date]);
 
-        await pool.query(query, [userId, category, label, value, reporting_date]);
+        // Aggregate totals for the reporting_date
+        const [totals] = await pool.query(`
+            SELECT 
+                SUM(CASE WHEN category = 'Assets' THEN value ELSE 0 END) AS total_assets,
+                SUM(CASE WHEN category = 'Debts' THEN value ELSE 0 END) AS total_debts,
+                SUM(CASE WHEN category = 'Expenses' THEN value ELSE 0 END) AS unnecessary_expenses
+            FROM financial_entries
+            WHERE user_id = ? AND reporting_date = ?
+        `, [userId, reporting_date]);
 
-        res.status(201).json({ message: 'Entry added successfully' });
+        const { total_assets, total_debts, unnecessary_expenses } = totals[0];
+
+        // Update the financial_summary table
+        const updateQuery = `
+            UPDATE financial_summary
+            SET total_assets = ?, total_debts = ?, unnecessary_expenses = ?
+            WHERE user_id = ? AND end_date = ?
+        `;
+        await pool.query(updateQuery, [total_assets, total_debts, unnecessary_expenses, userId, reporting_date]);
+
+        res.status(201).json({ message: 'Entry added and summary updated successfully' });
     } catch (error) {
-        console.error('Error adding financial entry:', error);
+        console.error('Error adding financial entry and updating summary:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.put('/api/entries/:id', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { id } = req.params;
+        const { value } = req.body;
+
+        // Update the entry in financial_entries
+        const updateEntryQuery = `
+            UPDATE financial_entries
+            SET value = ?
+            WHERE id = ? AND user_id = ?
+        `;
+        await pool.query(updateEntryQuery, [value, id, req.userId]);
+
+        // Get the reporting_date for the updated entry
+        const [entry] = await pool.query(`
+            SELECT reporting_date
+            FROM financial_entries
+            WHERE id = ? AND user_id = ?
+        `, [id, req.userId]);
+
+        if (entry.length === 0) {
+            return res.status(404).json({ error: 'Entry not found' });
+        }
+
+        const { reporting_date } = entry[0];
+
+        // Aggregate totals for the reporting_date
+        const [totals] = await pool.query(`
+            SELECT 
+                SUM(CASE WHEN category = 'Assets' THEN value ELSE 0 END) AS total_assets,
+                SUM(CASE WHEN category = 'Debts' THEN value ELSE 0 END) AS total_debts,
+                SUM(CASE WHEN category = 'Expenses' THEN value ELSE 0 END) AS unnecessary_expenses
+            FROM financial_entries
+            WHERE user_id = ? AND reporting_date = ?
+        `, [req.userId, reporting_date]);
+
+        const { total_assets, total_debts, unnecessary_expenses } = totals[0];
+
+        // Update the financial_summary table
+        const updateSummaryQuery = `
+            UPDATE financial_summary
+            SET total_assets = ?, total_debts = ?, unnecessary_expenses = ?
+            WHERE user_id = ? AND end_date = ?
+        `;
+        await pool.query(updateSummaryQuery, [total_assets, total_debts, unnecessary_expenses, req.userId, reporting_date]);
+
+        res.status(200).json({ message: 'Entry updated and summary recalculated successfully' });
+    } catch (error) {
+        console.error('Error updating entry and recalculating summary:', error);
         res.status(500).send('Server Error');
     }
 });
@@ -319,41 +396,36 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         const wealthAlreadyTaxed = prevSummaries.reduce((acc, row) => acc + row.summary, 0);
 
         // Insert a new reporting period
-        const query = `
+        const insertQuery = `
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
             VALUES (?, ?, ?, ?, ?)
         `;
+        await pool.query(insertQuery, [userId, lastEndDate, end_date, wealthAlreadyTaxed, goldRate]);
 
-        await pool.query(query, [userId, lastEndDate, end_date, wealthAlreadyTaxed, goldRate]);
+        // Aggregate totals for the new reporting_date
+        const [totals] = await pool.query(`
+            SELECT 
+                SUM(CASE WHEN category = 'Assets' THEN value ELSE 0 END) AS total_assets,
+                SUM(CASE WHEN category = 'Debts' THEN value ELSE 0 END) AS total_debts,
+                SUM(CASE WHEN category = 'Expenses' THEN value ELSE 0 END) AS unnecessary_expenses
+            FROM financial_entries
+            WHERE user_id = ? AND reporting_date = ?
+        `, [userId, end_date]);
 
-        res.status(201).json({ message: 'New reporting period added successfully!' });
+        const { total_assets, total_debts, unnecessary_expenses } = totals[0];
+
+        // Update the new reporting period with calculated totals
+        const updateQuery = `
+            UPDATE financial_summary
+            SET total_assets = ?, total_debts = ?, unnecessary_expenses = ?
+            WHERE user_id = ? AND end_date = ?
+        `;
+        await pool.query(updateQuery, [total_assets, total_debts, unnecessary_expenses, userId, end_date]);
+
+        res.status(201).json({ message: 'New reporting period added and totals populated successfully!' });
     } catch (error) {
         console.error('Error adding reporting period:', error.message, error.stack);
         res.status(500).json({ error: 'Server Error' });
-    }
-});
-
-app.put('/api/entries/:id', checkLoginStatus, async (req, res) => {
-    if (!req.loggedIn) {
-        return res.status(403).send('Unauthorized');
-    }
-
-    try {
-        const { id } = req.params;
-        const { value } = req.body;
-
-        const query = `
-            UPDATE financial_entries
-            SET value = ?
-            WHERE id = ? AND user_id = ?
-        `;
-
-        await pool.query(query, [value, id, req.userId]);
-
-        res.status(200).json({ message: 'Entry updated successfully' });
-    } catch (error) {
-        console.error('Error updating entry:', error);
-        res.status(500).send('Server Error');
     }
 });
 
