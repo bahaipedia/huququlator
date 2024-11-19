@@ -225,8 +225,8 @@ document.querySelector('.dashboard-table').addEventListener('change', (event) =>
         // Parse the new value or default to 0.00 if empty
         const newValue = parseFloat(event.target.value) || 0.00;
 
-        // Send updated value to the backend for existing entries
-        fetch(`/api/entries/${entryId}`, {
+        // Send updated value to the backend for existing labels
+        fetch(`/api/labels/${entryId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ value: newValue }),
