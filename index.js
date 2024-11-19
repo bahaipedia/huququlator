@@ -308,7 +308,7 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
     }
 });
 
-app.post('/api/entries', checkLoginStatus, async (req, res) => {
+app.post('/api/labels', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
     }
@@ -378,7 +378,7 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
     }
 });
 
-app.put('/api/entries/:id', checkLoginStatus, async (req, res) => {
+app.put('/api/labels/:id', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
     }
