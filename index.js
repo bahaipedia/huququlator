@@ -104,14 +104,12 @@ app.get('/', checkLoginStatus, (req, res) => {
 // Get the value of 2.25 troy ounces of gold
 app.get('/api/gold-price', async (req, res) => {
     try {
-        const { date } = req.query; // Expecting 'date' in the format 'YYYYMMDD'
         const now = Date.now();
         const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        const today = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Format: YYYYMMDD
 
-        // Ensure date is provided
-        if (!date) {
-            return res.status(400).json({ error: 'Date parameter is required' });
-        }
+        // Use today's date if no date is provided
+        const { date = today } = req.query;
 
         // If the same date is requested and cached, return the cached value
         if (cache.goldPrice && cache.timestamp && cache.date === date && now - cache.timestamp < oneDay) {
