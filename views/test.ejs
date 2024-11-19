@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Values</title>
+</head>
+<body>
+    <h1>Testing Values</h1>
+
+    <h2>Entries</h2>
+    <ul>
+        <% entries.forEach(entry => { %>
+            <li>
+                <strong>Label:</strong> <%= entry.label %><br>
+                <strong>Reporting Date (from financial_entries table):</strong> <%= entry.reporting_date %><br>
+                <strong>Value:</strong> <%= entry.value %><br>
+                <strong>Category:</strong> <%= entry.category %>
+            </li>
+        <% }); %>
+    </ul>
+
+    <h2>Summaries</h2>
+    <ul>
+        <% summaries.forEach(summary => { %>
+            <li>
+                <strong>End Date (from financial_summary table):</strong> <%= summary.end_date %><br>
+                <strong>Total Assets:</strong> <%= summary.total_assets %><br>
+                <strong>Total Debts:</strong> <%= summary.total_debts %><br>
+                <strong>Unnecessary Expenses:</strong> <%= summary.unnecessary_expenses %>
+            </li>
+        <% }); %>
+    </ul>
+
+    <h2>Comparisons</h2>
+    <ul>
+        <% entries.forEach(entry => { %>
+            <% summaries.forEach(summary => { %>
+                <li>
+                    Comparing <strong>entry.reporting_date:</strong> <%= entry.reporting_date %> with 
+                    <strong>summary.end_date:</strong> <%= summary.end_date %><br>
+                    Match: <%= entry.reporting_date === summary.end_date ? 'Yes' : 'No' %>
+                </li>
+            <% }); %>
+        <% }); %>
+    </ul>
+</body>
+</html>
