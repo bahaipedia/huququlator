@@ -153,10 +153,6 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-app.get('/dashboard', checkLoginStatus, (req, res) => {
-    res.render('dashboard', { loggedIn: req.loggedIn, username: req.username });
-});
-
 // User Registration Endpoint
 app.post(
     '/register',
@@ -209,6 +205,155 @@ app.post('/login', async (req, res) => {
     } catch (error) {
         logger.error('Error during login', { error });
         res.status(500).render('login', { errorMessage: 'An error occurred during login.', loggedIn: false });
+    }
+});
+
+app.get('/dashboard', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.redirect('/login');
+    }
+
+    try {
+        const userId = req.userId;
+
+        // Fetch financial summaries for the user
+        const [summaries] = await pool.query(
+            'SELECT * FROM financial_summary WHERE user_id = ? ORDER BY end_date ASC',
+            [userId]
+        );
+
+        // Fetch financial entries for the most recent reporting period
+        const latestSummary = summaries[summaries.length - 1];
+        let entries = [];
+        if (latestSummary) {
+            const [entriesResult] = await pool.query(
+                'SELECT * FROM financial_entries WHERE user_id = ? AND reporting_date = ?',
+                [userId, latestSummary.end_date]
+            );
+            entries = entriesResult;
+        }
+
+        res.render('dashboard', {
+            loggedIn: req.loggedIn,
+            username: req.username,
+            summaries,
+            entries,
+            pageIndicator: 'dashboard'
+        });
+    } catch (error) {
+        console.error('Error loading Dashboard page:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.post('/api/entries', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { category, label, value, reporting_date } = req.body;
+        const userId = req.userId;
+
+        const query = `
+            INSERT INTO financial_entries (user_id, category, label, value, reporting_date)
+            VALUES (?, ?, ?, ?, ?)
+        `;
+
+        await pool.query(query, [userId, category, label, value, reporting_date]);
+
+        res.status(201).json({ message: 'Entry added successfully' });
+    } catch (error) {
+        console.error('Error adding financial entry:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.post('/api/summary', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { end_date } = req.body;
+        const userId = req.userId;
+
+        // Fetch gold rate from the API
+        const goldResponse = await axios.get('/api/gold-price');
+        const goldRate = goldResponse.data.value;
+
+        // Calculate wealth_already_taxed from previous summaries
+        const [prevSummaries] = await pool.query(
+            'SELECT total_assets - total_debts + unnecessary_expenses - wealth_already_taxed AS summary FROM financial_summary WHERE user_id = ?',
+            [userId]
+        );
+
+        const wealthAlreadyTaxed = prevSummaries.reduce((acc, row) => acc + row.summary, 0);
+
+        // Insert a new reporting period
+        const query = `
+            INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
+            VALUES (
+                ?, 
+                (SELECT MAX(end_date) FROM financial_summary WHERE user_id = ?), 
+                ?, ?, ?
+            )
+        `;
+
+        await pool.query(query, [userId, userId, end_date, wealthAlreadyTaxed, goldRate]);
+
+        res.status(201).json({ message: 'New reporting period added successfully' });
+    } catch (error) {
+        console.error('Error adding reporting period:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.put('/api/entries/:id', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { id } = req.params;
+        const { value } = req.body;
+
+        const query = `
+            UPDATE financial_entries
+            SET value = ?
+            WHERE id = ? AND user_id = ?
+        `;
+
+        await pool.query(query, [value, id, req.userId]);
+
+        res.status(200).json({ message: 'Entry updated successfully' });
+    } catch (error) {
+        console.error('Error updating entry:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.put('/api/summary/:id', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { id } = req.params;
+        const { huquq_payments_made } = req.body;
+
+        const query = `
+            UPDATE financial_summary
+            SET huquq_payments_made = ?
+            WHERE id = ? AND user_id = ?
+        `;
+
+        await pool.query(query, [huquq_payments_made, id, req.userId]);
+
+        res.status(200).json({ message: 'Summary updated successfully' });
+    } catch (error) {
+        console.error('Error updating summary:', error);
+        res.status(500).send('Server Error');
     }
 });
 
