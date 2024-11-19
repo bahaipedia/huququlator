@@ -478,24 +478,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
                 )
             `;
             await pool.query(duplicateEntriesQuery, [end_date, userId, userId]);
-
-            // Fetch the newly created entries
-            const [newEntries] = await pool.query(
-                'SELECT id, category, label, value, reporting_date FROM financial_entries WHERE user_id = ? AND reporting_date = ?',
-                [userId, end_date]
-            );
-
-            res.status(201).json({
-                message: 'New reporting period added successfully!',
-                newEntries,
-            });
-        } else {
-            res.status(200).json({
-                message: 'Reporting period already exists. No new entries created.',
-            });
         }
-
-        const [newEntries] = await pool.query(
 
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
