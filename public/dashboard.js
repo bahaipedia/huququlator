@@ -14,53 +14,8 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
                 return response.json();
             })
             .then(data => {
-                console.log('New reporting period added successfully:', data);
-
-                // Update the frontend dynamically without a full reload
-                const dashboardTable = document.querySelector('.dashboard-table tbody');
-                const summaryTable = document.querySelector('.summary-table thead tr');
-                const summaryBody = document.querySelector('.summary-table tbody');
-
-                // Add new column to dashboard table
-                const newHeaderCell = document.createElement('th');
-                newHeaderCell.textContent = new Date(endDate).toLocaleDateString();
-                newHeaderCell.dataset.date = endDate;
-                newHeaderCell.innerHTML += `
-                    <button 
-                        class="delete-year-button" 
-                        data-id="${data.summaryId}">
-                        Delete
-                    </button>
-                `;
-                summaryTable.appendChild(newHeaderCell);
-
-                // Add new inputs to each row of dashboard table
-                dashboardTable.querySelectorAll('tr').forEach(row => {
-                    if (row.querySelector('.section-title')) return; // Skip section headers
-
-                    const newCell = document.createElement('td');
-                    newCell.innerHTML = `
-                        <input 
-                            type="text" 
-                            value="0.00" 
-                            data-id="" 
-                            class="${row.classList.contains('asset-input') ? 'asset-input' : 
-                                row.classList.contains('debt-input') ? 'debt-input' : 
-                                'expense-input'}"
-                            data-reporting-period="${endDate}"
-                        />
-                    `;
-                    row.appendChild(newCell);
-                });
-
-                // Add new column to summary table
-                summaryBody.querySelectorAll('tr').forEach(row => {
-                    const newCell = document.createElement('td');
-                    newCell.textContent = '0.00';
-                    row.appendChild(newCell);
-                });
-
                 alert('New reporting period added successfully!');
+                location.reload(); // Reload to reflect the new column
             })
             .catch(err => {
                 console.error('Error adding reporting period:', err);
