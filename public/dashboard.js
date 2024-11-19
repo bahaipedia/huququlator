@@ -66,19 +66,25 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                 <input type="text" placeholder="Label" class="new-item-label" />
             </td>
             <td>
-                <input type="number" placeholder="Value" class="new-item-value" />
+                <input 
+                    type="number" 
+                    placeholder="Value" 
+                    value="0.00" 
+                    class="new-item-value" 
+                />
                 <button class="save-item-button">Save</button>
             </td>
         `;
 
         buttonRow.parentNode.insertBefore(newRow, buttonRow);
 
+        // Save button logic remains the same
         newRow.querySelector('.save-item-button').addEventListener('click', () => {
             const label = newRow.querySelector('.new-item-label').value.trim();
             const value = parseFloat(newRow.querySelector('.new-item-value').value);
 
-            if (!label || isNaN(value)) {
-                alert('Please enter a valid label and value.');
+            if (!label) {
+                alert('Please enter a valid label.');
                 return;
             }
 
