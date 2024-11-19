@@ -390,15 +390,21 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         const { end_date } = req.body; // Expected format: YYYY-MM-DD
         const userId = req.userId;
 
-        // Convert end_date to YYYYMMDD format
-        const formattedDate = end_date.replace(/-/g, '');
+        // Check if the date is in the future
+        const today = new Date().toISOString().split('T')[0];
+        const isFutureDate = end_date > today;
 
-        // Fetch gold rate
-        const goldResponse = await axios.get(`http://localhost:3000/api/gold-price?date=${formattedDate}`);
-        const goldRate = goldResponse.data.value;
+        let goldRate = 0.00;
 
-        if (!goldRate) {
-            throw new Error('Failed to fetch gold rate.');
+        if (!isFutureDate) {
+            // Fetch the gold rate for valid past/current dates
+            const formattedDate = end_date.replace(/-/g, '');
+            const goldResponse = await axios.get(`http://localhost:3000/api/gold-price?date=${formattedDate}`);
+            goldRate = goldResponse.data.value;
+
+            if (!goldRate) {
+                throw new Error('Failed to fetch gold rate.');
+            }
         }
 
         // Fetch the previous reporting period's end_date
@@ -417,14 +423,14 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
 
         const wealthAlreadyTaxed = prevSummaries.reduce((acc, row) => acc + row.summary, 0);
 
-        // Insert a new reporting period
+        // Insert a new reporting period with placeholder totals
         const insertQuery = `
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
             VALUES (?, ?, ?, ?, ?)
         `;
         await pool.query(insertQuery, [userId, lastEndDate, end_date, wealthAlreadyTaxed, goldRate]);
 
-        // Aggregate totals for the new reporting_date
+        // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
             SELECT 
                 SUM(CASE WHEN category = 'Assets' THEN value ELSE 0 END) AS total_assets,
@@ -444,7 +450,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         `;
         await pool.query(updateQuery, [total_assets, total_debts, unnecessary_expenses, userId, end_date]);
 
-        res.status(201).json({ message: 'New reporting period added and totals populated successfully!' });
+        res.status(201).json({ message: 'New reporting period added successfully!' });
     } catch (error) {
         console.error('Error adding reporting period:', error.message, error.stack);
         res.status(500).json({ error: 'Server Error' });
