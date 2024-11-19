@@ -123,7 +123,7 @@
                     <tr>
                         <td>Total Assets:</td>
                         <% summaries.forEach(summary => { %>
-                            <td class="total-assets"><%= summary.total_assets.toFixed(2) %></td>
+                            <%= summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00' %>
                         <% }); %>
                     </tr>
                     <tr>
