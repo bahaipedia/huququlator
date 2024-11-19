@@ -50,11 +50,20 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
 });
 
 /* Add a New Asset, Debt, or Expense */
-document.querySelectorAll('.add-item-button.asset-button').forEach(button => {
+// Handle Adding New Items for Any Category
+document.querySelectorAll('.add-item-button').forEach(button => {
     button.addEventListener('click', () => {
-        const label = prompt('Enter Asset Name:');
+        // Determine the category based on the button's class
+        const category = button.classList.contains('asset-button')
+            ? 'Assets'
+            : button.classList.contains('debt-button')
+            ? 'Debts'
+            : 'Expenses';
+
+        const label = prompt(`Enter ${category} Name:`);
+
         if (label) {
-            // Extract the date and format it as YYYY-MM-DD
+            // Extract the reporting date and format it as YYYY-MM-DD
             const reportingDateRaw = button.closest('.dashboard-table-wrapper')
                 .querySelector('thead th:nth-child(2)')
                 .dataset.date;
@@ -65,7 +74,7 @@ document.querySelectorAll('.add-item-button.asset-button').forEach(button => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    category: 'Assets',
+                    category,
                     label,
                     value: 0.00, // Default value
                     reporting_date: reportingDate
@@ -78,12 +87,12 @@ document.querySelectorAll('.add-item-button.asset-button').forEach(button => {
                     return response.json();
                 })
                 .then(data => {
-                    alert('New asset added successfully!');
+                    alert(`New ${category.toLowerCase()} added successfully!`);
                     location.reload(); // Reload to reflect the new entry
                 })
                 .catch(err => {
-                    console.error('Error adding asset:', err);
-                    alert('Failed to add the asset. Please try again.');
+                    console.error(`Error adding ${category.toLowerCase()}:`, err);
+                    alert(`Failed to add the ${category.toLowerCase()}. Please try again.`);
                 });
         }
     });
