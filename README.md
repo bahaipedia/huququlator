@@ -76,6 +76,14 @@ CREATE TABLE users (
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
+CREATE TABLE labels (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    category ENUM('Assets', 'Debts', 'Expenses') NOT NULL,
+    label VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE(user_id, category, label)
+);
 CREATE TABLE financial_summary (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -87,20 +95,16 @@ CREATE TABLE financial_summary (
     wealth_already_taxed DECIMAL(10, 2) DEFAULT 0.00,
     gold_rate DECIMAL(10, 2) DEFAULT NULL,
     huquq_payments_made DECIMAL(10, 2) DEFAULT 0.00,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 CREATE TABLE financial_entries (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    category ENUM('Assets', 'Debts', 'Expenses') NOT NULL, 
-    label VARCHAR(255) NOT NULL,
+    category ENUM('Assets', 'Debts', 'Expenses') NOT NULL,
     value DECIMAL(10, 2) DEFAULT 0.00,
-    reporting_date DATE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    summary_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (summary_id) REFERENCES financial_summary(id)
 );
 ```
 
