@@ -41,8 +41,7 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
                     return response.json();
                 })
                 .then(() => {
-                    alert('Year and associated entries deleted successfully!');
-                    location.reload(); // Reload to reflect changes
+                    location.reload(); 
                 })
                 .catch(err => {
                     console.error('Error deleting year:', err);
@@ -52,7 +51,6 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
     });
 });
 
-/* Add a New Asset, Debt, or Expense */
 /* Add a New Asset, Debt, or Expense */
 document.querySelectorAll('.add-item-button').forEach(button => {
     button.addEventListener('click', () => {
@@ -137,8 +135,6 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
                 // Remove the row from the table
                 const row = event.target.closest('tr');
                 row.remove();
-
-                alert('Label and associated entries deleted successfully!');
             })
             .catch(err => {
                 console.error('Error deleting label:', err);
