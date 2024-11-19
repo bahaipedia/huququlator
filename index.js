@@ -271,12 +271,21 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
+        // Match financial entries to summaries by reporting_date
+        const normalizedEntries = summaries.map(summary => {
+            const matchingEntries = entries.filter(entry => entry.reporting_date === summary.end_date);
+            return {
+                summary,
+                entries: matchingEntries
+            };
+        });
+
         // Render the dashboard with normalized data
         res.render('dashboard', {
             loggedIn: req.loggedIn,
             username: req.username,
             summaries,
-            entries,
+            entries: normalizedEntries,
             pageIndicator: 'dashboard'
         });
     } catch (error) {
