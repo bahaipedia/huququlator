@@ -348,7 +348,7 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
             VALUES (?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE value = ?
         `;
-        await pool.query(upsertQuery, [labelId, reporting_date, value, value]);
+        await pool.query(upsertQuery, [labelId, reporting_date, value, userId, value]);
 
         // Aggregate totals for the reporting_date
         const [totals] = await pool.query(`
