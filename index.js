@@ -485,13 +485,9 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
                 [userId, end_date]
             );
 
-            res.status(201).json({
+            return res.status(201).json({
                 message: 'New reporting period added successfully!',
                 newEntries,
-            });
-        } else {
-            res.status(200).json({
-                message: 'Reporting period already exists. No new entries created.',
             });
         }
 
