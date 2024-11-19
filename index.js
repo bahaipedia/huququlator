@@ -292,15 +292,23 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         const userId = req.userId;
 
         // Convert end_date to YYYYMMDD format
-        const formattedDate = end_date.replace(/-/g, ''); // Remove hyphens
+        const formattedDate = end_date.replace(/-/g, '');
 
-        // Fetch gold rate with the correct date format
+        // Fetch gold rate
         const goldResponse = await axios.get(`http://localhost:3000/api/gold-price?date=${formattedDate}`);
         const goldRate = goldResponse.data.value;
 
         if (!goldRate) {
             throw new Error('Failed to fetch gold rate.');
         }
+
+        // Fetch the previous reporting period's end_date
+        const [previousPeriod] = await pool.query(
+            'SELECT MAX(end_date) AS last_end_date FROM financial_summary WHERE user_id = ?',
+            [userId]
+        );
+
+        const lastEndDate = previousPeriod[0]?.last_end_date || null;
 
         // Calculate wealth_already_taxed
         const [prevSummaries] = await pool.query(
@@ -313,14 +321,10 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         // Insert a new reporting period
         const query = `
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
-            VALUES (
-                ?, 
-                (SELECT MAX(end_date) FROM financial_summary WHERE user_id = ?), 
-                ?, ?, ?
-            )
+            VALUES (?, ?, ?, ?, ?)
         `;
 
-        await pool.query(query, [userId, userId, end_date, wealthAlreadyTaxed, goldRate]);
+        await pool.query(query, [userId, lastEndDate, end_date, wealthAlreadyTaxed, goldRate]);
 
         res.status(201).json({ message: 'New reporting period added successfully!' });
     } catch (error) {
