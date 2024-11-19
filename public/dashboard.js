@@ -215,7 +215,14 @@ document.querySelector('.summary-table').addEventListener('change', (event) => {
 document.querySelector('.dashboard-table').addEventListener('change', (event) => {
     if (event.target && event.target.tagName === 'INPUT') {
         const entryId = event.target.dataset.id;
-        const newValue = parseFloat(event.target.value);
+
+        // Ignore inputs without a data-id (new unsaved rows)
+        if (!entryId) {
+            return; // Skip processing if there's no data-id
+        }
+
+        // Parse the new value or default to 0.00 if empty
+        const newValue = parseFloat(event.target.value) || 0.00;
 
         // Send updated value to the backend for existing entries
         fetch(`/api/entries/${entryId}`, {
