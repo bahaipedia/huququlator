@@ -1,34 +1,37 @@
 /* Add a New Asset, Debt, or Expense */
-document.querySelectorAll('.add-item-button').forEach(button => {
+// Handle Add a New Asset
+document.querySelectorAll('.add-item-button.asset-button').forEach(button => {
     button.addEventListener('click', () => {
-        const category = button.classList.contains('asset-button')
-            ? 'Assets'
-            : button.classList.contains('debt-button')
-            ? 'Debts'
-            : 'Expenses';
-
-        const label = prompt(`Enter ${category} Name:`);
+        const label = prompt('Enter Asset Name:');
         if (label) {
-            const reportingDate = document.querySelector('.dashboard-table thead th:nth-child(2)').textContent;
+            // Extract the date from the header, ensuring only the raw date is used
+            const reportingDate = button.closest('.dashboard-table-wrapper')
+                .querySelector('thead th:nth-child(2)')
+                .dataset.date;
 
             fetch('/api/entries', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    category,
+                    category: 'Assets',
                     label,
-                    value: 0.00, // Default value until user edits
+                    value: 0.00, // Default value
                     reporting_date: reportingDate
-                })
+                }),
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    alert(`${category} added successfully!`);
-                    location.reload(); // Reload to reflect changes
+                    alert('New asset added successfully!');
+                    location.reload(); // Reload to reflect the new entry
                 })
                 .catch(err => {
-                    console.error('Error adding item:', err);
-                    alert('Failed to add the item.');
+                    console.error('Error adding asset:', err);
+                    alert('Failed to add the asset. Please try again.');
                 });
         }
     });
