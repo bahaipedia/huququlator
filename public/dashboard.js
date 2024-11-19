@@ -71,7 +71,10 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                 <input type="text" placeholder="Label" class="new-item-label" />
                 <button class="save-item-button">Save</button>
             </td>
-            <td colspan="100%"></td> <!-- Placeholder for values in reporting years -->
+            ${summaries.map(() => `
+                <td>
+                    <input type="number" value="0.00" disabled />
+                </td>`).join('')}
         `;
 
         buttonRow.parentNode.insertBefore(newRow, buttonRow);
