@@ -158,24 +158,32 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
 function calculateTotals() {
     let totalAssets = 0;
     let totalDebts = 0;
+    let totalExpenses = 0;
 
-    // Iterate through all asset and debt input fields and sum their values
+    // Sum up all visible asset, debt, and expense input fields
     document.querySelectorAll('.asset-input').forEach(input => {
         totalAssets += parseFloat(input.value) || 0;
     });
     document.querySelectorAll('.debt-input').forEach(input => {
         totalDebts += parseFloat(input.value) || 0;
     });
+    document.querySelectorAll('.expense-input').forEach(input => {
+        totalExpenses += parseFloat(input.value) || 0;
+    });
 
-    // Update the totals in the DOM
+    // Update the DOM for Total Assets, Debts, and Expenses
     const totalAssetsElement = document.querySelector('.total-assets');
     const totalDebtsElement = document.querySelector('.total-debts');
+    const totalExpensesElement = document.querySelector('.unnecessary-expenses');
 
     if (totalAssetsElement) {
         totalAssetsElement.textContent = totalAssets.toFixed(2);
     }
     if (totalDebtsElement) {
         totalDebtsElement.textContent = `(${totalDebts.toFixed(2)})`;
+    }
+    if (totalExpensesElement) {
+        totalExpensesElement.textContent = totalExpenses.toFixed(2);
     }
 
     // Recalculate summary and related values
