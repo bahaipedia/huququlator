@@ -421,14 +421,15 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        const wealthAlreadyTaxed = prevSummaries.reduce((acc, row) => acc + row.summary, 0).toFixed(5);
+        const wealthAlreadyTaxed = prevSummaries.reduce((acc, row) => acc + (row.summary || 0), 0);
+        const roundedWealthAlreadyTaxed = parseFloat(wealthAlreadyTaxed.toFixed(5));
 
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
             VALUES (?, ?, ?, ?, ?)
         `;
-        await pool.query(insertQuery, [userId, lastEndDate, end_date, wealthAlreadyTaxed, goldRate]);
+        await pool.query(insertQuery, [userId, lastEndDate, end_date, roundedWealthAlreadyTaxed, goldRate]);
 
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
