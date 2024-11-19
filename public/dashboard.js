@@ -50,33 +50,54 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
 });
 
 /* Add a New Asset, Debt, or Expense */
-// Handle Adding New Items for Any Category
 document.querySelectorAll('.add-item-button').forEach(button => {
     button.addEventListener('click', () => {
-        // Determine the category based on the button's class
+        // Determine the category (Assets, Debts, Expenses)
         const category = button.classList.contains('asset-button')
             ? 'Assets'
             : button.classList.contains('debt-button')
             ? 'Debts'
             : 'Expenses';
 
-        const label = prompt(`Enter ${category} Name:`);
+        // Find the table body for the category
+        const tableBody = button.closest('tbody');
 
-        if (label) {
-            // Extract the reporting date and format it as YYYY-MM-DD
-            const reportingDateRaw = button.closest('.dashboard-table-wrapper')
+        // Add a new row dynamically
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>
+                <input type="text" placeholder="Enter ${category} Name" class="new-item-label" />
+            </td>
+            <td>
+                <input type="number" placeholder="Enter Value" class="new-item-value" />
+                <button class="save-item-button">Save</button>
+            </td>
+        `;
+        tableBody.appendChild(newRow);
+
+        // Handle Save Button Click
+        newRow.querySelector('.save-item-button').addEventListener('click', () => {
+            const label = newRow.querySelector('.new-item-label').value;
+            const value = newRow.querySelector('.new-item-value').value;
+
+            if (!label || isNaN(value)) {
+                alert('Please enter a valid name and value.');
+                return;
+            }
+
+            // Extract the reporting date
+            const reportingDate = button.closest('.dashboard-table-wrapper')
                 .querySelector('thead th:nth-child(2)')
                 .dataset.date;
 
-            const reportingDate = new Date(reportingDateRaw).toISOString().split('T')[0]; // Format as YYYY-MM-DD
-
+            // Send data to the backend
             fetch('/api/entries', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     category,
                     label,
-                    value: 0.00, // Default value
+                    value: parseFloat(value),
                     reporting_date: reportingDate
                 }),
             })
@@ -87,14 +108,14 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                     return response.json();
                 })
                 .then(data => {
-                    alert(`New ${category.toLowerCase()} added successfully!`);
-                    location.reload(); // Reload to reflect the new entry
+                    alert(`${category} added successfully!`);
+                    location.reload(); // Reload the page to reflect the new entry
                 })
                 .catch(err => {
                     console.error(`Error adding ${category.toLowerCase()}:`, err);
                     alert(`Failed to add the ${category.toLowerCase()}. Please try again.`);
                 });
-        }
+        });
     });
 });
 
