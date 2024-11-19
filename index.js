@@ -314,10 +314,10 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        const { category, label, value, reporting_date } = req.body;
+        const { category, label } = req.body;
         const userId = req.userId;
 
-        // Ensure the label exists in the financial_labels table
+        // Check if the label already exists
         let [labelResult] = await pool.query(
             `
             SELECT id 
@@ -330,7 +330,7 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
         let labelId;
 
         if (labelResult.length === 0) {
-            // If label does not exist, insert it
+            // Insert the new label
             const insertLabelQuery = `
                 INSERT INTO financial_labels (user_id, category, label)
                 VALUES (?, ?, ?)
@@ -338,42 +338,13 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
             const result = await pool.query(insertLabelQuery, [userId, category, label]);
             labelId = result[0].insertId; // Get the inserted label's ID
         } else {
-            // Use the existing label's ID
-            labelId = labelResult[0].id;
+            labelId = labelResult[0].id; // Use existing label's ID
         }
 
-        // Insert or update the financial_entries table
-        const upsertQuery = `
-            INSERT INTO financial_entries (label_id, reporting_date, value, user_id)
-            VALUES (?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE value = ?
-        `;
-        await pool.query(upsertQuery, [labelId, reporting_date, value, userId, value]);
-
-        // Aggregate totals for the reporting_date
-        const [totals] = await pool.query(`
-            SELECT 
-                SUM(CASE WHEN l.category = 'Assets' THEN v.value ELSE 0 END) AS total_assets,
-                SUM(CASE WHEN l.category = 'Debts' THEN v.value ELSE 0 END) AS total_debts,
-                SUM(CASE WHEN l.category = 'Expenses' THEN v.value ELSE 0 END) AS unnecessary_expenses
-            FROM financial_entries v
-            JOIN financial_labels l ON v.label_id = l.id
-            WHERE l.user_id = ? AND v.reporting_date = ?
-        `, [userId, reporting_date]);
-
-        const { total_assets, total_debts, unnecessary_expenses } = totals[0];
-
-        // Update the financial_summary table
-        const updateQuery = `
-            UPDATE financial_summary
-            SET total_assets = ?, total_debts = ?, unnecessary_expenses = ?
-            WHERE user_id = ? AND end_date = ?
-        `;
-        await pool.query(updateQuery, [total_assets, total_debts, unnecessary_expenses, userId, reporting_date]);
-
-        res.status(201).json({ message: 'Label added and summary updated successfully' });
+        // Return the labelId to the client
+        res.status(201).json({ labelId });
     } catch (error) {
-        console.error('Error adding financial label and updating summary:', error);
+        console.error('Error adding financial label:', error);
         res.status(500).send('Server Error');
     }
 });
