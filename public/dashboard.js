@@ -99,13 +99,19 @@ document.querySelector('.dashboard-table').addEventListener('change', (event) =>
     }
 });
 
-/* Recalculate Summary Table (Optional) */
+/* Calculate Summary Table */
 function calculateSummary() {
     const totalAssets = parseFloat(document.querySelector('.total-assets')?.textContent) || 0;
-    const totalDebts = parseFloat(document.querySelector('.total-debts')?.textContent.replace(/[()]/g, '')) || 0;
+    const totalDebts = parseFloat(document.querySelector('.total-debts')?.textContent?.replace(/[()]/g, '')) || 0;
     const unnecessaryExpenses = parseFloat(document.querySelector('.unnecessary-expenses')?.textContent) || 0;
     const wealthAlreadyTaxed = parseFloat(document.querySelector('.wealth-already-taxed input')?.value) || 0;
     const goldRate = parseFloat(document.querySelector('.gold-rate')?.textContent) || 0;
+
+    // Only proceed with calculations if the required elements exist
+    if (!goldRate || !document.querySelector('.summary-table')) {
+        console.warn('No data available for calculations.');
+        return;
+    }
 
     const summary = totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed;
     const unitsOfHuquq = summary / goldRate;
@@ -114,11 +120,22 @@ function calculateSummary() {
     const huquqPaymentsMade = parseFloat(document.querySelector('.huquq-payments-made input')?.value) || 0;
     const remainderDue = huquqPaymentOwed - huquqPaymentsMade;
 
-    document.querySelector('.summary-value').textContent = `$${summary.toFixed(2)}`;
-    document.querySelector('.units-of-huquq').textContent = unitsOfHuquq.toFixed(2);
-    document.querySelector('.rounded-units').textContent = roundedUnits;
-    document.querySelector('.payment-owed').textContent = `$${huquqPaymentOwed.toFixed(2)}`;
-    document.querySelector('.remainder-due').textContent = `$${remainderDue.toFixed(2)}`;
+    // Update the DOM only if the elements exist
+    if (document.querySelector('.summary-value')) {
+        document.querySelector('.summary-value').textContent = `$${summary.toFixed(2)}`;
+    }
+    if (document.querySelector('.units-of-huquq')) {
+        document.querySelector('.units-of-huquq').textContent = unitsOfHuquq.toFixed(2);
+    }
+    if (document.querySelector('.rounded-units')) {
+        document.querySelector('.rounded-units').textContent = roundedUnits;
+    }
+    if (document.querySelector('.payment-owed')) {
+        document.querySelector('.payment-owed').textContent = `$${huquqPaymentOwed.toFixed(2)}`;
+    }
+    if (document.querySelector('.remainder-due')) {
+        document.querySelector('.remainder-due').textContent = `$${remainderDue.toFixed(2)}`;
+    }
 }
 
 // Call the calculation function after the page loads or when data changes
