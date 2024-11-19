@@ -440,31 +440,42 @@ app.put('/api/entries/:id', checkLoginStatus, async (req, res) => {
     }
 });
 
-app.delete('/api/entries/:id', checkLoginStatus, async (req, res) => {
+app.delete('/api/labels/:id', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
     }
 
     try {
         const { id } = req.params;
+        const userId = req.userId;
 
-        // Ensure the value to delete belongs to the user's labels
-        const deleteQuery = `
+        // Delete associated entries from financial_entries
+        await pool.query(
+            `
             DELETE FROM financial_entries
-            WHERE id = ? AND label_id IN (
+            WHERE label_id = ? AND label_id IN (
                 SELECT id FROM financial_labels WHERE user_id = ?
             )
-        `;
+            `,
+            [id, userId]
+        );
 
-        const [result] = await pool.query(deleteQuery, [id, req.userId]);
+        // Delete the label itself
+        const [result] = await pool.query(
+            `
+            DELETE FROM financial_labels
+            WHERE id = ? AND user_id = ?
+            `,
+            [id, userId]
+        );
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Entry not found or not authorized to delete' });
+            return res.status(404).json({ error: 'Label not found or not authorized to delete' });
         }
 
-        res.status(200).json({ message: 'Entry deleted successfully' });
+        res.status(200).json({ message: 'Label and associated entries deleted successfully' });
     } catch (error) {
-        console.error('Error deleting entry:', error);
+        console.error('Error deleting label:', error);
         res.status(500).send('Server Error');
     }
 });
