@@ -216,13 +216,16 @@ function calculateSummary() {
     const wealthAlreadyTaxed = parseFloat(document.querySelector('.wealth-already-taxed input')?.value) || 0;
     const goldRate = parseFloat(document.querySelector('.gold-rate')?.textContent) || 0;
 
+    // Round values to ensure consistency
+    const roundedWealthAlreadyTaxed = parseFloat(wealthAlreadyTaxed.toFixed(2));
+
     // Only proceed with calculations if the required elements exist
     if (!goldRate || !document.querySelector('.summary-table')) {
         console.warn('No data available for calculations.');
         return;
     }
 
-    const summary = totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed;
+    const summary = totalAssets - totalDebts + unnecessaryExpenses - roundedWealthAlreadyTaxed;
     const unitsOfHuquq = summary / goldRate;
     const roundedUnits = Math.floor(unitsOfHuquq);
     const huquqPaymentOwed = 0.19 * (roundedUnits * goldRate);
