@@ -123,19 +123,19 @@
                     <tr>
                         <td>Total Assets:</td>
                         <% summaries.forEach(summary => { %>
-                            <%= summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00' %>
+                            <td class="total-assets"><%= summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00' %></td>
                         <% }); %>
                     </tr>
                     <tr>
                         <td>Total Debts:</td>
                         <% summaries.forEach(summary => { %>
-                            <td class="total-debts">(<%= summary.total_debts.toFixed(2) %>)</td>
+                            <td class="total-debts">(<%= summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00' %>)</td>
                         <% }); %>
                     </tr>
                     <tr>
                         <td>Unnecessary Expenses:</td>
                         <% summaries.forEach(summary => { %>
-                            <td class="unnecessary-expenses"><%= summary.unnecessary_expenses.toFixed(2) %></td>
+                            <td class="unnecessary-expenses"><%= summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00' %></td>
                         <% }); %>
                     </tr>
                     <tr>
