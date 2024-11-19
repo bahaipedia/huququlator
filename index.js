@@ -292,8 +292,12 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         const userId = req.userId;
 
         // Fetch gold rate from the API
-        const goldResponse = await axios.get('/api/gold-price');
+        const goldResponse = await axios.get(`/api/gold-price?date=${end_date}`);
         const goldRate = goldResponse.data.value;
+
+        if (!goldRate) {
+            throw new Error('Failed to fetch gold rate.');
+        }
 
         // Calculate wealth_already_taxed from previous summaries
         const [prevSummaries] = await pool.query(
@@ -315,10 +319,10 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
 
         await pool.query(query, [userId, userId, end_date, wealthAlreadyTaxed, goldRate]);
 
-        res.status(201).json({ message: 'New reporting period added successfully' });
+        res.status(201).json({ message: 'New reporting period added successfully!' });
     } catch (error) {
-        console.error('Error adding reporting period:', error);
-        res.status(500).send('Server Error');
+        console.error('Error adding reporting period:', error.message, error.stack);
+        res.status(500).json({ error: 'Server Error' }); // Ensure JSON response
     }
 });
 
