@@ -288,18 +288,21 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        const { end_date } = req.body;
+        const { end_date } = req.body; // Expected format: YYYY-MM-DD
         const userId = req.userId;
 
-        // Fetch gold rate from the API
-        const goldResponse = await axios.get(`/api/gold-price?date=${end_date}`);
+        // Convert end_date to YYYYMMDD format
+        const formattedDate = end_date.replace(/-/g, ''); // Remove hyphens
+
+        // Fetch gold rate with the correct date format
+        const goldResponse = await axios.get(`http://localhost:3000/api/gold-price?date=${formattedDate}`);
         const goldRate = goldResponse.data.value;
 
         if (!goldRate) {
             throw new Error('Failed to fetch gold rate.');
         }
 
-        // Calculate wealth_already_taxed from previous summaries
+        // Calculate wealth_already_taxed
         const [prevSummaries] = await pool.query(
             'SELECT total_assets - total_debts + unnecessary_expenses - wealth_already_taxed AS summary FROM financial_summary WHERE user_id = ?',
             [userId]
@@ -322,7 +325,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         res.status(201).json({ message: 'New reporting period added successfully!' });
     } catch (error) {
         console.error('Error adding reporting period:', error.message, error.stack);
-        res.status(500).json({ error: 'Server Error' }); // Ensure JSON response
+        res.status(500).json({ error: 'Server Error' });
     }
 });
 
