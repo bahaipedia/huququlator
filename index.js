@@ -229,19 +229,21 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
     try {
         const userId = req.userId;
 
-        // Fetch financial summaries for the user
+        // Fetch summaries
         const [summaries] = await pool.query(
             'SELECT * FROM financial_summary WHERE user_id = ? ORDER BY end_date ASC',
             [userId]
         );
 
-        // Fetch all financial entries for the user across all reporting periods
+        // Fetch entries
         const [entries] = await pool.query(
             'SELECT * FROM financial_entries WHERE user_id = ? ORDER BY reporting_date ASC',
             [userId]
         );
 
-        // Render the dashboard with all necessary data
+        // Log data to verify structure
+        console.log({ summaries, entries });
+
         res.render('dashboard', {
             loggedIn: req.loggedIn,
             username: req.username,
