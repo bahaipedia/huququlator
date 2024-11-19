@@ -457,6 +457,17 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         `;
         await pool.query(insertQuery, [userId, lastEndDate, end_date, roundedWealthAlreadyTaxed, goldRate]);
 
+        // Duplicate financial entries from the most recent period
+        if (lastEndDate) {
+            const duplicateQuery = `
+                INSERT INTO financial_entries (user_id, category, label, value, reporting_date)
+                SELECT user_id, category, label, 0.00 AS value, ? AS reporting_date
+                FROM financial_entries
+                WHERE user_id = ? AND reporting_date = ?
+            `;
+            await pool.query(duplicateQuery, [end_date, userId, lastEndDate]);
+        }
+
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
             SELECT 
