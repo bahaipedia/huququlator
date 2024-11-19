@@ -371,9 +371,9 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
         `;
         await pool.query(updateQuery, [total_assets, total_debts, unnecessary_expenses, userId, reporting_date]);
 
-        res.status(201).json({ message: 'Entry added and summary updated successfully' });
+        res.status(201).json({ message: 'Label added and summary updated successfully' });
     } catch (error) {
-        console.error('Error adding financial entry and updating summary:', error);
+        console.error('Error adding financial label and updating summary:', error);
         res.status(500).send('Server Error');
     }
 });
