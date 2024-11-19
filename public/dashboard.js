@@ -52,14 +52,12 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
 /* Add a New Asset, Debt, or Expense */
 document.querySelectorAll('.add-item-button').forEach(button => {
     button.addEventListener('click', () => {
-        // Determine the category (Assets, Debts, Expenses)
         const category = button.classList.contains('asset-button')
             ? 'Assets'
             : button.classList.contains('debt-button')
             ? 'Debts'
             : 'Expenses';
 
-        // Find the row containing the button and insert the new row just above it
         const buttonRow = button.closest('tr');
         const newRow = document.createElement('tr');
 
@@ -73,10 +71,8 @@ document.querySelectorAll('.add-item-button').forEach(button => {
             </td>
         `;
 
-        // Insert the new row before the button row
         buttonRow.parentNode.insertBefore(newRow, buttonRow);
 
-        // Handle Save Button Click
         newRow.querySelector('.save-item-button').addEventListener('click', () => {
             const label = newRow.querySelector('.new-item-label').value.trim();
             const value = parseFloat(newRow.querySelector('.new-item-value').value);
@@ -86,14 +82,12 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                 return;
             }
 
-            // Extract and format the reporting date
             const reportingDateRaw = button.closest('.dashboard-table-wrapper')
                 .querySelector('thead th:nth-child(2)')
                 .dataset.date;
 
-            const reportingDate = new Date(reportingDateRaw).toISOString().split('T')[0]; // Proper format YYYY-MM-DD
+            const reportingDate = new Date(reportingDateRaw).toISOString().split('T')[0];
 
-            // Send data to the backend
             fetch('/api/entries', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -111,7 +105,7 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                     return response.json();
                 })
                 .then(() => {
-                    location.reload(); // Reload the page to reflect the new entry
+                    location.reload();
                 })
                 .catch(err => {
                     console.error(`Error adding ${category.toLowerCase()}:`, err);
@@ -119,6 +113,34 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                 });
         });
     });
+});
+
+// Handle Deleting an Asset, Debt, or Expense
+document.querySelector('.dashboard-table').addEventListener('click', (event) => {
+    if (event.target.classList.contains('delete-item-button')) {
+        const entryId = event.target.dataset.id;
+
+        if (!confirm('Are you sure you want to delete this entry?')) {
+            return;
+        }
+
+        fetch(`/api/entries/${entryId}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(() => {
+                event.target.closest('tr').remove(); // Remove row from the table
+            })
+            .catch(err => {
+                console.error('Error deleting entry:', err);
+                alert('Failed to delete the entry.');
+            });
+    }
 });
 
 /* Handle Changes in the Summary Table Using Event Delegation */
