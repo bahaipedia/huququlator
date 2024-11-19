@@ -60,6 +60,31 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
     }
 });
 
+// Delete a Reporting Period
+document.querySelectorAll('.delete-year-button').forEach(button => {
+    button.addEventListener('click', () => {
+        const yearId = button.dataset.id;
+
+        if (confirm('Are you sure you want to delete this year? This action cannot be undone.')) {
+            fetch(`/api/summary/${yearId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    alert('Year deleted successfully!');
+                    location.reload(); // Reload to reflect changes
+                })
+                .catch(err => {
+                    console.error('Error deleting year:', err);
+                    alert('Failed to delete the year. Please try again later.');
+                });
+        }
+    });
+});
+
 /* Handle Changes in the Summary Table Using Event Delegation */
 document.querySelector('.summary-table').addEventListener('change', (event) => {
     if (event.target && event.target.tagName === 'INPUT') {
