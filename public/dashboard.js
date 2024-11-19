@@ -130,13 +130,13 @@ document.querySelectorAll('.add-item-button').forEach(button => {
 // Handle Deleting an Asset, Debt, or Expense
 document.querySelector('.dashboard-table').addEventListener('click', (event) => {
     if (event.target.classList.contains('delete-item-button')) {
-        const entryId = event.target.dataset.id;
+        const labelId = event.target.dataset.labelId;
 
-        if (!confirm('Are you sure you want to delete this entry?')) {
+        if (!confirm('Are you sure you want to delete this label and all associated entries?')) {
             return;
         }
 
-        fetch(`/api/entries/${entryId}`, {
+        fetch(`/api/labels/${labelId}`, {
             method: 'DELETE',
         })
             .then(response => {
@@ -150,13 +150,11 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
                 const row = event.target.closest('tr');
                 row.remove();
 
-                // Recalculate totals dynamically
-                calculateTotals();
-                alert('Entry deleted successfully!');
+                alert('Label and associated entries deleted successfully!');
             })
             .catch(err => {
-                console.error('Error deleting entry:', err);
-                alert('Failed to delete the entry.');
+                console.error('Error deleting label:', err);
+                alert('Failed to delete the label.');
             });
     }
 });
