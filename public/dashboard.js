@@ -201,26 +201,29 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
 });
 
 // Function to recalculate totals dynamically
-function calculateTotals() {
+function calculateTotals(reportingPeriod) {
     let totalAssets = 0;
     let totalDebts = 0;
     let totalExpenses = 0;
 
-    // Sum up all visible asset, debt, and expense input fields
-    document.querySelectorAll('.asset-input').forEach(input => {
+    // Select inputs for the current reporting period
+    const inputsSelector = `[data-reporting-period="${reportingPeriod}"]`;
+
+    // Sum up all visible asset, debt, and expense input fields for this period
+    document.querySelectorAll(`.asset-input${inputsSelector}`).forEach(input => {
         totalAssets += parseFloat(input.value) || 0;
     });
-    document.querySelectorAll('.debt-input').forEach(input => {
+    document.querySelectorAll(`.debt-input${inputsSelector}`).forEach(input => {
         totalDebts += parseFloat(input.value) || 0;
     });
-    document.querySelectorAll('.expense-input').forEach(input => {
+    document.querySelectorAll(`.expense-input${inputsSelector}`).forEach(input => {
         totalExpenses += parseFloat(input.value) || 0;
     });
 
-    // Update the DOM for Total Assets, Debts, and Expenses
-    const totalAssetsElement = document.querySelector('.total-assets');
-    const totalDebtsElement = document.querySelector('.total-debts');
-    const totalExpensesElement = document.querySelector('.unnecessary-expenses');
+    // Update the DOM for Total Assets, Debts, and Expenses for this period
+    const totalAssetsElement = document.querySelector(`.total-assets[data-reporting-period="${reportingPeriod}"]`);
+    const totalDebtsElement = document.querySelector(`.total-debts[data-reporting-period="${reportingPeriod}"]`);
+    const totalExpensesElement = document.querySelector(`.unnecessary-expenses[data-reporting-period="${reportingPeriod}"]`);
 
     if (totalAssetsElement) {
         totalAssetsElement.textContent = totalAssets.toFixed(2);
@@ -232,8 +235,8 @@ function calculateTotals() {
         totalExpensesElement.textContent = totalExpenses.toFixed(2);
     }
 
-    // Recalculate summary and related values
-    calculateSummary();
+    // Recalculate summary and related values for this period
+    calculateSummary(reportingPeriod);
 }
 
 /* Handle Changes in the Summary Table Using Event Delegation */
