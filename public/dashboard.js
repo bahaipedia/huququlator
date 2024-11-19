@@ -215,34 +215,38 @@ document.querySelector('.summary-table').addEventListener('change', (event) => {
 /* Handle Inline Editing for Financial Entries Using Event Delegation */
 document.querySelector('.dashboard-table').addEventListener('change', (event) => {
     if (event.target && event.target.tagName === 'INPUT') {
-        // Ignore inputs without a data-id attribute (e.g., for new rows)
         const entryId = event.target.dataset.id;
-        if (!entryId) return;
-
         const newValue = parseFloat(event.target.value);
 
         // Ensure valid numeric input
         if (isNaN(newValue)) {
             alert('Please enter a valid number.');
+            event.target.value = '0.00'; // Reset to default if invalid
             return;
         }
 
-        // Send updated value to the backend
+        if (!entryId) {
+            console.warn('New entry detected. Save manually to backend.');
+            return;
+        }
+
+        // Send updated value to the backend for existing entries
         fetch(`/api/entries/${entryId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ value: newValue }),
         })
-            .then((response) => {
+            .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(() => {
-                alert('Entry updated successfully!');
+                console.log('Entry updated successfully!');
+                calculateTotals(); // Recalculate totals after successful update
             })
-            .catch((err) => {
+            .catch(err => {
                 console.error('Error updating entry:', err);
                 alert('Failed to update the entry.');
             });
