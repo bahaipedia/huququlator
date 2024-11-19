@@ -25,7 +25,7 @@
                                     <%= new Date(summary.end_date).toLocaleDateString() %>
                                     <button 
                                         class="delete-year-button" 
-                                        data-id="<%= summary.id %>">
+                                        data-label-id="<%= summary.id %>">
                                         Delete
                                     </button>
                                 </th>
@@ -43,7 +43,7 @@
                                 <%= entry.label %>
                                 <button 
                                     class="delete-item-button" 
-                                    data-id="<%= entry.id %>" 
+                                    data-label-id="<%= entry.id %>" 
                                     style="float: right;">
                                     D
                                 </button>
@@ -54,14 +54,14 @@
                                     <input 
                                         type="text" 
                                         value="<%= entry.value %>" 
-                                        data-id="<%= entry.id %>" 
+                                        data-label-id="<%= entry.id %>" 
                                         class="asset-input"
                                     />
                                 <% } else { %>
                                     <input 
                                         type="text" 
                                         value="0.00" 
-                                        data-id="" 
+                                        data-label-id="" 
                                         class="asset-input"
                                     />
                                 <% } %>
@@ -85,7 +85,7 @@
                                 <%= entry.label %>
                                 <button 
                                     class="delete-item-button" 
-                                    data-id="<%= entry.id %>" 
+                                    data-label-id="<%= entry.id %>" 
                                     style="float: right;">
                                     D
                                 </button>
@@ -96,14 +96,14 @@
                                     (<input 
                                         type="text" 
                                         value="<%= entry.value %>" 
-                                        data-id="<%= entry.id %>" 
+                                        data-label-id="<%= entry.id %>" 
                                         class="debt-input"
                                     />)
                                 <% } else { %>
                                     (<input 
                                         type="text" 
                                         value="0.00" 
-                                        data-id="" 
+                                        data-label-id="" 
                                         class="debt-input"
                                     />)
                                 <% } %>
@@ -127,7 +127,7 @@
                                 <%= entry.label %>
                                 <button 
                                     class="delete-item-button" 
-                                    data-id="<%= entry.id %>" 
+                                    data-label-id="<%= entry.id %>" 
                                     style="float: right;">
                                     D
                                 </button>
@@ -138,14 +138,14 @@
                                     <input 
                                         type="text" 
                                         value="<%= entry.value %>" 
-                                        data-id="<%= entry.id %>" 
+                                        data-label-id="<%= entry.id %>" 
                                         class="expense-input"
                                     />
                                 <% } else { %>
                                     <input 
                                         type="text" 
                                         value="0.00" 
-                                        data-id="" 
+                                        data-label-id="" 
                                         class="expense-input"
                                     />
                                 <% } %>
