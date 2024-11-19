@@ -14,70 +14,89 @@
 
         <!-- Table Container -->
         <div class="table-container">
-            <!-- Dashboard Table and Add Year Button -->
+            <!-- Dashboard Table -->
             <div class="dashboard-table-wrapper">
                 <table class="dashboard-table">
                     <thead>
                         <tr>
                             <th>Accounts</th>
-                            <th>Year 2021</th>
+                            <% summaries.forEach(summary => { %>
+                                <th><%= new Date(summary.end_date).toLocaleDateString() %></th>
+                            <% }); %>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Assets Section -->
                         <tr class="section-row">
-                            <td colspan="2" class="section-title">Assets</td>
+                            <td colspan="<%= summaries.length + 1 %>" class="section-title">Assets</td>
                         </tr>
+                        <% entries.filter(entry => entry.category === 'Assets').forEach(entry => { %>
                         <tr>
-                            <td>Bitcoin</td>
-                            <td><input type="text" value="8833.22"></td>
+                            <td><%= entry.label %></td>
+                            <% summaries.forEach(summary => { %>
+                                <td>
+                                    <input 
+                                        type="text" 
+                                        value="<%= entry.value %>" 
+                                        data-id="<%= entry.id %>" 
+                                        class="asset-input"
+                                    />
+                                </td>
+                            <% }); %>
                         </tr>
+                        <% }); %>
                         <tr>
-                            <td>Ethereum</td>
-                            <td><input type="text" value="3113.92"></td>
-                        </tr>
-                        <tr>
-                            <td>Chase Checking</td>
-                            <td><input type="text" value="3408.25"></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
+                            <td colspan="<%= summaries.length + 1 %>">
                                 <button class="add-item-button asset-button">Add a New Asset</button>
                             </td>
                         </tr>
 
                         <!-- Debts Section -->
                         <tr class="section-row">
-                            <td colspan="2" class="section-title">Debts</td>
+                            <td colspan="<%= summaries.length + 1 %>" class="section-title">Debts</td>
                         </tr>
+                        <% entries.filter(entry => entry.category === 'Debts').forEach(entry => { %>
                         <tr>
-                            <td>American Express</td>
-                            <td class="debt-input-wrapper">(<input type="text" value="-18.97">)</td>
+                            <td><%= entry.label %></td>
+                            <% summaries.forEach(summary => { %>
+                                <td>
+                                    (<input 
+                                        type="text" 
+                                        value="<%= entry.value %>" 
+                                        data-id="<%= entry.id %>" 
+                                        class="debt-input"
+                                    />)
+                                </td>
+                            <% }); %>
                         </tr>
+                        <% }); %>
                         <tr>
-                            <td>Student Loan</td>
-                            <td class="debt-input-wrapper">(<input type="text" value="20000">)</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
+                            <td colspan="<%= summaries.length + 1 %>">
                                 <button class="add-item-button debt-button">Add a New Debt</button>
                             </td>
                         </tr>
 
                         <!-- Expenses Section -->
                         <tr class="section-row">
-                            <td colspan="2" class="section-title">Expenses</td>
+                            <td colspan="<%= summaries.length + 1 %>" class="section-title">Expenses</td>
                         </tr>
+                        <% entries.filter(entry => entry.category === 'Expenses').forEach(entry => { %>
                         <tr>
-                            <td>Streaming Subscriptions</td>
-                            <td><input type="text" value="120"></td>
+                            <td><%= entry.label %></td>
+                            <% summaries.forEach(summary => { %>
+                                <td>
+                                    <input 
+                                        type="text" 
+                                        value="<%= entry.value %>" 
+                                        data-id="<%= entry.id %>" 
+                                        class="expense-input"
+                                    />
+                                </td>
+                            <% }); %>
                         </tr>
+                        <% }); %>
                         <tr>
-                            <td>Coffee Shop Visits</td>
-                            <td><input type="text" value="300"></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
+                            <td colspan="<%= summaries.length + 1 %>">
                                 <button class="add-item-button expense-button">Add a New Expense</button>
                             </td>
                         </tr>
@@ -91,62 +110,68 @@
             </div>
 
             <!-- Summary Table -->
-            <table class="summary-table">
+            <table class="summary-table" data-summary-id="<%= summaries[summaries.length - 1]?.id %>">
                 <thead>
                     <tr>
                         <th>Summary</th>
-                        <th>Year 2021</th>
+                        <% summaries.forEach(summary => { %>
+                            <th><%= new Date(summary.end_date).toLocaleDateString() %></th>
+                        <% }); %>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>Total Assets:</td>
-                        <td>$131,355.39</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="total-assets"><%= summary.total_assets.toFixed(2) %></td>
+                        <% }); %>
                     </tr>
                     <tr>
                         <td>Total Debts:</td>
-                        <td class="debt-value">($20,018.97)</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="total-debts">(<%= summary.total_debts.toFixed(2) %>)</td>
+                        <% }); %>
                     </tr>
                     <tr>
                         <td>Unnecessary Expenses:</td>
-                        <td>$420.00</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="unnecessary-expenses"><%= summary.unnecessary_expenses.toFixed(2) %></td>
+                        <% }); %>
                     </tr>
                     <tr>
                         <td>Wealth already taxed:</td>
-                        <td><input type="text" value="$5,000.00"></td>
-                    </tr>
-                    <tr>
-                        <td>Summary:</td>
-                        <td>$105,916.42</td>
+                        <% summaries.forEach(summary => { %>
+                            <td>
+                                <input 
+                                    type="text" 
+                                    value="<%= summary.wealth_already_taxed.toFixed(2) %>" 
+                                    class="wealth-already-taxed"
+                                />
+                            </td>
+                        <% }); %>
                     </tr>
                     <tr>
                         <td>Gold Rate:</td>
-                        <td>$1,800.00</td>
-                    </tr>
-                    <tr>
-                        <td>Units of Huquq:</td>
-                        <td>10.5</td>
-                    </tr>
-                    <tr>
-                        <td>Rounded Units:</td>
-                        <td>11</td>
-                    </tr>
-                    <tr>
-                        <td>Huquq Payment Owed:</td>
-                        <td>$500.00</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="gold-rate"><%= summary.gold_rate.toFixed(2) %></td>
+                        <% }); %>
                     </tr>
                     <tr>
                         <td>Huquq Payments Made:</td>
-                        <td><input type="text" value="300.00"></td>
-                    </tr>
-                    <tr>
-                        <td>Remainder Due:</td>
-                        <td>$200.00</td>
+                        <% summaries.forEach(summary => { %>
+                            <td>
+                                <input 
+                                    type="text" 
+                                    value="<%= summary.huquq_payments_made.toFixed(2) %>" 
+                                    class="huquq-payments-made"
+                                />
+                            </td>
+                        <% }); %>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-  <script src="/dashboard.js"></script>
+    <script src="/dashboard.js"></script>
 </body>
 </html>
