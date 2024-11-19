@@ -1,43 +1,3 @@
-/* Add a New Asset, Debt, or Expense */
-document.querySelectorAll('.add-item-button.asset-button').forEach(button => {
-    button.addEventListener('click', () => {
-        const label = prompt('Enter Asset Name:');
-        if (label) {
-            // Extract the date and format it as YYYY-MM-DD
-            const reportingDateRaw = button.closest('.dashboard-table-wrapper')
-                .querySelector('thead th:nth-child(2)')
-                .dataset.date;
-
-            const reportingDate = new Date(reportingDateRaw).toISOString().split('T')[0]; // Format as YYYY-MM-DD
-
-            fetch('/api/entries', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    category: 'Assets',
-                    label,
-                    value: 0.00, // Default value
-                    reporting_date: reportingDate
-                }),
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    alert('New asset added successfully!');
-                    location.reload(); // Reload to reflect the new entry
-                })
-                .catch(err => {
-                    console.error('Error adding asset:', err);
-                    alert('Failed to add the asset. Please try again.');
-                });
-        }
-    });
-});
-
 /* Add a New Reporting Period */
 document.querySelector('.add-year-button').addEventListener('click', () => {
     const endDate = prompt('Enter the end date for the new reporting period (YYYY-MM-DD):');
@@ -84,6 +44,46 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
                 .catch(err => {
                     console.error('Error deleting year:', err);
                     alert('Failed to delete the year. Please try again later.');
+                });
+        }
+    });
+});
+
+/* Add a New Asset, Debt, or Expense */
+document.querySelectorAll('.add-item-button.asset-button').forEach(button => {
+    button.addEventListener('click', () => {
+        const label = prompt('Enter Asset Name:');
+        if (label) {
+            // Extract the date and format it as YYYY-MM-DD
+            const reportingDateRaw = button.closest('.dashboard-table-wrapper')
+                .querySelector('thead th:nth-child(2)')
+                .dataset.date;
+
+            const reportingDate = new Date(reportingDateRaw).toISOString().split('T')[0]; // Format as YYYY-MM-DD
+
+            fetch('/api/entries', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    category: 'Assets',
+                    label,
+                    value: 0.00, // Default value
+                    reporting_date: reportingDate
+                }),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('New asset added successfully!');
+                    location.reload(); // Reload to reflect the new entry
+                })
+                .catch(err => {
+                    console.error('Error adding asset:', err);
+                    alert('Failed to add the asset. Please try again.');
                 });
         }
     });
