@@ -273,7 +273,7 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
                 label_id, 
                 reporting_date, 
                 value 
-            FROM financial_values 
+            FROM financial_entries 
             WHERE label_id IN (SELECT id FROM financial_labels WHERE user_id = ?) 
             ORDER BY reporting_date ASC
             `,
@@ -342,9 +342,9 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
             labelId = labelResult[0].id;
         }
 
-        // Insert or update the financial_values table
+        // Insert or update the financial_entries table
         const upsertQuery = `
-            INSERT INTO financial_values (label_id, reporting_date, value)
+            INSERT INTO financial_entries (label_id, reporting_date, value)
             VALUES (?, ?, ?)
             ON DUPLICATE KEY UPDATE value = ?
         `;
@@ -356,7 +356,7 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
                 SUM(CASE WHEN l.category = 'Assets' THEN v.value ELSE 0 END) AS total_assets,
                 SUM(CASE WHEN l.category = 'Debts' THEN v.value ELSE 0 END) AS total_debts,
                 SUM(CASE WHEN l.category = 'Expenses' THEN v.value ELSE 0 END) AS unnecessary_expenses
-            FROM financial_values v
+            FROM financial_entries v
             JOIN financial_labels l ON v.label_id = l.id
             WHERE l.user_id = ? AND v.reporting_date = ?
         `, [userId, reporting_date]);
@@ -387,9 +387,9 @@ app.put('/api/entries/:id', checkLoginStatus, async (req, res) => {
         const { id } = req.params;
         const { value } = req.body;
 
-        // Update the value in financial_values
+        // Update the value in financial_entries
         const updateValueQuery = `
-            UPDATE financial_values
+            UPDATE financial_entries
             SET value = ?
             WHERE id = ? AND label_id IN (
                 SELECT id FROM financial_labels WHERE user_id = ?
@@ -400,7 +400,7 @@ app.put('/api/entries/:id', checkLoginStatus, async (req, res) => {
         // Get the reporting_date and label_id for the updated entry
         const [entry] = await pool.query(`
             SELECT reporting_date, label_id
-            FROM financial_values
+            FROM financial_entries
             WHERE id = ? AND label_id IN (
                 SELECT id FROM financial_labels WHERE user_id = ?
             )
@@ -418,7 +418,7 @@ app.put('/api/entries/:id', checkLoginStatus, async (req, res) => {
                 SUM(CASE WHEN l.category = 'Assets' THEN v.value ELSE 0 END) AS total_assets,
                 SUM(CASE WHEN l.category = 'Debts' THEN v.value ELSE 0 END) AS total_debts,
                 SUM(CASE WHEN l.category = 'Expenses' THEN v.value ELSE 0 END) AS unnecessary_expenses
-            FROM financial_values v
+            FROM financial_entries v
             JOIN financial_labels l ON v.label_id = l.id
             WHERE l.user_id = ? AND v.reporting_date = ?
         `, [req.userId, reporting_date]);
@@ -450,7 +450,7 @@ app.delete('/api/entries/:id', checkLoginStatus, async (req, res) => {
 
         // Ensure the value to delete belongs to the user's labels
         const deleteQuery = `
-            DELETE FROM financial_values
+            DELETE FROM financial_entries
             WHERE id = ? AND label_id IN (
                 SELECT id FROM financial_labels WHERE user_id = ?
             )
@@ -523,7 +523,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
 
         // Duplicate labels for the new reporting period and set initial values to 0.00
         const duplicateQuery = `
-            INSERT INTO financial_values (label_id, reporting_date, value)
+            INSERT INTO financial_entries (label_id, reporting_date, value)
             SELECT id, ?, 0.00
             FROM financial_labels
             WHERE user_id = ?
@@ -536,7 +536,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
                 SUM(CASE WHEN fl.category = 'Assets' THEN fv.value ELSE 0 END) AS total_assets,
                 SUM(CASE WHEN fl.category = 'Debts' THEN fv.value ELSE 0 END) AS total_debts,
                 SUM(CASE WHEN fl.category = 'Expenses' THEN fv.value ELSE 0 END) AS unnecessary_expenses
-            FROM financial_values fv
+            FROM financial_entries fv
             JOIN financial_labels fl ON fv.label_id = fl.id
             WHERE fl.user_id = ? AND fv.reporting_date = ?
         `, [userId, end_date]);
@@ -603,11 +603,11 @@ app.delete('/api/summary/:id', checkLoginStatus, async (req, res) => {
 
         const { end_date } = summary[0];
 
-        // Delete associated entries from financial_values
+        // Delete associated entries from financial_entries
         await pool.query(
             `
             DELETE fv
-            FROM financial_values fv
+            FROM financial_entries fv
             JOIN financial_labels fl ON fv.label_id = fl.id
             WHERE fl.user_id = ? AND fv.reporting_date = ?
             `,
