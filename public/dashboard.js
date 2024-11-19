@@ -41,14 +41,14 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
         fetch('/api/summary', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ end_date: endDate })
+            body: JSON.stringify({ end_date: endDate }),
         })
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => response.json())
+            .then((data) => {
                 alert('New reporting period added successfully!');
                 location.reload(); // Reload to reflect the new column
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error('Error adding reporting period:', err);
                 alert('Failed to add the reporting period.');
             });
@@ -78,24 +78,27 @@ document.querySelectorAll('.dashboard-table input').forEach(input => {
 });
 
 /* Handle Huquq Payments */
-document.querySelector('.summary-table input').addEventListener('change', () => {
-    const summaryId = document.querySelector('.summary-table').dataset.summaryId; // Assume summary ID is stored in the table
-    const huquqPaymentsMade = parseFloat(document.querySelector('.summary-table input').value);
+const huquqInput = document.querySelector('.summary-table input');
+if (huquqInput) {
+    huquqInput.addEventListener('change', () => {
+        const summaryId = document.querySelector('.summary-table').dataset.summaryId; // Assume summary ID is stored in the table
+        const huquqPaymentsMade = parseFloat(huquqInput.value);
 
-    fetch(`/api/summary/${summaryId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ huquq_payments_made: huquqPaymentsMade })
-    })
-        .then(response => response.json())
-        .then(data => {
-            alert('Huquq payment updated successfully!');
+        fetch(`/api/summary/${summaryId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ huquq_payments_made: huquqPaymentsMade }),
         })
-        .catch(err => {
-            console.error('Error updating Huquq payment:', err);
-            alert('Failed to update Huquq payment.');
-        });
-});
+            .then((response) => response.json())
+            .then((data) => {
+                alert('Huquq payment updated successfully!');
+            })
+            .catch((err) => {
+                console.error('Error updating Huquq payment:', err);
+                alert('Failed to update Huquq payment.');
+            });
+    });
+}
 
 /* Display Summary Calculations */
 function calculateSummary() {
