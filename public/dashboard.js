@@ -43,14 +43,19 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ end_date: endDate }),
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 alert('New reporting period added successfully!');
                 location.reload(); // Reload to reflect the new column
             })
             .catch(err => {
                 console.error('Error adding reporting period:', err);
-                alert('Failed to add the reporting period.');
+                alert('Failed to add the reporting period. Please try again later.');
             });
     }
 });
