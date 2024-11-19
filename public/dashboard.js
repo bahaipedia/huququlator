@@ -148,16 +148,31 @@ document.querySelector('.summary-table').addEventListener('change', (event) => {
 /* Handle Inline Editing for Financial Entries Using Event Delegation */
 document.querySelector('.dashboard-table').addEventListener('change', (event) => {
     if (event.target && event.target.tagName === 'INPUT') {
-        const entryId = event.target.dataset.id; // Assume each input has a data-id attribute
+        // Ignore inputs without a data-id attribute (e.g., for new rows)
+        const entryId = event.target.dataset.id;
+        if (!entryId) return;
+
         const newValue = parseFloat(event.target.value);
 
+        // Ensure valid numeric input
+        if (isNaN(newValue)) {
+            alert('Please enter a valid number.');
+            return;
+        }
+
+        // Send updated value to the backend
         fetch(`/api/entries/${entryId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ value: newValue }),
         })
-            .then((response) => response.json())
-            .then((data) => {
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(() => {
                 alert('Entry updated successfully!');
             })
             .catch((err) => {
