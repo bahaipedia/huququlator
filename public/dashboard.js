@@ -123,7 +123,6 @@ document.querySelectorAll('.add-item-button').forEach(button => {
 
 // Handle Deleting an Asset, Debt, or Expense
 document.querySelector('.dashboard-table').addEventListener('click', (event) => {
-    // Handle deleting an item
     if (event.target.classList.contains('delete-item-button')) {
         const entryId = event.target.dataset.id;
 
@@ -153,77 +152,29 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
                 alert('Failed to delete the entry.');
             });
     }
-
-    // Handle saving a new item
-    if (event.target.classList.contains('save-item-button')) {
-        const newRow = event.target.closest('tr');
-        const label = newRow.querySelector('.new-item-label').value.trim();
-        const value = parseFloat(newRow.querySelector('.new-item-value').value) || 0;
-        const category = newRow.closest('tbody').querySelector('.section-title').textContent.trim();
-        const reportingDateRaw = newRow.closest('.dashboard-table-wrapper').querySelector('thead th:nth-child(2)').dataset.date;
-        const reportingDate = new Date(reportingDateRaw).toISOString().split('T')[0];
-
-        if (!label) {
-            alert('Please enter a valid label.');
-            return;
-        }
-
-        fetch('/api/entries', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                category,
-                label,
-                value,
-                reporting_date: reportingDate
-            }),
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Dynamically set the new data-id and update the row
-                newRow.querySelector('.new-item-value').dataset.id = data.id;
-                newRow.querySelector('.save-item-button').remove(); // Remove the save button
-                console.log('New entry created successfully:', data);
-
-                // Recalculate totals dynamically
-                calculateTotals();
-            })
-            .catch(err => {
-                console.error('Error saving new item:', err);
-                alert('Failed to save the new item.');
-            });
-    }
 });
 
 // Function to recalculate totals dynamically
-function calculateTotals(reportingPeriod) {
+function calculateTotals() {
     let totalAssets = 0;
     let totalDebts = 0;
     let totalExpenses = 0;
 
-    // Select inputs for the current reporting period
-    const inputsSelector = `[data-reporting-period="${reportingPeriod}"]`;
-
-    // Sum up all visible asset, debt, and expense input fields for this period
-    document.querySelectorAll(`.asset-input${inputsSelector}`).forEach(input => {
+    // Sum up all visible asset, debt, and expense input fields
+    document.querySelectorAll('.asset-input').forEach(input => {
         totalAssets += parseFloat(input.value) || 0;
     });
-    document.querySelectorAll(`.debt-input${inputsSelector}`).forEach(input => {
+    document.querySelectorAll('.debt-input').forEach(input => {
         totalDebts += parseFloat(input.value) || 0;
     });
-    document.querySelectorAll(`.expense-input${inputsSelector}`).forEach(input => {
+    document.querySelectorAll('.expense-input').forEach(input => {
         totalExpenses += parseFloat(input.value) || 0;
     });
 
-    // Update the DOM for Total Assets, Debts, and Expenses for this period
-    const totalAssetsElement = document.querySelector(`.total-assets[data-reporting-period="${reportingPeriod}"]`);
-    const totalDebtsElement = document.querySelector(`.total-debts[data-reporting-period="${reportingPeriod}"]`);
-    const totalExpensesElement = document.querySelector(`.unnecessary-expenses[data-reporting-period="${reportingPeriod}"]`);
+    // Update the DOM for Total Assets, Debts, and Expenses
+    const totalAssetsElement = document.querySelector('.total-assets');
+    const totalDebtsElement = document.querySelector('.total-debts');
+    const totalExpensesElement = document.querySelector('.unnecessary-expenses');
 
     if (totalAssetsElement) {
         totalAssetsElement.textContent = totalAssets.toFixed(2);
@@ -235,8 +186,8 @@ function calculateTotals(reportingPeriod) {
         totalExpensesElement.textContent = totalExpenses.toFixed(2);
     }
 
-    // Recalculate summary and related values for this period
-    calculateSummary(reportingPeriod);
+    // Recalculate summary and related values
+    calculateSummary();
 }
 
 /* Handle Changes in the Summary Table Using Event Delegation */
