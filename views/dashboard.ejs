@@ -151,9 +151,49 @@
                         <% }); %>
                     </tr>
                     <tr>
+                        <td>Summary:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="summary-value">
+                                <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed 
+                                    ? (summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed).toFixed(2) 
+                                    : '0.00' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
                         <td>Gold Rate:</td>
                         <% summaries.forEach(summary => { %>
                             <td class="gold-rate"><%= summary.gold_rate ? parseFloat(summary.gold_rate).toFixed(2) : '0.00' %></td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Units of Huquq:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="units-of-huquq">
+                                <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate 
+                                    ? ((summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed) / summary.gold_rate).toFixed(2) 
+                                    : '0.00' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Rounded Units:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="rounded-units">
+                                <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate 
+                                    ? Math.floor((summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed) / summary.gold_rate) 
+                                    : '0' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Huquq Payment Owed:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="payment-owed">
+                                <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate 
+                                    ? (0.19 * Math.floor((summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed) / summary.gold_rate) * summary.gold_rate).toFixed(2) 
+                                    : '0.00' %>
+                            </td>
                         <% }); %>
                     </tr>
                     <tr>
@@ -165,6 +205,16 @@
                                     value="<%= summary.huquq_payments_made ? parseFloat(summary.huquq_payments_made).toFixed(2) : '0.00' %>" 
                                     class="huquq-payments-made"
                                 />
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Remainder Due:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="remainder-due">
+                                <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate && summary.huquq_payments_made 
+                                    ? ((0.19 * Math.floor((summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed) / summary.gold_rate) * summary.gold_rate) - summary.huquq_payments_made).toFixed(2) 
+                                    : '0.00' %>
                             </td>
                         <% }); %>
                     </tr>
