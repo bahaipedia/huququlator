@@ -105,7 +105,6 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                 .then(data => {
                     // Update the row with the newly assigned label ID
                     newRow.querySelector('.new-item-label').dataset.labelId = data.labelId;
-                    newRow.remove();
                     location.reload();
                 })
                 .catch(err => {
