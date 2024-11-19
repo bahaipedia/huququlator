@@ -235,17 +235,13 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        // Fetch financial entries for the most recent reporting period
-        const latestSummary = summaries[summaries.length - 1];
-        let entries = [];
-        if (latestSummary) {
-            const [entriesResult] = await pool.query(
-                'SELECT * FROM financial_entries WHERE user_id = ? AND reporting_date = ?',
-                [userId, latestSummary.end_date]
-            );
-            entries = entriesResult;
-        }
+        // Fetch all financial entries for the user across all reporting periods
+        const [entries] = await pool.query(
+            'SELECT * FROM financial_entries WHERE user_id = ? ORDER BY reporting_date ASC',
+            [userId]
+        );
 
+        // Render the dashboard with all necessary data
         res.render('dashboard', {
             loggedIn: req.loggedIn,
             username: req.username,
