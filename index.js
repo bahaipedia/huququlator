@@ -221,6 +221,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Dashboard route
 app.get('/dashboard', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.redirect('/login');
@@ -242,9 +243,7 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
                 unnecessary_expenses, 
                 wealth_already_taxed, 
                 gold_rate, 
-                huquq_payments_made, 
-                created_at, 
-                updated_at 
+                huquq_payments_made 
             FROM financial_summary 
             WHERE user_id = ? 
             ORDER BY end_date ASC
@@ -252,31 +251,55 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        // Fetch all financial entries for the user with normalized reporting_date
-        const [entries] = await pool.query(
+        // Fetch all labels for the user
+        const [labels] = await pool.query(
             `
             SELECT 
                 id, 
                 user_id, 
                 category, 
-                label, 
-                value, 
-                DATE_FORMAT(reporting_date, '%Y-%m-%d') AS reporting_date, 
-                created_at, 
-                updated_at 
-            FROM financial_entries 
+                label 
+            FROM financial_labels 
             WHERE user_id = ? 
+            ORDER BY category ASC, label ASC
+            `,
+            [userId]
+        );
+
+        // Fetch all financial values for the user with normalized reporting_date
+        const [values] = await pool.query(
+            `
+            SELECT 
+                label_id, 
+                reporting_date, 
+                value 
+            FROM financial_values 
+            WHERE label_id IN (SELECT id FROM financial_labels WHERE user_id = ?) 
             ORDER BY reporting_date ASC
             `,
             [userId]
         );
+
+        // Transform values into a structure that is easier for rendering
+        const entryMap = labels.map(label => {
+            const labelValues = values.filter(v => v.label_id === label.id);
+            return {
+                id: label.id,
+                category: label.category,
+                label: label.label,
+                values: summaries.map(summary => {
+                    const match = labelValues.find(v => v.reporting_date === summary.end_date);
+                    return match ? match.value : 0.00; // Default value if no match is found
+                }),
+            };
+        });
 
         // Render the dashboard with normalized data
         res.render('dashboard', {
             loggedIn: req.loggedIn,
             username: req.username,
             summaries,
-            entries,
+            entries: entryMap,
             pageIndicator: 'dashboard'
         });
     } catch (error) {
@@ -294,21 +317,48 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
         const { category, label, value, reporting_date } = req.body;
         const userId = req.userId;
 
-        // Insert the new entry into financial_entries
-        const insertQuery = `
-            INSERT INTO financial_entries (user_id, category, label, value, reporting_date)
-            VALUES (?, ?, ?, ?, ?)
+        // Ensure the label exists in the financial_labels table
+        let [labelResult] = await pool.query(
+            `
+            SELECT id 
+            FROM financial_labels 
+            WHERE user_id = ? AND category = ? AND label = ?
+            `,
+            [userId, category, label]
+        );
+
+        let labelId;
+
+        if (labelResult.length === 0) {
+            // If label does not exist, insert it
+            const insertLabelQuery = `
+                INSERT INTO financial_labels (user_id, category, label)
+                VALUES (?, ?, ?)
+            `;
+            const result = await pool.query(insertLabelQuery, [userId, category, label]);
+            labelId = result[0].insertId; // Get the inserted label's ID
+        } else {
+            // Use the existing label's ID
+            labelId = labelResult[0].id;
+        }
+
+        // Insert or update the financial_values table
+        const upsertQuery = `
+            INSERT INTO financial_values (label_id, reporting_date, value)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE value = ?
         `;
-        await pool.query(insertQuery, [userId, category, label, value, reporting_date]);
+        await pool.query(upsertQuery, [labelId, reporting_date, value, value]);
 
         // Aggregate totals for the reporting_date
         const [totals] = await pool.query(`
             SELECT 
-                SUM(CASE WHEN category = 'Assets' THEN value ELSE 0 END) AS total_assets,
-                SUM(CASE WHEN category = 'Debts' THEN value ELSE 0 END) AS total_debts,
-                SUM(CASE WHEN category = 'Expenses' THEN value ELSE 0 END) AS unnecessary_expenses
-            FROM financial_entries
-            WHERE user_id = ? AND reporting_date = ?
+                SUM(CASE WHEN l.category = 'Assets' THEN v.value ELSE 0 END) AS total_assets,
+                SUM(CASE WHEN l.category = 'Debts' THEN v.value ELSE 0 END) AS total_debts,
+                SUM(CASE WHEN l.category = 'Expenses' THEN v.value ELSE 0 END) AS unnecessary_expenses
+            FROM financial_values v
+            JOIN financial_labels l ON v.label_id = l.id
+            WHERE l.user_id = ? AND v.reporting_date = ?
         `, [userId, reporting_date]);
 
         const { total_assets, total_debts, unnecessary_expenses } = totals[0];
@@ -337,19 +387,23 @@ app.put('/api/entries/:id', checkLoginStatus, async (req, res) => {
         const { id } = req.params;
         const { value } = req.body;
 
-        // Update the entry in financial_entries
-        const updateEntryQuery = `
-            UPDATE financial_entries
+        // Update the value in financial_values
+        const updateValueQuery = `
+            UPDATE financial_values
             SET value = ?
-            WHERE id = ? AND user_id = ?
+            WHERE id = ? AND label_id IN (
+                SELECT id FROM financial_labels WHERE user_id = ?
+            )
         `;
-        await pool.query(updateEntryQuery, [value, id, req.userId]);
+        await pool.query(updateValueQuery, [value, id, req.userId]);
 
-        // Get the reporting_date for the updated entry
+        // Get the reporting_date and label_id for the updated entry
         const [entry] = await pool.query(`
-            SELECT reporting_date
-            FROM financial_entries
-            WHERE id = ? AND user_id = ?
+            SELECT reporting_date, label_id
+            FROM financial_values
+            WHERE id = ? AND label_id IN (
+                SELECT id FROM financial_labels WHERE user_id = ?
+            )
         `, [id, req.userId]);
 
         if (entry.length === 0) {
@@ -361,11 +415,12 @@ app.put('/api/entries/:id', checkLoginStatus, async (req, res) => {
         // Aggregate totals for the reporting_date
         const [totals] = await pool.query(`
             SELECT 
-                SUM(CASE WHEN category = 'Assets' THEN value ELSE 0 END) AS total_assets,
-                SUM(CASE WHEN category = 'Debts' THEN value ELSE 0 END) AS total_debts,
-                SUM(CASE WHEN category = 'Expenses' THEN value ELSE 0 END) AS unnecessary_expenses
-            FROM financial_entries
-            WHERE user_id = ? AND reporting_date = ?
+                SUM(CASE WHEN l.category = 'Assets' THEN v.value ELSE 0 END) AS total_assets,
+                SUM(CASE WHEN l.category = 'Debts' THEN v.value ELSE 0 END) AS total_debts,
+                SUM(CASE WHEN l.category = 'Expenses' THEN v.value ELSE 0 END) AS unnecessary_expenses
+            FROM financial_values v
+            JOIN financial_labels l ON v.label_id = l.id
+            WHERE l.user_id = ? AND v.reporting_date = ?
         `, [req.userId, reporting_date]);
 
         const { total_assets, total_debts, unnecessary_expenses } = totals[0];
@@ -393,12 +448,19 @@ app.delete('/api/entries/:id', checkLoginStatus, async (req, res) => {
     try {
         const { id } = req.params;
 
-        const query = `
-            DELETE FROM financial_entries
-            WHERE id = ? AND user_id = ?
+        // Ensure the value to delete belongs to the user's labels
+        const deleteQuery = `
+            DELETE FROM financial_values
+            WHERE id = ? AND label_id IN (
+                SELECT id FROM financial_labels WHERE user_id = ?
+            )
         `;
 
-        await pool.query(query, [id, req.userId]);
+        const [result] = await pool.query(deleteQuery, [id, req.userId]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Entry not found or not authorized to delete' });
+        }
 
         res.status(200).json({ message: 'Entry deleted successfully' });
     } catch (error) {
@@ -447,7 +509,9 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        const wealthAlreadyTaxed = prevSummaries.length > 0 ? prevSummaries.reduce((acc, row) => acc + (parseFloat(row.summary) || 0), 0) : 0;
+        const wealthAlreadyTaxed = prevSummaries.length > 0
+            ? prevSummaries.reduce((acc, row) => acc + (parseFloat(row.summary) || 0), 0)
+            : 0;
         const roundedWealthAlreadyTaxed = parseFloat(wealthAlreadyTaxed.toFixed(5));
 
         // Insert a new reporting period with placeholder totals
@@ -457,14 +521,24 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         `;
         await pool.query(insertQuery, [userId, lastEndDate, end_date, roundedWealthAlreadyTaxed, goldRate]);
 
+        // Duplicate labels for the new reporting period and set initial values to 0.00
+        const duplicateQuery = `
+            INSERT INTO financial_values (label_id, reporting_date, value)
+            SELECT id, ?, 0.00
+            FROM financial_labels
+            WHERE user_id = ?
+        `;
+        await pool.query(duplicateQuery, [end_date, userId]);
+
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
             SELECT 
-                SUM(CASE WHEN category = 'Assets' THEN value ELSE 0 END) AS total_assets,
-                SUM(CASE WHEN category = 'Debts' THEN value ELSE 0 END) AS total_debts,
-                SUM(CASE WHEN category = 'Expenses' THEN value ELSE 0 END) AS unnecessary_expenses
-            FROM financial_entries
-            WHERE user_id = ? AND reporting_date = ?
+                SUM(CASE WHEN fl.category = 'Assets' THEN fv.value ELSE 0 END) AS total_assets,
+                SUM(CASE WHEN fl.category = 'Debts' THEN fv.value ELSE 0 END) AS total_debts,
+                SUM(CASE WHEN fl.category = 'Expenses' THEN fv.value ELSE 0 END) AS unnecessary_expenses
+            FROM financial_values fv
+            JOIN financial_labels fl ON fv.label_id = fl.id
+            WHERE fl.user_id = ? AND fv.reporting_date = ?
         `, [userId, end_date]);
 
         const { total_assets, total_debts, unnecessary_expenses } = totals[0];
@@ -517,7 +591,30 @@ app.delete('/api/summary/:id', checkLoginStatus, async (req, res) => {
         const { id } = req.params;
         const userId = req.userId;
 
-        // Delete the reporting period from the database
+        // Fetch the end_date for the reporting period being deleted
+        const [summary] = await pool.query(
+            'SELECT end_date FROM financial_summary WHERE id = ? AND user_id = ?',
+            [id, userId]
+        );
+
+        if (summary.length === 0) {
+            return res.status(404).json({ error: 'Year not found or not authorized to delete.' });
+        }
+
+        const { end_date } = summary[0];
+
+        // Delete associated entries from financial_values
+        await pool.query(
+            `
+            DELETE fv
+            FROM financial_values fv
+            JOIN financial_labels fl ON fv.label_id = fl.id
+            WHERE fl.user_id = ? AND fv.reporting_date = ?
+            `,
+            [userId, end_date]
+        );
+
+        // Delete the reporting period from financial_summary
         const result = await pool.query(
             'DELETE FROM financial_summary WHERE id = ? AND user_id = ?',
             [id, userId]
@@ -527,7 +624,7 @@ app.delete('/api/summary/:id', checkLoginStatus, async (req, res) => {
             return res.status(404).json({ error: 'Year not found or not authorized to delete.' });
         }
 
-        res.status(200).json({ message: 'Year deleted successfully.' });
+        res.status(200).json({ message: 'Year and associated data deleted successfully.' });
     } catch (error) {
         console.error('Error deleting year:', error);
         res.status(500).json({ error: 'Server error' });
