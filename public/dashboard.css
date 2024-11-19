@@ -98,6 +98,9 @@
 .delete-year-button {
     float:right;
 }
+.save-item-button  {
+    float:right;
+}
 .summary-table input,
 .dashboard-table input {
     width: 80px;
