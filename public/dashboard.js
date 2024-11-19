@@ -38,7 +38,10 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
-                    alert('Year deleted successfully!');
+                    return response.json();
+                })
+                .then(() => {
+                    alert('Year and associated entries deleted successfully!');
                     location.reload(); // Reload to reflect changes
                 })
                 .catch(err => {
@@ -80,7 +83,7 @@ document.querySelectorAll('.add-item-button').forEach(button => {
 
         newRow.querySelector('.save-item-button').addEventListener('click', () => {
             const label = newRow.querySelector('.new-item-label').value.trim();
-            const value = parseFloat(newRow.querySelector('.new-item-value').value);
+            const value = parseFloat(newRow.querySelector('.new-item-value').value) || 0.00;
 
             if (!label) {
                 alert('Please enter a valid label.');
@@ -109,8 +112,12 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                     }
                     return response.json();
                 })
-                .then(() => {
-                    location.reload();
+                .then(data => {
+                    // Update the row with the newly assigned data-id
+                    newRow.querySelector('.new-item-value').dataset.id = data.id;
+                    newRow.querySelector('.save-item-button').remove(); // Remove the save button
+                    alert(`${category} added successfully!`);
+                    calculateTotals(); // Recalculate totals dynamically
                 })
                 .catch(err => {
                     console.error(`Error adding ${category.toLowerCase()}:`, err);
@@ -145,6 +152,7 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
 
                 // Recalculate totals dynamically
                 calculateTotals();
+                alert('Entry deleted successfully!');
             })
             .catch(err => {
                 console.error('Error deleting entry:', err);
@@ -161,13 +169,16 @@ function calculateTotals() {
 
     // Sum up all visible asset, debt, and expense input fields
     document.querySelectorAll('.asset-input').forEach(input => {
-        totalAssets += parseFloat(input.value) || 0;
+        const value = parseFloat(input.value) || 0;
+        totalAssets += value;
     });
     document.querySelectorAll('.debt-input').forEach(input => {
-        totalDebts += parseFloat(input.value) || 0;
+        const value = parseFloat(input.value) || 0;
+        totalDebts += value;
     });
     document.querySelectorAll('.expense-input').forEach(input => {
-        totalExpenses += parseFloat(input.value) || 0;
+        const value = parseFloat(input.value) || 0;
+        totalExpenses += value;
     });
 
     // Update the DOM for Total Assets, Debts, and Expenses
@@ -192,17 +203,22 @@ function calculateTotals() {
 /* Handle Changes in the Summary Table Using Event Delegation */
 document.querySelector('.summary-table').addEventListener('change', (event) => {
     if (event.target && event.target.tagName === 'INPUT') {
-        const summaryId = document.querySelector('.summary-table').dataset.summaryId; // Assume summary ID is stored in the table
-        const huquqPaymentsMade = parseFloat(event.target.value);
+        const summaryId = event.target.closest('table').dataset.summaryId; // Assume summary ID is stored in the table
+        const huquqPaymentsMade = parseFloat(event.target.value) || 0.00;
 
         fetch(`/api/summary/${summaryId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ huquq_payments_made: huquqPaymentsMade }),
         })
-            .then((response) => response.json())
-            .then((data) => {
-                alert('Huquq payment updated successfully!');
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(() => {
+                calculateTotals();
             })
             .catch((err) => {
                 console.error('Error updating Huquq payment:', err);
@@ -218,7 +234,8 @@ document.querySelector('.dashboard-table').addEventListener('change', (event) =>
 
         // Ignore inputs without a data-id (new unsaved rows)
         if (!entryId) {
-            return; // Skip processing if there's no data-id
+            console.warn('New entry detected. Use the save button to submit it.');
+            return;
         }
 
         // Parse the new value or default to 0.00 if empty
