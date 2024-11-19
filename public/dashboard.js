@@ -223,7 +223,8 @@ function calculateSummary() {
     }
 
     const summary = totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed;
-    const unitsOfHuquq = summary / goldRate;
+    const adjustedSummary = summary < 0 ? 0 : summary;
+    const unitsOfHuquq = adjustedSummary / goldRate;
     const roundedUnits = Math.floor(unitsOfHuquq);
     const huquqPaymentOwed = 0.19 * (roundedUnits * goldRate);
     const huquqPaymentsMade = parseFloat(document.querySelector('.huquq-payments-made input')?.value) || 0;
@@ -231,7 +232,7 @@ function calculateSummary() {
 
     // Update the DOM only if the elements exist
     if (document.querySelector('.summary-value')) {
-        document.querySelector('.summary-value').textContent = `$${summary.toFixed(2)}`;
+        document.querySelector('.summary-value').textContent = `$${adjustedSummary.toFixed(2)}`;
     }
     if (document.querySelector('.units-of-huquq')) {
         document.querySelector('.units-of-huquq').textContent = unitsOfHuquq.toFixed(2);
