@@ -76,6 +76,32 @@ CREATE TABLE users (
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
+CREATE TABLE financial_summary (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    start_date DATE DEFAULT NULL,
+    end_date DATE NOT NULL,
+    total_assets DECIMAL(10, 2) DEFAULT 0.00,
+    total_debts DECIMAL(10, 2) DEFAULT 0.00,
+    unnecessary_expenses DECIMAL(10, 2) DEFAULT 0.00,
+    wealth_already_taxed DECIMAL(10, 2) DEFAULT 0.00,
+    gold_rate DECIMAL(10, 2) DEFAULT NULL,
+    huquq_payments_made DECIMAL(10, 2) DEFAULT 0.00,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+CREATE TABLE financial_entries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    category ENUM('Assets', 'Debts', 'Expenses') NOT NULL, 
+    label VARCHAR(255) NOT NULL,
+    value DECIMAL(10, 2) DEFAULT 0.00,
+    reporting_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
 ```
 
 In the project directory
