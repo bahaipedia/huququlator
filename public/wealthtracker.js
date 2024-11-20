@@ -15,13 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
         newHeader.textContent = date;
         theadRow.appendChild(newHeader);
 
-        // Add a new input cell for each data row in the body
+        // Add a new input cell for each row in the body
         table.querySelector('tbody').querySelectorAll('tr').forEach(row => {
-            // Skip rows with <th> elements (section headers like "Assets", "Debts", "Expenses")
-            if (row.querySelector('th')) return;
+            // Skip section header rows
+            if (row.querySelector('th') && row.children.length === 1) return;
 
-            const labelCell = row.querySelector('td');
-            const labelId = labelCell ? labelCell.getAttribute('data-label-id') : 'new'; // Use data-label-id if available
+            const labelId = row.querySelector('td')?.getAttribute('data-label-id'); // Use a custom attribute to identify rows
             const cell = document.createElement('td');
             cell.innerHTML = `<input type="text" id="cell-${labelId}_${date}" />`;
             row.appendChild(cell);
