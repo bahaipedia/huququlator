@@ -8,8 +8,6 @@
 </head>
 <body>
     <h1>Wealth Tracker</h1>
-    <button id="add-row">Add a Row</button>
-    <button id="add-column">Add a Column</button>
     <table id="wealth-table" border="1">
         <thead>
             <tr>
@@ -20,9 +18,13 @@
             </tr>
         </thead>
         <tbody>
-            <% labels.forEach(label => { %>
+            <!-- Assets Section -->
+            <tr>
+                <th colspan="<%= reportingDates.length + 1 %>">Assets</th>
+            </tr>
+            <% categorizedLabels.Assets.forEach(label => { %>
                 <tr>
-                    <td><%= label.label %> (<%= label.category %>)</td>
+                    <td><%= label.label %></td>
                     <% reportingDates.forEach(date => { %>
                         <td>
                             <input type="text" 
@@ -32,6 +34,55 @@
                     <% }); %>
                 </tr>
             <% }); %>
+            <tr>
+                <td colspan="<%= reportingDates.length + 1 %>">
+                    <button id="add-asset">Add Asset</button>
+                </td>
+            </tr>
+
+            <!-- Debts Section -->
+            <tr>
+                <th colspan="<%= reportingDates.length + 1 %>">Debts</th>
+            </tr>
+            <% categorizedLabels.Debts.forEach(label => { %>
+                <tr>
+                    <td><%= label.label %></td>
+                    <% reportingDates.forEach(date => { %>
+                        <td>
+                            <input type="text" 
+                                   id="cell-<%= label.id %>-<%= date %>" 
+                                   value="<%= groupedEntries[date] && groupedEntries[date][label.id] ? groupedEntries[date][label.id] : '' %>" />
+                        </td>
+                    <% }); %>
+                </tr>
+            <% }); %>
+            <tr>
+                <td colspan="<%= reportingDates.length + 1 %>">
+                    <button id="add-debt">Add Debt</button>
+                </td>
+            </tr>
+
+            <!-- Expenses Section -->
+            <tr>
+                <th colspan="<%= reportingDates.length + 1 %>">Expenses</th>
+            </tr>
+            <% categorizedLabels.Expenses.forEach(label => { %>
+                <tr>
+                    <td><%= label.label %></td>
+                    <% reportingDates.forEach(date => { %>
+                        <td>
+                            <input type="text" 
+                                   id="cell-<%= label.id %>-<%= date %>" 
+                                   value="<%= groupedEntries[date] && groupedEntries[date][label.id] ? groupedEntries[date][label.id] : '' %>" />
+                        </td>
+                    <% }); %>
+                </tr>
+            <% }); %>
+            <tr>
+                <td colspan="<%= reportingDates.length + 1 %>">
+                    <button id="add-expense">Add Expense</button>
+                </td>
+            </tr>
         </tbody>
     </table>
 </body>
