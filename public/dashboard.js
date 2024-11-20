@@ -78,7 +78,7 @@ document.querySelectorAll('.add-item-button').forEach(button => {
         const buttonRow = button.closest('tr');
         const newRow = document.createElement('tr');
 
-        // Create a new row for adding a label
+        // Create a temporary row for adding a label
         newRow.innerHTML = `
             <td>
                 <input type="text" placeholder="Label" class="new-item-label" />
@@ -101,6 +101,10 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                 return;
             }
 
+            // Disable the save button while processing
+            const saveButton = newRow.querySelector('.save-item-button');
+            saveButton.disabled = true;
+
             fetch('/api/labels', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -116,13 +120,13 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                     return response.json();
                 })
                 .then(data => {
-                    // Update the row with the newly assigned label ID
-                    newRow.querySelector('.new-item-label').dataset.labelId = data.labelId;
+                    // Reload the table to fetch the updated backend data
                     location.reload();
                 })
                 .catch(err => {
                     console.error(`Error adding ${category.toLowerCase()} label:`, err);
                     alert(`Failed to add the ${category.toLowerCase()} label. Please try again.`);
+                    saveButton.disabled = false; // Re-enable the button if there was an error
                 });
         });
     });
