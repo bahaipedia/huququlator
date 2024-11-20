@@ -222,6 +222,7 @@ app.post('/login', async (req, res) => {
 });
 
 // Dashboard route
+// Dashboard route
 app.get('/dashboard', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.redirect('/login');
@@ -230,7 +231,7 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
     try {
         const userId = req.userId;
 
-        // Fetch financial summaries for the user with normalized end_date
+        // Fetch financial summaries for the user
         const [summaries] = await pool.query(
             `
             SELECT 
@@ -266,14 +267,14 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        // Fetch all financial values for the user with normalized reporting_date
+        // Fetch all financial entries with normalized reporting_date
         const [entries] = await pool.query(
             `
             SELECT 
                 fl.id AS label_id,
                 fl.category,
                 fl.label,
-                COALESCE(fv.value, 0) AS value,
+                fv.value,
                 fv.reporting_date
             FROM financial_labels fl
             LEFT JOIN financial_entries fv ON fl.id = fv.label_id AND fv.user_id = ?
@@ -283,24 +284,22 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
             [userId, userId]
         );
 
-        // Transform the data into a structure that is easier to render
+        // Transform the data for easier rendering
         const entryMap = labels.map(label => {
-            // For each label, filter all matching entries
+            // Find all matching entries for the label
             const labelEntries = entries.filter(entry => entry.label_id === label.id);
-            
             return {
                 id: label.id,
                 category: label.category,
                 label: label.label,
                 values: summaries.map(summary => {
-                    // Find the value that matches this label and summary's end date
                     const match = labelEntries.find(entry => entry.reporting_date === summary.end_date);
-                    return match ? match.value : 0.00; // Default to 0.00 if no match
+                    return match ? parseFloat(match.value).toFixed(2) : '0.00';
                 }),
             };
         });
 
-        // Render the dashboard with normalized data
+        // Render the dashboard with the gathered data
         res.render('dashboard', {
             loggedIn: req.loggedIn,
             username: req.username,
