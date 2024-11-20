@@ -42,7 +42,7 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
 // Delete a Reporting Period
 document.querySelectorAll('.delete-year-button').forEach(button => {
     button.addEventListener('click', () => {
-        const yearId = button.dataset.labelId;
+        const entryId = button.dataset.entryId;
 
         if (confirm('Are you sure you want to delete this year? This action cannot be undone.')) {
             fetch(`/api/entries/${yearId}`, {
