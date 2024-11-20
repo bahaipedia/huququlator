@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Step 2: Restore "0.00" if the user leaves it empty
+        // Step 2: Restore "0.00" if the user leaves it empty and save the value to backend
         input.addEventListener('blur', () => {
             if (input.value.trim() === '') {
                 input.value = '0.00'; // Restore the value if the input is left empty
@@ -200,8 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .then(() => {
                     console.log('Value saved successfully.');
-                    // Refresh summary section to reflect updated values
-                    refreshSummary();
+                    refreshEntries(); // Refresh entries to reflect updated values
+                    refreshSummary(); // Refresh summary section to reflect updated values
                 })
                 .catch(err => {
                     console.error('Error saving value:', err);
@@ -221,12 +221,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Function to refresh entries
+function refreshEntries() {
+    fetch('/api/entries')
+        .then(response => response.json())
+        .then(data => {
+            updateEntriesSection(data.entries);
+        })
+        .catch(err => {
+            console.error('Error refreshing entries:', err);
+        });
+}
+
+// Function to update entries in the DOM
+function updateEntriesSection(entries) {
+    entries.forEach(entry => {
+        const inputElement = document.querySelector(
+            `[data-label-id="${entry.label_id}"][data-reporting-date="${entry.reporting_date}"]`
+        );
+        if (inputElement) {
+            inputElement.value = parseFloat(entry.value).toFixed(2); // Update with the new value
+            inputElement.dataset.originalValue = parseFloat(entry.value).toFixed(2); // Update original value as well
+        }
+    });
+}
+
 // Function to refresh the summary section
 function refreshSummary() {
     fetch('/api/summary')
         .then(response => response.json())
         .then(data => {
-            // Assuming you have a function to update the summary section with new data
             updateSummarySection(data.summaries);
         })
         .catch(err => {
@@ -236,7 +260,6 @@ function refreshSummary() {
 
 function updateSummarySection(summaries) {
     // Update the summary section based on the returned data
-    // Example: Loop over each summary cell and update its value
     summaries.forEach(summary => {
         const summaryElement = document.querySelector(`[data-summary-id="${summary.id}"]`);
         if (summaryElement) {
