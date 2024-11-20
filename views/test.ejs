@@ -18,5 +18,37 @@
     <h2>Financial Entries</h2>
     <pre><%= JSON.stringify(entries, null, 2) %></pre>
 
+    <h2>Entries Grouped by Labels</h2>
+    <ul>
+        <% labels.forEach(label => { %>
+        <li>
+            <strong><%= label.category %> - <%= label.label %> (ID: <%= label.id %>)</strong>
+            <ul>
+                <% entries.filter(entry => entry.label_id === label.id).forEach(entry => { %>
+                    <li>
+                        Date: <%= entry.reporting_date %>, Value: <%= entry.value %>
+                    </li>
+                <% }); %>
+            </ul>
+        </li>
+        <% }); %>
+    </ul>
+
+    <h2>Entries with Matching Summaries</h2>
+    <ul>
+        <% summaries.forEach(summary => { %>
+        <li>
+            <strong>Summary for End Date: <%= summary.end_date %></strong>
+            <ul>
+                <% entries.filter(entry => entry.reporting_date === summary.end_date).forEach(entry => { %>
+                    <li>
+                        Label ID: <%= entry.label_id %>, Value: <%= entry.value %>, Category: <%= entry.category %>, Label: <%= entry.label %>
+                    </li>
+                <% }); %>
+            </ul>
+        </li>
+        <% }); %>
+    </ul>
+
 </body>
 </html>
