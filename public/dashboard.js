@@ -159,94 +159,74 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Get all input fields with the 'financial-input' class
+    // Select all financial input fields on the page
     const inputs = document.querySelectorAll('.financial-input');
 
     inputs.forEach((input, index) => {
-        // Clear value when clicking on "0.00"
+        // Step 1: Clear value when clicking on "0.00"
         input.addEventListener('focus', () => {
             if (input.value === '0.00') {
-                input.value = '';
+                input.value = ''; // Clear the value to make it easier for the user to type
             }
         });
 
-        // Restore "0.00" if the user leaves it empty
+        // Step 2: Restore "0.00" if the user leaves it empty
         input.addEventListener('blur', () => {
             if (input.value.trim() === '') {
-                input.value = '0.00';
+                input.value = '0.00'; // Restore the value if the input is left empty
             }
-        });
 
-        // Handle "tab" to move down to the next input
-        input.addEventListener('keydown', (event) => {
-            if (event.key === 'Tab') {
-                event.preventDefault(); 
-                let nextIndex = (index + 1) % inputs.length;
-                inputs[nextIndex].focus();
-            }
-        });
-
-        // Auto-save value on blur
-        input.addEventListener('blur', () => {
+            // Auto-save value on blur
             const labelId = input.dataset.labelId;
             const reportingDate = input.dataset.reportingDate;
             const newValue = parseFloat(input.value) || 0;
 
-            // Call API to save the updated value to the database
-            fetch(`/api/entries/update`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    label_id: labelId,
-                    reporting_date: reportingDate,
-                    value: newValue,
-                }),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(() => {
-                console.log('Value saved successfully.');
-                // Step 5: Refresh summary section to reflect updated values
-                refreshSummary();
-            })
-            .catch(err => {
-                console.error('Error saving value:', err);
-                alert('Failed to save the value. Please try again.');
-            });
+            // Only make a save request if the new value is different from the initial value
+            if (newValue !== parseFloat(input.dataset.originalValue)) {
+                fetch(`/api/entries/update`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        label_id: labelId,
+                        reporting_date: reportingDate,
+                        value: newValue,
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    console.log('Value saved successfully.');
+                    // Refresh summary section to reflect updated values
+                    refreshSummary();
+                })
+                .catch(err => {
+                    console.error('Error saving value:', err);
+                    alert('Failed to save the value. Please try again.');
+                });
+            }
+        });
+
+        // Step 3: Handle "tab" to move down to the next input
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Tab') {
+                event.preventDefault(); // Prevent the default browser tabbing behavior
+                let nextIndex = (index + 1) % inputs.length;
+                inputs[nextIndex].focus();
+            }
         });
     });
 });
 
-// Function to refresh entries section
-function refreshEntries() {
-    fetch('/api/entries')
-        .then(response => response.json())
-        .then(data => {
-            updateEntriesSection(data.entries);
-        })
-        .catch(err => {
-            console.error('Error refreshing entries:', err);
-        });
-}
-
-function updateEntriesSection(entries) {
-    entries.forEach(entry => {
-        const inputElement = document.querySelector(`[data-label-id="${entry.label_id}"][data-reporting-date="${entry.reporting_date}"]`);
-        if (inputElement) {
-            inputElement.value = entry.value; // Update the value from the database
-        }
-    });
-}
-
-// Function to refresh summary section
+// Function to refresh the summary section
 function refreshSummary() {
     fetch('/api/summary')
         .then(response => response.json())
         .then(data => {
+            // Assuming you have a function to update the summary section with new data
             updateSummarySection(data.summaries);
         })
         .catch(err => {
@@ -255,6 +235,8 @@ function refreshSummary() {
 }
 
 function updateSummarySection(summaries) {
+    // Update the summary section based on the returned data
+    // Example: Loop over each summary cell and update its value
     summaries.forEach(summary => {
         const summaryElement = document.querySelector(`[data-summary-id="${summary.id}"]`);
         if (summaryElement) {
