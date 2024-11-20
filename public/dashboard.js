@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle "tab" to move down to the next input
         input.addEventListener('keydown', (event) => {
             if (event.key === 'Tab') {
-                event.preventDefault(); // Prevent default tabbing behavior
+                event.preventDefault(); 
                 let nextIndex = (index + 1) % inputs.length;
                 inputs[nextIndex].focus();
             }
@@ -189,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Auto-save value on blur
         input.addEventListener('blur', () => {
             const labelId = input.dataset.labelId;
+            const reportingDate = input.dataset.reportingDate;
             const newValue = parseFloat(input.value) || 0;
 
             // Call API to save the updated value to the database
@@ -197,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     label_id: labelId,
+                    reporting_date: reportingDate,
                     value: newValue,
                 }),
             })
@@ -217,28 +219,46 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
-
-    // Function to refresh summary section
-    function refreshSummary() {
-        fetch('/api/summary')
-            .then(response => response.json())
-            .then(data => {
-                // Assuming you have a function to update the summary section with new data
-                updateSummarySection(data);
-            })
-            .catch(err => {
-                console.error('Error refreshing summary:', err);
-            });
-    }
-
-    function updateSummarySection(data) {
-        // Update the summary section based on the returned data
-        // Example: Loop over each summary cell and update its value
-        data.summaries.forEach(summary => {
-            const summaryElement = document.querySelector(`[data-summary-id="${summary.id}"]`);
-            if (summaryElement) {
-                summaryElement.textContent = summary.total; // Update with the new total
-            }
-        });
-    }
 });
+
+// Function to refresh entries section
+function refreshEntries() {
+    fetch('/api/entries')
+        .then(response => response.json())
+        .then(data => {
+            updateEntriesSection(data.entries);
+        })
+        .catch(err => {
+            console.error('Error refreshing entries:', err);
+        });
+}
+
+function updateEntriesSection(entries) {
+    entries.forEach(entry => {
+        const inputElement = document.querySelector(`[data-label-id="${entry.label_id}"][data-reporting-date="${entry.reporting_date}"]`);
+        if (inputElement) {
+            inputElement.value = entry.value; // Update the value from the database
+        }
+    });
+}
+
+// Function to refresh summary section
+function refreshSummary() {
+    fetch('/api/summary')
+        .then(response => response.json())
+        .then(data => {
+            updateSummarySection(data.summaries);
+        })
+        .catch(err => {
+            console.error('Error refreshing summary:', err);
+        });
+}
+
+function updateSummarySection(summaries) {
+    summaries.forEach(summary => {
+        const summaryElement = document.querySelector(`[data-summary-id="${summary.id}"]`);
+        if (summaryElement) {
+            summaryElement.textContent = summary.total; // Update with the new total
+        }
+    });
+}
