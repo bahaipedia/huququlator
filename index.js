@@ -101,8 +101,40 @@ app.get('/', checkLoginStatus, (req, res) => {
     res.render('index', { loggedIn: req.loggedIn, username: req.username });
 });
 
-app.get('/wealthtracker', (req, res) => {
-    res.render('wealthtracker');
+app.get('/wealthtracker', async (req, res) => {
+    try {
+        const userId = 1; // Replace with the actual logged-in user ID
+        
+        // Fetch financial labels
+        const [labels] = await pool.query(
+            `SELECT id, category, label FROM financial_labels WHERE user_id = ? ORDER BY category, id`,
+            [userId]
+        );
+        
+        // Fetch financial entries
+        const [entries] = await pool.query(
+            `SELECT label_id, reporting_date, value FROM financial_entries WHERE user_id = ? ORDER BY reporting_date`,
+            [userId]
+        );
+
+        // Group entries by reporting date for table columns
+        const groupedEntries = {};
+        entries.forEach(entry => {
+            if (!groupedEntries[entry.reporting_date]) {
+                groupedEntries[entry.reporting_date] = {};
+            }
+            groupedEntries[entry.reporting_date][entry.label_id] = entry.value;
+        });
+
+        res.render('wealthtracker', {
+            labels,
+            groupedEntries,
+            reportingDates: Object.keys(groupedEntries),
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
 });
 
 // Get the value of 2.25 troy ounces of gold
