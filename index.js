@@ -495,22 +495,25 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
         logger.info('Existing reporting dates:', datesResult);
 
         // Insert entries for the new label for all existing reporting_dates
-        const insertEntryQuery = `
-            INSERT INTO financial_entries (user_id, label_id, reporting_date, value)
-            VALUES (?, ?, ?, ?)
-        `;
-        const entries = datesResult.map(date => [
-            userId,
-            labelId,
-            date.reporting_date,
-            0.00, // Default value
-        ]);
+        if (datesResult.length > 0) {
+            const insertEntryQuery = `
+                INSERT INTO financial_entries (user_id, label_id, reporting_date, value)
+                VALUES ${datesResult.map(() => '(?, ?, ?, ?)').join(', ')}
+            `;
 
-        logger.info('Entries to insert:', entries);
+            // Flatten entries array
+            const entries = datesResult.flatMap(date => [
+                userId,
+                labelId,
+                date.reporting_date,
+                0.00, // Default value
+            ]);
 
-        if (entries.length > 0) {
+            logger.info('Running query:', insertEntryQuery);
+            logger.info('With values:', entries);
+
             try {
-                await pool.query(insertEntryQuery, [entries]);
+                await pool.query(insertEntryQuery, entries);
                 logger.info('Successfully inserted financial entries for the new label.');
             } catch (err) {
                 logger.error('Error inserting financial entries:', err);
