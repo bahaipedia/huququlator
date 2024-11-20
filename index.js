@@ -166,6 +166,83 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
+app.get('/test', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.redirect('/login');
+    }
+
+    try {
+        const userId = req.userId;
+
+        // Fetch financial summaries for the user
+        const [summaries] = await pool.query(
+            `
+            SELECT 
+                id, 
+                user_id, 
+                DATE_FORMAT(start_date, '%Y-%m-%d') AS start_date, 
+                DATE_FORMAT(end_date, '%Y-%m-%d') AS end_date, 
+                total_assets, 
+                total_debts, 
+                unnecessary_expenses, 
+                wealth_already_taxed, 
+                gold_rate, 
+                huquq_payments_made 
+            FROM financial_summary 
+            WHERE user_id = ? 
+            ORDER BY end_date ASC
+            `,
+            [userId]
+        );
+
+        // Fetch all labels for the user
+        const [labels] = await pool.query(
+            `
+            SELECT 
+                id, 
+                user_id, 
+                category, 
+                label 
+            FROM financial_labels 
+            WHERE user_id = ? 
+            ORDER BY category ASC, label ASC
+            `,
+            [userId]
+        );
+
+        // Fetch all financial entries with normalized reporting_date
+        const [entries] = await pool.query(
+            `
+            SELECT 
+                fv.id,
+                fv.user_id,
+                fv.label_id,
+                fv.reporting_date,
+                fv.value,
+                fl.category,
+                fl.label
+            FROM financial_entries fv
+            JOIN financial_labels fl ON fv.label_id = fl.id
+            WHERE fv.user_id = ?
+            ORDER BY fv.reporting_date ASC, fl.category ASC, fl.label ASC
+            `,
+            [userId]
+        );
+
+        // Render the test page to inspect the data retrieved
+        res.render('test', {
+            loggedIn: req.loggedIn,
+            username: req.username,
+            summaries,
+            labels,
+            entries,
+        });
+    } catch (error) {
+        console.error('Error loading test page:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
 // User Registration Endpoint
 app.post(
     '/register',
