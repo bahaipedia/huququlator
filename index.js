@@ -451,6 +451,48 @@ app.delete('/api/labels/:id', checkLoginStatus, async (req, res) => {
     }
 });
 
+app.post('/api/entries', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { reporting_date } = req.body; // Expected format: YYYY-MM-DD
+        const userId = req.userId;
+
+        // Check if reporting_date is provided
+        if (!reporting_date) {
+            return res.status(400).json({ error: 'Reporting date is required' });
+        }
+
+        // Fetch all labels for the user from financial_labels
+        const [labels] = await pool.query(
+            'SELECT id FROM financial_labels WHERE user_id = ?',
+            [userId]
+        );
+
+        if (labels.length === 0) {
+            return res.status(400).json({ error: 'No financial labels found for the user' });
+        }
+
+        // Insert a new financial entry for each label
+        const insertQuery = `
+            INSERT INTO financial_entries (user_id, label_id, reporting_date, value)
+            VALUES (?, ?, ?, ?)
+        `;
+
+        for (let label of labels) {
+            await pool.query(insertQuery, [userId, label.id, reporting_date, 0.00]);
+        }
+
+        res.status(201).json({ message: 'New financial entries added for the reporting period successfully!' });
+
+    } catch (error) {
+        console.error('Error adding financial entries:', error.message, error.stack);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
 app.post('/api/summary', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
