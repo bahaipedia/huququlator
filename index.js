@@ -105,7 +105,7 @@ app.get('/wealthtracker', async (req, res) => {
     try {
         const userId = 1; // Replace with the actual logged-in user ID
 
-        // Fetch financial labels
+        // Fetch financial labels grouped by category
         const [labels] = await pool.query(
             `SELECT id, category, label FROM financial_labels WHERE user_id = ? ORDER BY category, id`,
             [userId]
@@ -132,8 +132,20 @@ app.get('/wealthtracker', async (req, res) => {
             groupedEntries[entry.reporting_date][entry.label_id] = entry.value;
         });
 
+        // Organize labels by category
+        const categorizedLabels = {
+            Assets: [],
+            Debts: [],
+            Expenses: [],
+        };
+        labels.forEach(label => {
+            if (categorizedLabels[label.category]) {
+                categorizedLabels[label.category].push(label);
+            }
+        });
+
         res.render('wealthtracker', {
-            labels,
+            categorizedLabels,
             groupedEntries,
             reportingDates: Object.keys(groupedEntries), // Dates will already be formatted as 'YYYY-MM-DD'
         });
