@@ -101,6 +101,10 @@ app.get('/', checkLoginStatus, (req, res) => {
     res.render('index', { loggedIn: req.loggedIn, username: req.username });
 });
 
+app.get('/wealthtracker', (req, res) => {
+    res.render('wealthtracker');
+});
+
 // Get the value of 2.25 troy ounces of gold
 app.get('/api/gold-price', async (req, res) => {
     try {
