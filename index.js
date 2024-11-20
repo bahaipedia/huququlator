@@ -493,6 +493,55 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
     }
 });
 
+app.delete('/api/entries/:id', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { id } = req.params;
+        const userId = req.userId;
+
+        // Fetch the end_date for the reporting period being deleted
+        const [summary] = await pool.query(
+            'SELECT end_date FROM financial_summary WHERE id = ? AND user_id = ?',
+            [id, userId]
+        );
+
+        if (summary.length === 0) {
+            return res.status(404).json({ error: 'Year not found or not authorized to delete.' });
+        }
+
+        const { end_date } = summary[0];
+
+        // Delete associated entries from financial_entries for the given end_date
+        await pool.query(
+            `
+            DELETE fv
+            FROM financial_entries fv
+            JOIN financial_labels fl ON fv.label_id = fl.id
+            WHERE fl.user_id = ? AND fv.reporting_date = ?
+            `,
+            [userId, end_date]
+        );
+
+        // Delete the reporting period from financial_summary
+        const result = await pool.query(
+            'DELETE FROM financial_summary WHERE id = ? AND user_id = ?',
+            [id, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Year not found or not authorized to delete.' });
+        }
+
+        res.status(200).json({ message: 'Year and associated entries deleted successfully.' });
+    } catch (error) {
+        console.error('Error deleting entries and summary:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 app.post('/api/summary', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
@@ -594,55 +643,6 @@ app.put('/api/summary/:id', checkLoginStatus, async (req, res) => {
     } catch (error) {
         console.error('Error updating summary:', error);
         res.status(500).send('Server Error');
-    }
-});
-
-app.delete('/api/summary/:id', checkLoginStatus, async (req, res) => {
-    if (!req.loggedIn) {
-        return res.status(403).send('Unauthorized');
-    }
-
-    try {
-        const { id } = req.params;
-        const userId = req.userId;
-
-        // Fetch the end_date for the reporting period being deleted
-        const [summary] = await pool.query(
-            'SELECT end_date FROM financial_summary WHERE id = ? AND user_id = ?',
-            [id, userId]
-        );
-
-        if (summary.length === 0) {
-            return res.status(404).json({ error: 'Year not found or not authorized to delete.' });
-        }
-
-        const { end_date } = summary[0];
-
-        // Delete associated entries from financial_entries
-        await pool.query(
-            `
-            DELETE fv
-            FROM financial_entries fv
-            JOIN financial_labels fl ON fv.label_id = fl.id
-            WHERE fl.user_id = ? AND fv.reporting_date = ?
-            `,
-            [userId, end_date]
-        );
-
-        // Delete the reporting period from financial_summary
-        const result = await pool.query(
-            'DELETE FROM financial_summary WHERE id = ? AND user_id = ?',
-            [id, userId]
-        );
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Year not found or not authorized to delete.' });
-        }
-
-        res.status(200).json({ message: 'Year and associated data deleted successfully.' });
-    } catch (error) {
-        console.error('Error deleting year:', error);
-        res.status(500).json({ error: 'Server error' });
     }
 });
 
