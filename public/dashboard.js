@@ -128,7 +128,7 @@ document.querySelectorAll('.add-item-button').forEach(button => {
     });
 });
 
-// Handle Deleting an Asset, Debt, or Expense
+// Delete an Asset, Debt, or Expense
 document.querySelector('.dashboard-table').addEventListener('click', (event) => {
     if (event.target.classList.contains('delete-item-button')) {
         const labelId = event.target.dataset.labelId;
@@ -158,92 +158,48 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
     }
 });
 
-// Function to recalculate totals dynamically
-function calculateTotals() {
-    let totalAssets = 0;
-    let totalDebts = 0;
-    let totalExpenses = 0;
+document.addEventListener('DOMContentLoaded', () => {
+    // Get all input fields with the 'financial-input' class
+    const inputs = document.querySelectorAll('.financial-input');
 
-    // Sum up all visible asset, debt, and expense input fields
-    document.querySelectorAll('.asset-input').forEach(input => {
-        const value = parseFloat(input.value) || 0;
-        totalAssets += value;
-    });
-    document.querySelectorAll('.debt-input').forEach(input => {
-        const value = parseFloat(input.value) || 0;
-        totalDebts += value;
-    });
-    document.querySelectorAll('.expense-input').forEach(input => {
-        const value = parseFloat(input.value) || 0;
-        totalExpenses += value;
-    });
+    inputs.forEach((input, index) => {
+        // Clear value when clicking on "0.00"
+        input.addEventListener('focus', () => {
+            if (input.value === '0.00') {
+                input.value = '';
+            }
+        });
 
-    // Update the DOM for Total Assets, Debts, and Expenses
-    const totalAssetsElement = document.querySelector('.total-assets');
-    const totalDebtsElement = document.querySelector('.total-debts');
-    const totalExpensesElement = document.querySelector('.unnecessary-expenses');
+        // Restore "0.00" if the user leaves it empty
+        input.addEventListener('blur', () => {
+            if (input.value.trim() === '') {
+                input.value = '0.00';
+            }
+        });
 
-    if (totalAssetsElement) {
-        totalAssetsElement.textContent = totalAssets.toFixed(2);
-    }
-    if (totalDebtsElement) {
-        totalDebtsElement.textContent = `(${totalDebts.toFixed(2)})`;
-    }
-    if (totalExpensesElement) {
-        totalExpensesElement.textContent = totalExpenses.toFixed(2);
-    }
+        // Handle "tab" to move down to the next input
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Tab') {
+                event.preventDefault(); // Prevent default tabbing behavior
+                let nextIndex = (index + 1) % inputs.length;
+                inputs[nextIndex].focus();
+            }
+        });
 
-    // Recalculate summary and related values
-    calculateSummary();
-}
+        // Auto-save value on blur
+        input.addEventListener('blur', () => {
+            const labelId = input.dataset.labelId;
+            const newValue = parseFloat(input.value) || 0;
 
-/* Handle Changes in the Summary Table Using Event Delegation */
-document.querySelector('.summary-table').addEventListener('change', (event) => {
-    if (event.target && event.target.tagName === 'INPUT') {
-        const summaryId = event.target.closest('table').dataset.summaryId; // Assume summary ID is stored in the table
-        const huquqPaymentsMade = parseFloat(event.target.value) || 0.00;
-
-        fetch(`/api/summary/${summaryId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ huquq_payments_made: huquqPaymentsMade }),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
+            // Call API to save the updated value to the database
+            fetch(`/api/entries/update`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    label_id: labelId,
+                    value: newValue,
+                }),
             })
-            .then(() => {
-                calculateTotals();
-            })
-            .catch((err) => {
-                console.error('Error updating Huquq payment:', err);
-                alert('Failed to update Huquq payment.');
-            });
-    }
-});
-
-/* Handle Inline Editing for Financial Entries Using Event Delegation */
-document.querySelector('.dashboard-table').addEventListener('change', (event) => {
-    if (event.target && event.target.tagName === 'INPUT') {
-        const entryId = event.target.dataset.id;
-
-        // Ignore inputs without a data-id (new unsaved rows)
-        if (!entryId) {
-            console.warn('New entry detected. Use the save button to submit it.');
-            return;
-        }
-
-        // Parse the new value or default to 0.00 if empty
-        const newValue = parseFloat(event.target.value) || 0.00;
-
-        // Send updated value to the backend for existing labels
-        fetch(`/api/labels/${entryId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ value: newValue }),
-        })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -251,54 +207,38 @@ document.querySelector('.dashboard-table').addEventListener('change', (event) =>
                 return response.json();
             })
             .then(() => {
-                calculateTotals();
+                console.log('Value saved successfully.');
+                // Step 5: Refresh summary section to reflect updated values
+                refreshSummary();
             })
             .catch(err => {
-                console.error('Error updating entry:', err);
-                alert('Failed to update the entry.');
+                console.error('Error saving value:', err);
+                alert('Failed to save the value. Please try again.');
+            });
+        });
+    });
+
+    // Function to refresh summary section
+    function refreshSummary() {
+        fetch('/api/summary')
+            .then(response => response.json())
+            .then(data => {
+                // Assuming you have a function to update the summary section with new data
+                updateSummarySection(data);
+            })
+            .catch(err => {
+                console.error('Error refreshing summary:', err);
             });
     }
+
+    function updateSummarySection(data) {
+        // Update the summary section based on the returned data
+        // Example: Loop over each summary cell and update its value
+        data.summaries.forEach(summary => {
+            const summaryElement = document.querySelector(`[data-summary-id="${summary.id}"]`);
+            if (summaryElement) {
+                summaryElement.textContent = summary.total; // Update with the new total
+            }
+        });
+    }
 });
-
-/* Calculate Summary Table */
-function calculateSummary() {
-    const totalAssets = parseFloat(document.querySelector('.total-assets')?.textContent) || 0;
-    const totalDebts = parseFloat(document.querySelector('.total-debts')?.textContent?.replace(/[()]/g, '')) || 0;
-    const unnecessaryExpenses = parseFloat(document.querySelector('.unnecessary-expenses')?.textContent) || 0;
-    const wealthAlreadyTaxed = parseFloat(document.querySelector('.wealth-already-taxed input')?.value) || 0;
-    const goldRate = parseFloat(document.querySelector('.gold-rate')?.textContent) || 0;
-
-    // Only proceed with calculations if the required elements exist
-    if (!goldRate || !document.querySelector('.summary-table')) {
-        console.warn('No data available for calculations.');
-        return;
-    }
-
-    const summary = totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed;
-    const adjustedSummary = summary < 0 ? 0 : summary;
-    const unitsOfHuquq = adjustedSummary / goldRate;
-    const roundedUnits = Math.floor(unitsOfHuquq);
-    const huquqPaymentOwed = 0.19 * (roundedUnits * goldRate);
-    const huquqPaymentsMade = parseFloat(document.querySelector('.huquq-payments-made input')?.value) || 0;
-    const remainderDue = huquqPaymentOwed - huquqPaymentsMade;
-
-    // Update the DOM only if the elements exist
-    if (document.querySelector('.summary-value')) {
-        document.querySelector('.summary-value').textContent = `$${adjustedSummary.toFixed(2)}`;
-    }
-    if (document.querySelector('.units-of-huquq')) {
-        document.querySelector('.units-of-huquq').textContent = unitsOfHuquq.toFixed(2);
-    }
-    if (document.querySelector('.rounded-units')) {
-        document.querySelector('.rounded-units').textContent = roundedUnits;
-    }
-    if (document.querySelector('.payment-owed')) {
-        document.querySelector('.payment-owed').textContent = `$${huquqPaymentOwed.toFixed(2)}`;
-    }
-    if (document.querySelector('.remainder-due')) {
-        document.querySelector('.remainder-due').textContent = `$${remainderDue.toFixed(2)}`;
-    }
-}
-
-// Call the calculation function after the page loads or when data changes
-calculateSummary();
