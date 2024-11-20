@@ -43,21 +43,30 @@
                                 <%= entry.label %>
                                 <button 
                                     class="delete-item-button" 
-                                    data-label-id="<%= entry.label_id %>"
+                                    data-label-id="<%= entry.id %>" 
                                     style="float: right;">
                                     D
                                 </button>
                             </td>
                             <% summaries.forEach(summary => { %>
                             <td>
-                                <!-- Render the value from the entries retrieved -->
+                                <% if (entry.reporting_date === summary.end_date) { %>
                                     <input 
                                         type="text" 
                                         value="<%= entry.value %>" 
-                                        data-label-id="<%= entry.label_id %>" 
+                                        data-label-id="<%= entry.id %>" 
                                         data-reporting-date="<%= summary.end_date %>"
                                         class="financial-input"
                                     />
+                                <% } else { %>
+                                    <input 
+                                        type="text" 
+                                        value="0.00" 
+                                        data-label-id="<%= entry.id %>" 
+                                        data-reporting-date="<%= summary.end_date %>"
+                                        class="financial-input"
+                                    />
+                                <% } %>
                             </td>
                             <% }); %>
                         </tr>
