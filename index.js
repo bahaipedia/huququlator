@@ -572,6 +572,27 @@ app.delete('/api/entries/:id', checkLoginStatus, async (req, res) => {
     }
 });
 
+app.get('/api/summary', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const userId = req.userId;
+        
+        // Fetch summary data for the user
+        const [summaries] = await pool.query(
+            `SELECT * FROM financial_summary WHERE user_id = ?`, 
+            [userId]
+        );
+
+        res.status(200).json({ summaries });
+    } catch (error) {
+        console.error('Error fetching summary:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 app.post('/api/summary', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
