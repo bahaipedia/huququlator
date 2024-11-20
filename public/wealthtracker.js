@@ -17,7 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Add a new input cell for each row in the body
         table.querySelector('tbody').querySelectorAll('tr').forEach(row => {
-            if (row.querySelector('button')) return; // Skip rows with buttons (category buttons)
+            // Skip section header rows
+            if (row.querySelector('th') && row.children.length === 1) return;
+
             const labelId = row.querySelector('td')?.getAttribute('data-label-id'); // Use a custom attribute to identify rows
             const cell = document.createElement('td');
             cell.innerHTML = `<input type="text" id="cell-${labelId}_${date}" />`;
