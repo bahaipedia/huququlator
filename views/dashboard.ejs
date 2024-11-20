@@ -50,23 +50,13 @@
                             </td>
                             <% summaries.forEach(summary => { %>
                             <td>
-                                <% if (entry.reporting_date === summary.end_date) { %>
-                                    <input 
-                                        type="text" 
-                                        value="<%= entry.value %>" 
-                                        data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= summary.end_date %>"
-                                        class="financial-input"
-                                    />
-                                <% } else { %>
-                                    <input 
-                                        type="text" 
-                                        value="0.00" 
-                                        data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= summary.end_date %>"
-                                        class="financial-input"
-                                    />
-                                <% } %>
+                                <input 
+                                    type="text" 
+                                    value="<%= entry.reporting_date === summary.end_date ? entry.value : '0.00' %>" 
+                                    data-label-id="<%= entry.id %>" 
+                                    data-reporting-date="<%= summary.end_date %>"
+                                    class="financial-input"
+                                />
                             </td>
                             <% }); %>
                         </tr>
@@ -94,23 +84,13 @@
                             </td>
                             <% summaries.forEach(summary => { %>
                             <td>
-                                <% if (entry.reporting_date === summary.end_date) { %>
-                                    (<input 
-                                        type="text" 
-                                        value="<%= entry.value %>" 
-                                        data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= summary.end_date %>"
-                                        class="financial-input debt-input"
-                                    />)
-                                <% } else { %>
-                                    (<input 
-                                        type="text" 
-                                        value="0.00" 
-                                        data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= summary.end_date %>"
-                                        class="financial-input debt-input"
-                                    />)
-                                <% } %>
+                                (<input 
+                                    type="text" 
+                                    value="<%= entry.reporting_date === summary.end_date ? entry.value : '0.00' %>" 
+                                    data-label-id="<%= entry.id %>" 
+                                    data-reporting-date="<%= summary.end_date %>"
+                                    class="financial-input debt-input"
+                                />)
                             </td>
                             <% }); %>
                         </tr>
@@ -138,23 +118,13 @@
                             </td>
                             <% summaries.forEach(summary => { %>
                             <td>
-                                <% if (entry.reporting_date === summary.end_date) { %>
-                                    <input 
-                                        type="text" 
-                                        value="<%= entry.value %>" 
-                                        data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= summary.end_date %>"
-                                        class="financial-input expense-input"
-                                    />
-                                <% } else { %>
-                                    <input 
-                                        type="text" 
-                                        value="0.00" 
-                                        data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= summary.end_date %>"
-                                        class="financial-input expense-input"
-                                    />
-                                <% } %>
+                                <input 
+                                    type="text" 
+                                    value="<%= entry.reporting_date === summary.end_date ? entry.value : '0.00' %>" 
+                                    data-label-id="<%= entry.id %>" 
+                                    data-reporting-date="<%= summary.end_date %>"
+                                    class="financial-input expense-input"
+                                />
                             </td>
                             <% }); %>
                         </tr>
