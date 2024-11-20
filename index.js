@@ -174,7 +174,7 @@ app.get('/test', checkLoginStatus, async (req, res) => {
     try {
         const userId = req.userId;
 
-        // Fetch financial summaries for the user
+        // Fetch financial summaries
         const [summaries] = await pool.query(
             `
             SELECT 
@@ -210,14 +210,14 @@ app.get('/test', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        // Fetch all financial entries with normalized reporting_date
+        // Fetch all financial entries
         const [entries] = await pool.query(
             `
             SELECT 
                 fv.id,
                 fv.user_id,
                 fv.label_id,
-                DATE_FORMAT(fv.reporting_date, '%Y-%m-%d') AS reporting_date, -- Normalize date format
+                DATE_FORMAT(fv.reporting_date, '%Y-%m-%d') AS reporting_date,
                 fv.value,
                 fl.category,
                 fl.label
@@ -229,10 +229,8 @@ app.get('/test', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        // Render the test page to inspect the data retrieved
+        // Render the test page with raw data for debugging
         res.render('test', {
-            loggedIn: req.loggedIn,
-            username: req.username,
             summaries,
             labels,
             entries,
