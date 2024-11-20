@@ -267,29 +267,35 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
         );
 
         // Fetch all financial values for the user with normalized reporting_date
-        const [values] = await pool.query(
+        const [entries] = await pool.query(
             `
             SELECT 
-                label_id, 
-                reporting_date, 
-                value 
-            FROM financial_entries 
-            WHERE label_id IN (SELECT id FROM financial_labels WHERE user_id = ?) 
-            ORDER BY reporting_date ASC
+                fl.id AS label_id,
+                fl.category,
+                fl.label,
+                COALESCE(fv.value, 0) AS value,
+                fv.reporting_date
+            FROM financial_labels fl
+            LEFT JOIN financial_entries fv ON fl.id = fv.label_id AND fv.user_id = ?
+            WHERE fl.user_id = ?
+            ORDER BY fl.category ASC, fl.label ASC, fv.reporting_date ASC
             `,
-            [userId]
+            [userId, userId]
         );
 
-        // Transform values into a structure that is easier for rendering
+        // Transform the data into a structure that is easier to render
         const entryMap = labels.map(label => {
-            const labelValues = values.filter(v => v.label_id === label.id);
+            // For each label, filter all matching entries
+            const labelEntries = entries.filter(entry => entry.label_id === label.id);
+            
             return {
                 id: label.id,
                 category: label.category,
                 label: label.label,
                 values: summaries.map(summary => {
-                    const match = labelValues.find(v => v.reporting_date === summary.end_date);
-                    return match ? match.value : 0.00; // Default value if no match is found
+                    // Find the value that matches this label and summary's end date
+                    const match = labelEntries.find(entry => entry.reporting_date === summary.end_date);
+                    return match ? match.value : 0.00; // Default to 0.00 if no match
                 }),
             };
         });
