@@ -2,6 +2,7 @@
 document.querySelector('.add-year-button').addEventListener('click', () => {
     const endDate = prompt('Enter the end date for the new reporting period (YYYY-MM-DD):');
     if (endDate) {
+        // Step 1: Add a new reporting period to financial_summary
         fetch('/api/summary', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -14,11 +15,25 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
                 return response.json();
             })
             .then(data => {
-                alert('New reporting period added successfully!');
+                // Step 2: Add financial entries for each label for the new reporting period
+                return fetch('/api/entries', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reporting_date: endDate }),
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('New reporting period and entries added successfully!');
                 location.reload(); // Reload to reflect the new column
             })
             .catch(err => {
-                console.error('Error adding reporting period:', err);
+                console.error('Error adding reporting period and entries:', err);
                 alert('Failed to add the reporting period. Please try again later.');
             });
     }
@@ -30,7 +45,7 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
         const yearId = button.dataset.id;
 
         if (confirm('Are you sure you want to delete this year? This action cannot be undone.')) {
-            fetch(`/api/summary/${yearId}`, {
+            fetch(`/api/entries/${yearId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' }
             })
