@@ -22,7 +22,7 @@
                             <th>Accounts</th>
                             <% summaries.forEach(summary => { %>
                                 <th data-date="<%= summary.end_date %>">
-                                    <%= new Date(summary.end_date).toLocaleDateString() %>
+                                    <%= new Date(summary.end_date).toISOString().split('T')[0] %>
                                     <button 
                                         class="delete-year-button" 
                                         data-label-id="<%= summary.id %>">
