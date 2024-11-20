@@ -451,6 +451,33 @@ app.delete('/api/labels/:id', checkLoginStatus, async (req, res) => {
     }
 });
 
+// Route to get all entries for a user
+app.get('/api/entries', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const userId = req.userId;
+
+        // Fetch financial entries for the current user, including their labels and categories
+        const [entries] = await pool.query(
+            `
+            SELECT fl.id AS label_id, fl.label, COALESCE(fv.value, 0) AS value, fv.reporting_date, fl.category
+            FROM financial_labels fl
+            LEFT JOIN financial_entries fv ON fl.id = fv.label_id AND fv.user_id = ?
+            WHERE fl.user_id = ?
+            `,
+            [userId, userId]
+        );
+
+        res.status(200).json({ entries });
+    } catch (error) {
+        console.error('Error fetching entries:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 app.post('/api/entries', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
