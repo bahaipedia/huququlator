@@ -17,10 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Add a new input cell for each row in the body
         table.querySelector('tbody').querySelectorAll('tr').forEach(row => {
-            // Skip section header rows
-            if (row.querySelector('th') && row.children.length === 1) return;
+            // Skip section headers and button rows
+            if (row.querySelector('th') || row.querySelector('button')) return;
 
-            const labelId = row.querySelector('td')?.getAttribute('data-label-id'); // Use a custom attribute to identify rows
+            const labelId = row.querySelector('td')?.getAttribute('data-label-id');
             const cell = document.createElement('td');
             cell.innerHTML = `<input type="text" id="cell-${labelId}_${date}" />`;
             row.appendChild(cell);
