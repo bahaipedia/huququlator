@@ -45,7 +45,7 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
         const entryId = button.dataset.entryId;
 
         if (confirm('Are you sure you want to delete this year? This action cannot be undone.')) {
-            fetch(`/api/entries/${yearId}`, {
+            fetch(`/api/entries/${entryId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' }
             })
@@ -56,7 +56,7 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
                     return response.json();
                 })
                 .then(() => {
-                    location.reload(); 
+                    location.reload();
                 })
                 .catch(err => {
                     console.error('Error deleting year:', err);
