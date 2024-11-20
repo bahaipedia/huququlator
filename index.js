@@ -476,6 +476,31 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
             labelId = labelResult[0].id; // Use existing label's ID
         }
 
+        // Get all existing reporting_dates for the user
+        const [datesResult] = await pool.query(
+            `
+            SELECT DISTINCT reporting_date 
+            FROM financial_entries 
+            WHERE user_id = ?
+            `,
+            [userId]
+        );
+
+        // Insert entries for the new label for all existing reporting_dates
+        const insertEntryQuery = `
+            INSERT INTO financial_entries (user_id, label_id, reporting_date, value)
+            VALUES (?, ?, ?, ?)
+        `;
+        const entries = datesResult.map(date => [
+            userId,
+            labelId,
+            date.reporting_date,
+            0.00, // Default value
+        ]);
+        if (entries.length > 0) {
+            await pool.query(insertEntryQuery, [entries]);
+        }
+
         // Return the labelId to the client
         res.status(201).json({ labelId });
     } catch (error) {
