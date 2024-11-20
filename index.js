@@ -299,7 +299,6 @@ app.post('/login', async (req, res) => {
 });
 
 // Dashboard route
-// Dashboard route
 app.get('/dashboard', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.redirect('/login');
@@ -348,17 +347,19 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
         const [entries] = await pool.query(
             `
             SELECT 
-                fl.id AS label_id,
-                fl.category,
-                fl.label,
+                fv.id,
+                fv.user_id,
+                fv.label_id,
+                DATE_FORMAT(fv.reporting_date, '%Y-%m-%d') AS reporting_date, -- Normalize date format
                 fv.value,
-                fv.reporting_date
-            FROM financial_labels fl
-            LEFT JOIN financial_entries fv ON fl.id = fv.label_id AND fv.user_id = ?
-            WHERE fl.user_id = ?
-            ORDER BY fl.category ASC, fl.label ASC, fv.reporting_date ASC
+                fl.category,
+                fl.label
+            FROM financial_entries fv
+            JOIN financial_labels fl ON fv.label_id = fl.id
+            WHERE fv.user_id = ?
+            ORDER BY fv.reporting_date ASC, fl.category ASC, fl.label ASC
             `,
-            [userId, userId]
+            [userId]
         );
 
         // Transform the data for easier rendering
