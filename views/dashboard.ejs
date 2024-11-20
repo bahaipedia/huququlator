@@ -55,6 +55,7 @@
                                         type="text" 
                                         value="<%= entry.value %>" 
                                         data-label-id="<%= entry.id %>" 
+                                        data-reporting-date="<%= summary.end_date %>"
                                         class="financial-input asset-input"
                                     />
                                 <% } else { %>
@@ -62,6 +63,7 @@
                                         type="text" 
                                         value="0.00" 
                                         data-label-id="<%= entry.id %>" 
+                                        data-reporting-date="<%= summary.end_date %>"
                                         class="financial-input asset-input"
                                     />
                                 <% } %>
@@ -97,6 +99,7 @@
                                         type="text" 
                                         value="<%= entry.value %>" 
                                         data-label-id="<%= entry.id %>" 
+                                        data-reporting-date="<%= summary.end_date %>"
                                         class="financial-input debt-input"
                                     />)
                                 <% } else { %>
@@ -104,6 +107,7 @@
                                         type="text" 
                                         value="0.00" 
                                         data-label-id="<%= entry.id %>" 
+                                        data-reporting-date="<%= summary.end_date %>"
                                         class="financial-input debt-input"
                                     />)
                                 <% } %>
@@ -139,6 +143,7 @@
                                         type="text" 
                                         value="<%= entry.value %>" 
                                         data-label-id="<%= entry.id %>" 
+                                        data-reporting-date="<%= summary.end_date %>"
                                         class="financial-input expense-input"
                                     />
                                 <% } else { %>
@@ -146,6 +151,7 @@
                                         type="text" 
                                         value="0.00" 
                                         data-label-id="<%= entry.id %>" 
+                                        data-reporting-date="<%= summary.end_date %>"
                                         class="financial-input expense-input"
                                     />
                                 <% } %>
