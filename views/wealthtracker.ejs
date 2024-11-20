@@ -28,7 +28,7 @@
                     <% reportingDates.forEach(date => { %>
                         <td>
                             <input type="text" 
-                                   id="cell-<%= label.id %>-<%= date %>" 
+                                   id="cell-<%= label.id %>_<%= date %>" 
                                    value="<%= groupedEntries[date] && groupedEntries[date][label.id] ? groupedEntries[date][label.id] : '' %>" />
                         </td>
                     <% }); %>
@@ -50,7 +50,7 @@
                     <% reportingDates.forEach(date => { %>
                         <td>
                             <input type="text" 
-                                   id="cell-<%= label.id %>-<%= date %>" 
+                                   id="cell-<%= label.id %>_<%= date %>" 
                                    value="<%= groupedEntries[date] && groupedEntries[date][label.id] ? groupedEntries[date][label.id] : '' %>" />
                         </td>
                     <% }); %>
@@ -72,7 +72,7 @@
                     <% reportingDates.forEach(date => { %>
                         <td>
                             <input type="text" 
-                                   id="cell-<%= label.id %>-<%= date %>" 
+                                   id="cell-<%= label.id %>_<%= date %>" 
                                    value="<%= groupedEntries[date] && groupedEntries[date][label.id] ? groupedEntries[date][label.id] : '' %>" />
                         </td>
                     <% }); %>
