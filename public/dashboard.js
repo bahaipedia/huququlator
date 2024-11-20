@@ -105,6 +105,9 @@ document.querySelectorAll('.add-item-button').forEach(button => {
             const saveButton = newRow.querySelector('.save-item-button');
             saveButton.disabled = true;
 
+console.log('Category:', category);
+console.log('Label:', label);
+            
             fetch('/api/labels', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
