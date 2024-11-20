@@ -120,16 +120,17 @@ app.get('/wealthtracker', async (req, res) => {
         // Group entries by reporting date for table columns
         const groupedEntries = {};
         entries.forEach(entry => {
-            if (!groupedEntries[entry.reporting_date]) {
-                groupedEntries[entry.reporting_date] = {};
+            const formattedDate = format(new Date(entry.reporting_date), 'yyyy-MM-dd'); // Format the date
+            if (!groupedEntries[formattedDate]) {
+                groupedEntries[formattedDate] = {};
             }
-            groupedEntries[entry.reporting_date][entry.label_id] = entry.value;
+            groupedEntries[formattedDate][entry.label_id] = entry.value;
         });
 
         res.render('wealthtracker', {
             labels,
             groupedEntries,
-            reportingDates: Object.keys(groupedEntries),
+            reportingDates: Object.keys(groupedEntries), // These will now be formatted as 'YYYY-MM-DD'
         });
     } catch (err) {
         console.error(err);
