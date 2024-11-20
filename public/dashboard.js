@@ -1,4 +1,4 @@
-/* Add a New Reporting Period */
+/* Add a New Reporting Period1 */
 document.querySelector('.add-year-button').addEventListener('click', () => {
     const endDate = prompt('Enter the end date for the new reporting period (YYYY-MM-DD):');
     if (endDate) {
