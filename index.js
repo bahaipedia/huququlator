@@ -445,6 +445,7 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
 
 app.post('/api/labels', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
+        logger.info('Unauthorized access attempt.');
         return res.status(403).send('Unauthorized');
     }
 
@@ -452,7 +453,7 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
         const { category, label } = req.body;
         const userId = req.userId;
 
-        console.log('Received request to add label:', { category, label, userId });
+        logger.info('Received request to add label.', { category, label, userId });
 
         // Check if the label already exists
         let [labelResult] = await pool.query(
@@ -468,21 +469,21 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
 
         if (labelResult.length === 0) {
             // Insert the new label
-            console.log('Label does not exist. Inserting new label...');
+            logger.info('Label does not exist. Inserting new label...');
             const insertLabelQuery = `
                 INSERT INTO financial_labels (user_id, category, label)
                 VALUES (?, ?, ?)
             `;
             const result = await pool.query(insertLabelQuery, [userId, category, label]);
             labelId = result[0].insertId; // Get the inserted label's ID
-            console.log('Inserted new label with ID:', labelId);
+            logger.info('Inserted new label with ID:', labelId);
         } else {
             labelId = labelResult[0].id; // Use existing label's ID
-            console.log('Label already exists with ID:', labelId);
+            logger.info('Label already exists with ID:', labelId);
         }
 
         // Get all existing reporting_dates for the user
-        console.log('Fetching existing reporting dates...');
+        logger.info('Fetching existing reporting dates...');
         const [datesResult] = await pool.query(
             `
             SELECT DISTINCT reporting_date 
@@ -491,7 +492,7 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
             `,
             [userId]
         );
-        console.log('Existing reporting dates:', datesResult);
+        logger.info('Existing reporting dates:', datesResult);
 
         // Insert entries for the new label for all existing reporting_dates
         const insertEntryQuery = `
@@ -505,21 +506,21 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
             0.00, // Default value
         ]);
 
-        console.log('Entries to insert:', entries);
+        logger.info('Entries to insert:', entries);
 
         if (entries.length > 0) {
             try {
                 await pool.query(insertEntryQuery, [entries]);
-                console.log('Successfully inserted financial entries for the new label.');
+                logger.info('Successfully inserted financial entries for the new label.');
             } catch (err) {
-                console.error('Error inserting financial entries:', err);
+                logger.error('Error inserting financial entries:', err);
             }
         }
 
         // Return the labelId to the client
         res.status(201).json({ labelId });
     } catch (error) {
-        console.error('Error adding financial label:', error);
+        logger.error('Error adding financial label:', error);
         res.status(500).send('Server Error');
     }
 });
