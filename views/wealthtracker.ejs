@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wealth Tracker</title>
-    <!-- Reference the JavaScript file -->
     <script defer src="/wealthtracker.js"></script>
 </head>
 <body>
@@ -15,10 +14,24 @@
         <thead>
             <tr>
                 <th>Labels</th>
+                <% reportingDates.forEach(date => { %>
+                    <th><%= date %></th>
+                <% }); %>
             </tr>
         </thead>
         <tbody>
-            <!-- Dynamic rows will go here -->
+            <% labels.forEach(label => { %>
+                <tr>
+                    <td><%= label.label %> (<%= label.category %>)</td>
+                    <% reportingDates.forEach(date => { %>
+                        <td>
+                            <input type="text" 
+                                   id="cell-<%= label.id %>-<%= date %>" 
+                                   value="<%= groupedEntries[date] && groupedEntries[date][label.id] ? groupedEntries[date][label.id] : '' %>" />
+                        </td>
+                    <% }); %>
+                </tr>
+            <% }); %>
         </tbody>
     </table>
 </body>
