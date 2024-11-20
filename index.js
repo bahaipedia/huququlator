@@ -104,16 +104,22 @@ app.get('/', checkLoginStatus, (req, res) => {
 app.get('/wealthtracker', async (req, res) => {
     try {
         const userId = 1; // Replace with the actual logged-in user ID
-        
+
         // Fetch financial labels
         const [labels] = await pool.query(
             `SELECT id, category, label FROM financial_labels WHERE user_id = ? ORDER BY category, id`,
             [userId]
         );
-        
-        // Fetch financial entries
+
+        // Fetch financial entries with formatted reporting_date
         const [entries] = await pool.query(
-            `SELECT label_id, reporting_date, value FROM financial_entries WHERE user_id = ? ORDER BY reporting_date`,
+            `SELECT 
+                label_id, 
+                DATE_FORMAT(reporting_date, '%Y-%m-%d') AS reporting_date, 
+                value 
+             FROM financial_entries 
+             WHERE user_id = ? 
+             ORDER BY reporting_date`,
             [userId]
         );
 
@@ -129,7 +135,7 @@ app.get('/wealthtracker', async (req, res) => {
         res.render('wealthtracker', {
             labels,
             groupedEntries,
-            reportingDates: Object.keys(groupedEntries),
+            reportingDates: Object.keys(groupedEntries), // Dates will already be formatted as 'YYYY-MM-DD'
         });
     } catch (err) {
         console.error(err);
