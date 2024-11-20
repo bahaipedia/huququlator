@@ -493,6 +493,36 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
     }
 });
 
+app.put('/api/entries/update', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { label_id, value } = req.body;
+        const userId = req.userId;
+
+        // Update the financial entry with the given label
+        const result = await pool.query(
+            `
+            UPDATE financial_entries
+            SET value = ?
+            WHERE user_id = ? AND label_id = ?
+            `,
+            [value, userId, label_id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Entry not found or not authorized to update.' });
+        }
+
+        res.status(200).json({ message: 'Entry updated successfully.' });
+    } catch (error) {
+        console.error('Error updating entry:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 app.delete('/api/entries/:id', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
