@@ -217,7 +217,7 @@ app.get('/test', checkLoginStatus, async (req, res) => {
                 fv.id,
                 fv.user_id,
                 fv.label_id,
-                fv.reporting_date,
+                DATE_FORMAT(fv.reporting_date, '%Y-%m-%d') AS reporting_date, -- Normalize date format
                 fv.value,
                 fl.category,
                 fl.label
