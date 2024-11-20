@@ -452,6 +452,8 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
         const { category, label } = req.body;
         const userId = req.userId;
 
+        console.log('Received request to add label:', { category, label, userId });
+
         // Check if the label already exists
         let [labelResult] = await pool.query(
             `
@@ -466,17 +468,21 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
 
         if (labelResult.length === 0) {
             // Insert the new label
+            console.log('Label does not exist. Inserting new label...');
             const insertLabelQuery = `
                 INSERT INTO financial_labels (user_id, category, label)
                 VALUES (?, ?, ?)
             `;
             const result = await pool.query(insertLabelQuery, [userId, category, label]);
             labelId = result[0].insertId; // Get the inserted label's ID
+            console.log('Inserted new label with ID:', labelId);
         } else {
             labelId = labelResult[0].id; // Use existing label's ID
+            console.log('Label already exists with ID:', labelId);
         }
 
         // Get all existing reporting_dates for the user
+        console.log('Fetching existing reporting dates...');
         const [datesResult] = await pool.query(
             `
             SELECT DISTINCT reporting_date 
@@ -485,6 +491,7 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
             `,
             [userId]
         );
+        console.log('Existing reporting dates:', datesResult);
 
         // Insert entries for the new label for all existing reporting_dates
         const insertEntryQuery = `
@@ -497,8 +504,16 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
             date.reporting_date,
             0.00, // Default value
         ]);
+
+        console.log('Entries to insert:', entries);
+
         if (entries.length > 0) {
-            await pool.query(insertEntryQuery, [entries]);
+            try {
+                await pool.query(insertEntryQuery, [entries]);
+                console.log('Successfully inserted financial entries for the new label.');
+            } catch (err) {
+                console.error('Error inserting financial entries:', err);
+            }
         }
 
         // Return the labelId to the client
