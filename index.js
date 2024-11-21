@@ -359,27 +359,6 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
     try {
         const userId = req.userId;
 
-        // Fetch financial summaries for the user
-        const [summaries] = await pool.query(
-            `
-            SELECT 
-                id, 
-                user_id, 
-                DATE_FORMAT(start_date, '%Y-%m-%d') AS start_date, 
-                DATE_FORMAT(end_date, '%Y-%m-%d') AS end_date, 
-                total_assets, 
-                total_debts, 
-                unnecessary_expenses, 
-                wealth_already_taxed, 
-                gold_rate, 
-                huquq_payments_made 
-            FROM financial_summary 
-            WHERE user_id = ? 
-            ORDER BY end_date ASC
-            `,
-            [userId]
-        );
-
         // Fetch all labels for the user
         const [labels] = await pool.query(
             `
