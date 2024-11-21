@@ -1014,15 +1014,23 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
         const { value, end_date } = req.body; // Value and reporting period
         const userId = req.userId;
 
+        console.log('Updating wealth_already_taxed:', { userId, value, end_date });
+
         const updateQuery = `
             UPDATE financial_summary
             SET wealth_already_taxed = ?
             WHERE user_id = ? AND end_date = ?
         `;
 
-        await pool.query(updateQuery, [parseFloat(value), userId, end_date]);
+        const [result] = await pool.query(updateQuery, [parseFloat(value), userId, end_date]);
 
-        res.status(200).json({ message: 'Wealth already taxed updated successfully' });
+        console.log('Update query result:', result);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'No matching summary found to update.' });
+        }
+
+        res.status(200).json({ message: 'Wealth already taxed updated successfully.' });
     } catch (error) {
         console.error('Error updating wealth already taxed:', error);
         res.status(500).send('Server Error');
