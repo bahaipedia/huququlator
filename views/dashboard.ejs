@@ -202,15 +202,18 @@
                         <td>Wealth being taxed today:</td>
                         <% summaries.forEach(summary => { %>
                             <td class="summary-value">
-                                <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed 
-                                    ? (summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed).toFixed(2) 
+                                <%= (parseFloat(summary.total_assets) || 0) - 
+                                    (parseFloat(summary.total_debts) || 0) + 
+                                    (parseFloat(summary.unnecessary_expenses) || 0) - 
+                                    (parseFloat(summary.wealth_already_taxed) || 0)
+                                    ? (parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)).toFixed(2)
                                     : '0.00' %>
                             </td>
                             <script>
-                                console.log('Total Assets:', <%= summary.total_assets %>);
-                                console.log('Total Debts:', <%= summary.total_debts %>);
-                                console.log('Unnecessary Expenses:', <%= summary.unnecessary_expenses %>);
-                                console.log('Wealth Already Taxed:', <%= summary.wealth_already_taxed %>);
+                                console.log('Parsed Total Assets:', parseFloat(<%= summary.total_assets %>) || 0);
+                                console.log('Parsed Total Debts:', parseFloat(<%= summary.total_debts %>) || 0);
+                                console.log('Parsed Unnecessary Expenses:', parseFloat(<%= summary.unnecessary_expenses %>) || 0);
+                                console.log('Parsed Wealth Already Taxed:', parseFloat(<%= summary.wealth_already_taxed %>) || 0);
                             </script>
                         <% }); %>
                     </tr>
