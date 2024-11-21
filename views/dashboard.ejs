@@ -186,12 +186,14 @@
                     </tr>
                     <tr>
                         <td>Wealth already taxed:</td>
-                        <% summaries.forEach(summary => { %>
+                        <% summaries.forEach((summary, index) => { %>
                             <td>
                                 <input 
                                     type="text" 
-                                    value="<%= summary.wealth_already_taxed ? parseFloat(summary.wealth_already_taxed).toFixed(2) : '0.00' %>" 
+                                    value="<%= summary.wealth_already_taxed ? parseFloat(summary.wealth_already_taxed).toFixed(2) : '0.00' %>"
                                     class="wealth-already-taxed"
+                                    data-end-date="<%= summary.end_date %>"
+                                    <%= index === 0 ? '' : 'disabled' %>
                                 />
                             </td>
                         <% }); %>
