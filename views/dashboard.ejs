@@ -37,7 +37,7 @@
                         <tr class="section-row">
                             <td colspan="<%= summaries.length + 1 %>" class="section-title">Assets</td>
                         </tr>
-                        <% entries.filter(entry => entry.category === 'Assets').forEach(entry => { %>
+                        <% entryMap.filter(entry => entry.category === 'Assets').forEach(entry => { %>
                         <tr>
                             <td>
                                 <%= entry.label %>
@@ -48,17 +48,19 @@
                                     D
                                 </button>
                             </td>
-                            <% summaries.forEach(summary => { %>
-                            <td>
-                                <input 
-                                    type="text" 
-                                    value="<%= entry.reporting_date === summary.end_date ? entry.value : '0.00' %>" 
-                                    data-label-id="<%= entry.id %>" 
-                                    data-reporting-date="<%= summary.end_date %>"
-                                    class="financial-input"
-                                />
-                            </td>
-                            <% }); %>
+                            <% if (summaries.length > 0) { %>
+                                <% entry.values.forEach(value => { %>
+                                <td>
+                                    <input 
+                                        type="text" 
+                                        value="<%= value %>" 
+                                        data-label-id="<%= entry.id %>" 
+                                        data-reporting-date="<%= summaries[entry.values.indexOf(value)].end_date %>"
+                                        class="financial-input"
+                                    />
+                                </td>
+                                <% }); %>
+                            <% } %>
                         </tr>
                         <% }); %>
                         <tr>
@@ -66,7 +68,6 @@
                                 <button class="add-item-button asset-button">Add a New Asset</button>
                             </td>
                         </tr>
-
                         <!-- Debts Section -->
                         <tr class="section-row">
                             <td colspan="<%= summaries.length + 1 %>" class="section-title">Debts</td>
