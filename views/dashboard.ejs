@@ -263,8 +263,8 @@
                         <td>Remainder Due:</td>
                         <% summaries.forEach(summary => { %>
                             <td class="remainder-due">
-                                <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate && summary.huquq_payments_made 
-                                    ? ((0.19 * Math.floor((summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed) / summary.gold_rate) * summary.gold_rate) - summary.huquq_payments_made).toFixed(2) 
+                                <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate && summary.huquq_payments_made) 
+                                    ? ((0.19 * Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)) * parseFloat(summary.gold_rate)) - parseFloat(summary.huquq_payments_made)).toFixed(2) 
                                     : '0.00' %>
                             </td>
                         <% }); %>
