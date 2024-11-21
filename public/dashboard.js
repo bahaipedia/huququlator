@@ -316,32 +316,31 @@ document.querySelectorAll('.financial-input').forEach(input => {
 // Save values and refresh the summary
 document.querySelectorAll('.save-button, .save-huquq-payments').forEach(button => {
     button.addEventListener('click', (event) => {
-        const parentCell = event.target.closest('td'); 
-        const endDate = parentCell.dataset.endDate; 
-        const input = parentCell.querySelector('input');
-        const value = input ? input.value : null; 
+        const row = event.target.closest('tr');
+        const isWealthTaxed = button.classList.contains('save-button');
+        const field = isWealthTaxed ? 'wealth_already_taxed' : 'huquq_payments_made';
 
-        if (value !== null) {
-            // Determine the field to update based on the button clicked
-            const field = parentCell.classList.contains('wealth-already-taxed') ? 'wealth_already_taxed' : 'huquq_payments_made';
+        const endDate = row.querySelector(isWealthTaxed ? '.wealth-already-taxed' : '.huquq-payments-made').dataset.endDate;
+        const value = row.querySelector(isWealthTaxed ? '.wealth-already-taxed' : '.huquq-payments-made').value;
 
-            // Send the update to the server
-            fetch('/api/summary/update', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ field, value, end_date: endDate })
+        // Send the update to the server
+        fetch('/api/summary/update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ field, value, end_date: endDate })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    recalculateSummaryFields(); // Recalculate all the fields after the update
-                })
-                .catch(err => {
-                    console.error('Error updating summary fields:', err);
-                });
-        } else {
-            console.warn('No value to save.');
-        }
+            .then(() => {
+                recalculateSummaryFields(); // Recalculate all fields after the update
+            })
+            .catch(err => {
+                console.error(`Error updating ${field}:`, err);
+            });
     });
 });
+
