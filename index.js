@@ -884,26 +884,20 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        const { field, value, end_date } = req.body; // Field, value, and reporting period
+        const { value, end_date } = req.body; // Value and reporting period
         const userId = req.userId;
 
         // Validate input
-        if (!field || !value || !end_date) {
-            logger.warn('Missing field, value, or end_date in request:', { field, value, end_date });
-            return res.status(400).json({ error: 'Field, value, and end_date are required.' });
-        }
-
-        // Ensure the field is valid
-        if (!['wealth_already_taxed', 'huquq_payments_made'].includes(field)) {
-            logger.warn('Invalid field specified:', { field });
-            return res.status(400).json({ error: 'Invalid field specified.' });
+        if (!value || !end_date) {
+            logger.warn('Missing value or end_date in request:', { value, end_date });
+            return res.status(400).json({ error: 'Value and end_date are required.' });
         }
 
         const parsedValue = parseFloat(value);
 
         const updateQuery = `
             UPDATE financial_summary
-            SET ${field} = ?
+            SET wealth_already_taxed = ?
             WHERE user_id = ? AND end_date = ?
         `;
 
@@ -915,9 +909,9 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
             return res.status(404).json({ error: 'No matching summary found to update.' });
         }
 
-        res.status(200).json({ message: `${field} updated successfully.` });
+        res.status(200).json({ message: 'Wealth already taxed updated successfully.' });
     } catch (error) {
-        logger.error('Error updating summary field:', { error: error.message, stack: error.stack });
+        logger.error('Error updating wealth already taxed:', { error: error.message, stack: error.stack });
         res.status(500).send('Server Error');
     }
 });
