@@ -128,7 +128,9 @@ app.get('/api/gold-price', async (req, res) => {
                 : `https://api.metalpriceapi.com/v1/${formattedMetalPriceDate}?api_key=${apiKeyMetalPriceApi}&base=USD&currencies=XAU`;
 
             const responseMetalPriceApi = await axios.get(apiUrlMetalPriceApi);
-            goldPrice = responseMetalPriceApi.data.rates?.XAU;
+
+            // Extract gold price from MetalPriceAPI response
+            goldPrice = responseMetalPriceApi.data.rates?.USDXAU;
 
             if (!goldPrice) {
                 throw new Error('Gold price is missing in MetalPriceAPI response.');
@@ -152,6 +154,7 @@ app.get('/api/gold-price', async (req, res) => {
                     },
                 });
 
+                // Extract gold price from GoldAPI response
                 goldPrice = responseGoldApi.data.price;
 
                 if (!goldPrice) {
