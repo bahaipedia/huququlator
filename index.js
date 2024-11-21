@@ -404,13 +404,21 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
         // Check if entries exist
         if (entries.length === 0) {
             logger.info('No financial entries found. Rendering labels only.');
+
+            const entryMap = labels.map(label => ({
+                id: label.id,
+                category: label.category,
+                label: label.label,
+                values: [], // No financial entries, so values are empty
+            }));
+
             return res.render('dashboard', {
                 loggedIn: req.loggedIn,
                 username: req.username,
                 summaries: [], // No summaries because no entries exist
                 labels,
                 entries: [], // No entries
-                entryMap: [], // No entryMap since there are no entries
+                entryMap, // Labels-only entryMap
             });
         }
 
