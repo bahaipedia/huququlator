@@ -600,7 +600,6 @@ app.get('/api/entries', checkLoginStatus, async (req, res) => {
     }
 });
 
-// Route called when we add a new reporting period on the dashboard
 app.post('/api/entries', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
@@ -627,28 +626,13 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
             return res.status(400).json({ error: 'No financial labels found for the user' });
         }
 
-        // Step 3: Fetch the previous reporting period's wealth_already_taxed
-        const [previousSummary] = await pool.query(
-            `
-            SELECT wealth_already_taxed
-            FROM financial_summary
-            WHERE user_id = ?
-            ORDER BY end_date DESC
-            LIMIT 1
-            `,
-            [userId]
-        );
-
-        const previousWealthAlreadyTaxed = previousSummary.length > 0 
-            ? parseFloat(previousSummary[0].wealth_already_taxed) || 0 
-            : 0;
-
-        // Step 4: Construct batch insert values for financial_entries
+        // Step 3: Construct batch insert values
         const insertValues = [];
         for (const label of labels) {
             insertValues.push(userId, label.id, reporting_date, 0.00); // Default value: 0.00
         }
 
+        // Step 4: Perform batch insertion
         const placeholders = labels.map(() => '(?, ?, ?, ?)').join(', ');
         const insertQuery = `
             INSERT INTO financial_entries (user_id, label_id, reporting_date, value)
@@ -656,20 +640,11 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
         `;
         await pool.query(insertQuery, insertValues);
 
-        // Step 5: Insert a new summary entry with the previous wealth_already_taxed
-        await pool.query(
-            `
-            INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed)
-            VALUES (?, ?, ?, ?)
-            `,
-            [userId, null, reporting_date, previousWealthAlreadyTaxed]
-        );
-
-        // Step 6: Send success response
-        res.status(201).json({ message: 'New financial entries and summary added successfully!' });
+        // Step 5: Send success response
+        res.status(201).json({ message: 'New financial entries added for the reporting period successfully!' });
     } catch (error) {
-        // Step 7: Log and handle errors
-        logger.error('Error adding financial entries and summary:', {
+        // Step 6: Log and handle errors
+        logger.error('Error adding financial entries:', {
             message: error.message,
             stack: error.stack,
         });
