@@ -259,7 +259,9 @@
                                 <input 
                                     type="text" 
                                     value="<%= summary.huquq_payments_made ? parseFloat(summary.huquq_payments_made).toFixed(2) : '0.00' %>" 
+                                    data-end-date="<%= summary.end_date %>"
                                 />
+                                <button class="save-huquq-payments" data-end-date="<%= summary.end_date %>">S</button>
                             </td>
                         <% }); %>
                     </tr>
