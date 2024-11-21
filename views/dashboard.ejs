@@ -185,7 +185,7 @@
                         <% }); %>
                     </tr>
                     <tr>
-                        <td>Wealth already taxed:</td>
+                        <td>Wealth previously taxed:</td>
                         <% summaries.forEach((summary, index) => { %>
                             <td>
                                 <input 
@@ -199,7 +199,7 @@
                         <% }); %>
                     </tr>
                     <tr>
-                        <td>Summary:</td>
+                        <td>Wealth being taxed today:</td>
                         <% summaries.forEach(summary => { %>
                             <td class="summary-value">
                                 <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed 
