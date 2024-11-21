@@ -840,8 +840,19 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             : 0;
 
         // Calculate the new wealth_already_taxed by adding the payment adjustment
+        logger.info('Before updating wealth_already_taxed', {
+            userId,
+            wealthAlreadyTaxed,
+            huquqPaymentsMade,
+        });
+        
         const updatedWealthAlreadyTaxed = wealthAlreadyTaxed + (huquqPaymentsMade * (100 / 19));
 
+        logger.info('After calculating updatedWealthAlreadyTaxed', {
+            userId,
+            updatedWealthAlreadyTaxed,
+        });
+        
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
