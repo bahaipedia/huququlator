@@ -255,11 +255,10 @@
                     <tr>
                         <td>Huquq Payments Made:</td>
                         <% summaries.forEach(summary => { %>
-                            <td>
+                            <td class="huquq-payments-made" data-end-date="<%= summary.end_date %>">
                                 <input 
                                     type="text" 
                                     value="<%= summary.huquq_payments_made ? parseFloat(summary.huquq_payments_made).toFixed(2) : '0.00' %>" 
-                                    class="huquq-payments-made"
                                 />
                             </td>
                         <% }); %>
