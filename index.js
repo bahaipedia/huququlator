@@ -415,19 +415,20 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
         );
 
         // Transform the data for easier rendering
-        const entryMap = labels.map(label => {
-            const labelEntries = entries.filter(entry => entry.label_id === label.id);
-            return {
-                id: label.id,
-                category: label.category,
-                label: label.label,
-                values: summaries.map(summary => {
-                    const match = labelEntries.find(entry => entry.reporting_date === summary.end_date);
-                    return match ? parseFloat(match.value).toFixed(2) : '0.00';
-                }),
-            };
-        });
-
+const entryMap = labels.map(label => {
+    const labelEntries = entries.filter(entry => entry.label_id === label.id);
+    return {
+        id: label.id,
+        category: label.category,
+        label: label.label,
+        values: summaries.map(summary => {
+            const match = labelEntries.find(entry => entry.reporting_date === summary.end_date);
+            return match ? parseFloat(match.value).toFixed(2) : null; // Null indicates no financial_entry exists
+        }),
+        hasEntries: labelEntries.length > 0 // Indicates if this label has any entries
+    };
+});
+        
         // Render the dashboard page with the fetched data
         res.render('dashboard', {
             loggedIn: req.loggedIn,
