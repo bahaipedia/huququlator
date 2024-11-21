@@ -56,7 +56,7 @@
                                         type="text" 
                                         value="<%= value %>" 
                                         data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= summaries[entry.values.indexOf(value)].end_date %>"
+                                        data-reporting-date="<%= item.reportingDate %>"
                                         class="financial-input"
                                     />
                                 </td>
@@ -92,7 +92,7 @@
                                         type="text" 
                                         value="<%= value %>" 
                                         data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= summaries[entry.values.indexOf(value)].end_date %>"
+                                        data-reporting-date="<%= item.reportingDate %>"
                                         class="financial-input debt-input"
                                     />)
                                 </td>
@@ -128,7 +128,7 @@
                                         type="text" 
                                         value="<%= value %>" 
                                         data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= summaries[entry.values.indexOf(value)].end_date %>"
+                                        data-reporting-date="<%= item.reportingDate %>"
                                         class="financial-input expense-input"
                                     />
                                 </td>
