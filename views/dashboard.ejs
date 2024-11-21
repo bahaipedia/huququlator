@@ -170,12 +170,14 @@
                     </tr>
                     <tr>
                         <td>Total Debts:</td>
+                        <% summaries.forEach(summary => { %>
                             <td class="total-debts" data-end-date="<%= summary.end_date %>">
                                 <%= summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00' %>
                             </td>
                     </tr>
                     <tr>
                         <td>Unnecessary Expenses:</td>
+                        <% summaries.forEach(summary => { %>
                             <td class="unnecessary-expenses" data-end-date="<%= summary.end_date %>">
                                 <%= summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00' %>
                             </td>
