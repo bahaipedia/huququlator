@@ -825,15 +825,22 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             ? new Date(lastEndDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] 
             : null;
 
-        // Fetch the previous reporting period's wealth_already_taxed
+        // Fetch the previous reporting period's wealth_already_taxed and huquq_payments_made
         const [previousSummary] = await pool.query(
-            'SELECT wealth_already_taxed FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
+            'SELECT wealth_already_taxed, huquq_payments_made FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
             [userId]
         );
 
         const wealthAlreadyTaxed = previousSummary.length > 0 
             ? parseFloat(previousSummary[0].wealth_already_taxed) || 0 
             : 0;
+
+        const huquqPaymentsMade = previousSummary.length > 0 
+            ? parseFloat(previousSummary[0].huquq_payments_made) || 0 
+            : 0;
+
+        // Calculate the new wealth_already_taxed by adding the payment adjustment
+        const updatedWealthAlreadyTaxed = wealthAlreadyTaxed + (huquqPaymentsMade * (100 / 19));
 
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
