@@ -4,11 +4,11 @@
     position: relative;
 }
 .table-container {
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 20px;
-    width: 80%;
+    width: auto;
     position: relative;
 }
 .dashboard-table-wrapper {
@@ -79,10 +79,7 @@
     border-color: #aaa;
 }
 .add-year-button-wrapper {
-    position: absolute;
-    top: 60px; 
-    right: 10px;
-    z-index: 10;
+    align-self: flex-start;
 }
 .add-year-button {
     background-color: #f8f9fa;
@@ -93,7 +90,6 @@
     cursor: pointer;
     font-size: 0.9rem;
 }
-
 .add-year-button:hover {
     background-color: #e9ecef;
 }
@@ -118,7 +114,6 @@
     color: red;
     font-style: italic;
 }
-
 .debt-input-wrapper, .debt-input-wrapper input {
     color: red;
 }
