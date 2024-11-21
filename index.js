@@ -414,6 +414,40 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
+// Check if entries exist
+if (entries.length === 0) {
+    // Render only labels, as no summaries or entries exist
+    return res.render('dashboard', {
+        loggedIn: req.loggedIn,
+        username: req.username,
+        summaries: [], // No summaries because no entries exist
+        labels,
+        entries: [], // No entries
+        entryMap: [], // No entryMap since there are no entries
+    });
+}
+
+// Fetch financial summaries only if entries exist
+const [summaries] = await pool.query(
+    `
+    SELECT 
+        id, 
+        user_id, 
+        DATE_FORMAT(start_date, '%Y-%m-%d') AS start_date, 
+        DATE_FORMAT(end_date, '%Y-%m-%d') AS end_date, 
+        total_assets, 
+        total_debts, 
+        unnecessary_expenses, 
+        wealth_already_taxed, 
+        gold_rate, 
+        huquq_payments_made 
+    FROM financial_summary 
+    WHERE user_id = ? 
+    ORDER BY end_date ASC
+    `,
+    [userId]
+);
+
         // Transform the data for easier rendering
 const entryMap = labels.map(label => {
     const labelEntries = entries.filter(entry => entry.label_id === label.id);
@@ -423,7 +457,7 @@ const entryMap = labels.map(label => {
         label: label.label,
         values: summaries.map(summary => {
             const match = labelEntries.find(entry => entry.reporting_date === summary.end_date);
-            return match ? parseFloat(match.value).toFixed(2) : '0.00'; // Always return 0.00 if no entry exists
+            return match ? parseFloat(match.value).toFixed(2) : '0.00';
         }),
     };
 });
