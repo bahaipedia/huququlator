@@ -195,7 +195,9 @@
                                     data-end-date="<%= summary.end_date %>"
                                     <%= index === 0 ? '' : 'disabled' %>
                                 />
-                                <button class="save-button" data-end-date="<%= summary.end_date %>">S</button>
+                                <% if (index === 0) { %>
+                                    <button class="save-button" data-end-date="<%= summary.end_date %>">S</button>
+                                <% } %>
                             </td>
                         <% }); %>
                     </tr>
