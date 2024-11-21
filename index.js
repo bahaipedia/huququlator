@@ -718,35 +718,50 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
         const { reporting_date } = req.body; // Expected format: YYYY-MM-DD
         const userId = req.userId;
 
-        // Check if reporting_date is provided
+        // Step 1: Validate the reporting_date
         if (!reporting_date) {
+            logger.warn('Reporting date is missing in request body', { userId });
             return res.status(400).json({ error: 'Reporting date is required' });
         }
+        logger.info('Adding entries for reporting_date:', { reporting_date, userId });
 
-        // Fetch all labels for the user from financial_labels
+        // Step 2: Fetch all labels for the user
         const [labels] = await pool.query(
             'SELECT id FROM financial_labels WHERE user_id = ?',
             [userId]
         );
+        logger.info('Fetched labels for user:', { labels });
 
         if (labels.length === 0) {
+            logger.warn('No financial labels found for user:', { userId });
             return res.status(400).json({ error: 'No financial labels found for the user' });
         }
 
-        // Insert a new financial entry for each label
-        const insertQuery = `
-            INSERT INTO financial_entries (user_id, label_id, reporting_date, value)
-            VALUES (?, ?, ?, ?)
-        `;
-
-        for (let label of labels) {
-            await pool.query(insertQuery, [userId, label.id, reporting_date, 0.00]);
+        // Step 3: Construct batch insert values
+        const insertValues = [];
+        for (const label of labels) {
+            insertValues.push(userId, label.id, reporting_date, 0.00); // Default value: 0.00
         }
 
-        res.status(201).json({ message: 'New financial entries added for the reporting period successfully!' });
+        // Step 4: Perform batch insertion
+        const placeholders = labels.map(() => '(?, ?, ?, ?)').join(', ');
+        const insertQuery = `
+            INSERT INTO financial_entries (user_id, label_id, reporting_date, value)
+            VALUES ${placeholders}
+        `;
 
+        logger.info('Executing batch insert query for financial entries', { insertQuery });
+        await pool.query(insertQuery, insertValues);
+        logger.info('Batch insert completed successfully for financial entries', { reporting_date, userId });
+
+        // Step 5: Send success response
+        res.status(201).json({ message: 'New financial entries added for the reporting period successfully!' });
     } catch (error) {
-        console.error('Error adding financial entries:', error.message, error.stack);
+        // Step 6: Log and handle errors
+        logger.error('Error adding financial entries:', {
+            message: error.message,
+            stack: error.stack,
+        });
         res.status(500).json({ error: 'Server Error' });
     }
 });
