@@ -18,17 +18,18 @@
 
 .dashboard-table,
 .summary-table {
-    width: 500px;
+    width: auto; 
+    max-width: 90%; 
     border-collapse: collapse;
     border: 1px solid #ccc;
     margin-bottom: 20px;
-    table-layout: fixed;
+    table-layout: auto;
 }
 
 .dashboard-table th,
 .summary-table th {
-    background-color: #f8f9fa; /* Neutral light background */
-    color: #222; /* Dark text for better readability */
+    background-color: #f8f9fa;
+    color: #222;
     font-weight: 600;
     text-align: left;
     padding: 10px;
@@ -42,7 +43,7 @@
     border-bottom: 1px solid #ddd;
     vertical-align: middle;
     font-size: 0.9rem;
-    color: #444; /* Subtle text color */
+    color: #444;
 }
 
 .dashboard-table tr:last-child td,
