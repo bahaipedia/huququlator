@@ -217,28 +217,64 @@ function updateSummaryTable() {
         .then(data => {
             const summaries = data.summaries;
 
-            // Update the summary table rows dynamically
+            // Update the summary table rows dynamically and perform recalculations
             summaries.forEach(summary => {
                 const formattedEndDate = new Date(summary.end_date).toISOString().split('T')[0]; // Format as YYYY-MM-DD
 
+                // Fetch and update Total Assets, Total Debts, Unnecessary Expenses
                 const totalAssetsCell = document.querySelector(`.total-assets[data-end-date="${formattedEndDate}"]`);
                 const totalDebtsCell = document.querySelector(`.total-debts[data-end-date="${formattedEndDate}"]`);
                 const unnecessaryExpensesCell = document.querySelector(`.unnecessary-expenses[data-end-date="${formattedEndDate}"]`);
+                const goldRateCell = document.querySelector(`.gold-rate[data-end-date="${formattedEndDate}"]`);
+                const wealthAlreadyTaxedInput = document.querySelector(`.wealth-already-taxed[data-end-date="${formattedEndDate}"]`);
+                const huquqPaymentsMadeInput = document.querySelector(`.huquq-payments-made[data-end-date="${formattedEndDate}"]`);
 
-                // Only update if the corresponding cell exists in the DOM
-                if (totalAssetsCell) {
-                    totalAssetsCell.textContent = summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00';
-                }
-                if (totalDebtsCell) {
-                    totalDebtsCell.textContent = summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00';
-                }
-                if (unnecessaryExpensesCell) {
-                    unnecessaryExpensesCell.textContent = summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00';
-                }
+                const totalAssets = summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00';
+                const totalDebts = summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00';
+                const unnecessaryExpenses = summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00';
+                const goldRate = summary.gold_rate ? parseFloat(summary.gold_rate).toFixed(2) : '0.00';
+                const wealthAlreadyTaxed = parseFloat(wealthAlreadyTaxedInput?.value || 0) || 0;
+                const huquqPaymentsMade = parseFloat(huquqPaymentsMadeInput?.value || 0) || 0;
+
+                if (totalAssetsCell) totalAssetsCell.textContent = totalAssets;
+                if (totalDebtsCell) totalDebtsCell.textContent = totalDebts;
+                if (unnecessaryExpensesCell) unnecessaryExpensesCell.textContent = unnecessaryExpenses;
+                if (goldRateCell) goldRateCell.textContent = goldRate;
+
+                // Perform calculations
+                const totalAssetsValue = parseFloat(totalAssets) || 0;
+                const totalDebtsValue = parseFloat(totalDebts) || 0;
+                const unnecessaryExpensesValue = parseFloat(unnecessaryExpenses) || 0;
+                const goldRateValue = parseFloat(goldRate) || 0;
+
+                // Wealth Being Taxed Today
+                const wealthBeingTaxedToday = (totalAssetsValue - totalDebtsValue + unnecessaryExpensesValue - wealthAlreadyTaxed).toFixed(2);
+                const wealthBeingTaxedCell = document.querySelector(`.summary-value[data-end-date="${formattedEndDate}"]`);
+                if (wealthBeingTaxedCell) wealthBeingTaxedCell.textContent = wealthBeingTaxedToday;
+
+                // Units of Huquq
+                const unitsOfHuquq = (goldRateValue > 0) ? ((totalAssetsValue - totalDebtsValue + unnecessaryExpensesValue - wealthAlreadyTaxed) / goldRateValue).toFixed(2) : '0.00';
+                const unitsOfHuquqCell = document.querySelector(`.units-of-huquq[data-end-date="${formattedEndDate}"]`);
+                if (unitsOfHuquqCell) unitsOfHuquqCell.textContent = unitsOfHuquq;
+
+                // Rounded Units
+                const roundedUnits = Math.floor((totalAssetsValue - totalDebtsValue + unnecessaryExpensesValue - wealthAlreadyTaxed) / goldRateValue);
+                const roundedUnitsCell = document.querySelector(`.rounded-units[data-end-date="${formattedEndDate}"]`);
+                if (roundedUnitsCell) roundedUnitsCell.textContent = roundedUnits;
+
+                // Huquq Payment Owed
+                const huquqPaymentOwed = (0.19 * roundedUnits * goldRateValue).toFixed(2);
+                const huquqPaymentOwedCell = document.querySelector(`.payment-owed[data-end-date="${formattedEndDate}"]`);
+                if (huquqPaymentOwedCell) huquqPaymentOwedCell.textContent = huquqPaymentOwed;
+
+                // Remainder Due
+                const remainderDue = (0.19 * roundedUnits * goldRateValue - huquqPaymentsMade).toFixed(2);
+                const remainderDueCell = document.querySelector(`.remainder-due[data-end-date="${formattedEndDate}"]`);
+                if (remainderDueCell) remainderDueCell.textContent = remainderDue;
             });
         })
         .catch(err => {
-            console.error('Error fetching summary data:', err);
+            console.error('Error fetching and updating summary data:', err);
         });
 }
 
@@ -277,40 +313,6 @@ document.querySelectorAll('.financial-input').forEach(input => {
     });
 });
 
-// Function to recalculate dependent fields after Wealth Already Taxed is updated
-function recalculateSummaryFields() {
-    document.querySelectorAll('.summary-value').forEach(cell => {
-        const endDate = cell.getAttribute('data-end-date');
-        const wealthAlreadyTaxed = parseFloat(document.querySelector(`.wealth-already-taxed[data-end-date="${endDate}"]`).value) || 0;
-
-        const totalAssets = parseFloat(document.querySelector(`.total-assets[data-end-date="${endDate}"]`).textContent) || 0;
-        const totalDebts = parseFloat(document.querySelector(`.total-debts[data-end-date="${endDate}"]`).textContent) || 0;
-        const unnecessaryExpenses = parseFloat(document.querySelector(`.unnecessary-expenses[data-end-date="${endDate}"]`).textContent) || 0;
-        const goldRate = parseFloat(document.querySelector(`.gold-rate[data-end-date="${endDate}"]`).textContent) || 0;
-
-        // Update Wealth being taxed today
-        const wealthBeingTaxedToday = (totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed).toFixed(2);
-        document.querySelector(`.summary-value[data-end-date="${endDate}"]`).textContent = wealthBeingTaxedToday;
-
-        // Update Units of Huquq
-        const unitsOfHuquq = (goldRate > 0) ? ((totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed) / goldRate).toFixed(2) : '0.00';
-        document.querySelector(`.units-of-huquq[data-end-date="${endDate}"]`).textContent = unitsOfHuquq;
-
-        // Update Rounded Units
-        const roundedUnits = Math.floor((totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed) / goldRate);
-        document.querySelector(`.rounded-units[data-end-date="${endDate}"]`).textContent = roundedUnits;
-
-        // Update Huquq Payment Owed
-        const huquqPaymentOwed = (0.19 * Math.floor((totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed) / goldRate) * goldRate).toFixed(2);
-        document.querySelector(`.payment-owed[data-end-date="${endDate}"]`).textContent = huquqPaymentOwed;
-
-        // Update Remainder Due
-        const huquqPaymentsMade = parseFloat(document.querySelector(`.huquq-payments-made[data-end-date="${endDate}"]`).value) || 0;
-        const remainderDue = (0.19 * Math.floor((totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed) / goldRate) * goldRate - huquqPaymentsMade).toFixed(2);
-        document.querySelector(`.remainder-due[data-end-date="${endDate}"]`).textContent = remainderDue;
-    });
-}
-
 // Save wealth-already-taxed values and refresh the summary
 document.querySelectorAll('.save-button').forEach(button => {
     button.addEventListener('click', (event) => {
@@ -327,7 +329,7 @@ document.querySelectorAll('.save-button').forEach(button => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                recalculateSummaryFields(); // Recalculate all the fields after the update
+                updateSummaryTable(); // Recalculate all the fields after the update
             })
             .catch(err => {
                 console.error('Error updating summary fields:', err);
