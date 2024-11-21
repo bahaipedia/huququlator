@@ -352,10 +352,10 @@ document.querySelectorAll('.save-huquq-payments').forEach(button => {
         }
 
         // Send the update to the server
-        fetch('/api/summary/update', {
+        fetch('/api/summary/update-huquq', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ field: 'huquq_payments_made', value, end_date: endDate }),
+            body: JSON.stringify({ value, end_date: endDate }),
         })
             .then(response => {
                 if (!response.ok) {
