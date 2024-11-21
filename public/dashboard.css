@@ -73,15 +73,13 @@
     border-radius: 3px;
     cursor: pointer;
 }
-
 .add-item-button:hover {
     background-color: #F1F3F5;
     border-color: #aaa;
 }
-
 .add-year-button-wrapper {
     position: absolute;
-    right: 0; 
+    right: -150px;
     top: 0;
 }
 
