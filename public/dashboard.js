@@ -277,48 +277,46 @@ document.querySelectorAll('.financial-input').forEach(input => {
     });
 });
 
-// Automatically save wealth-already-taxed values and refresh the summary
-document.querySelectorAll('.wealth-already-taxed').forEach(input => {
-    if (!input.disabled) { // Ensure only enabled input can trigger updates
-        input.addEventListener('blur', (event) => {
-            const inputElement = event.target;
-            const value = inputElement.value.trim();
-            const endDate = inputElement.dataset.endDate;
+// Save wealth-already-taxed values and refresh the summary
+document.querySelectorAll('.save-button').forEach(button => {
+    button.addEventListener('click', (event) => {
+        const buttonElement = event.target;
+        const endDate = buttonElement.dataset.endDate;
+        const inputElement = buttonElement.closest('td').querySelector('.wealth-already-taxed');
+        const value = inputElement.value.trim();
 
-            console.log('Input blur triggered:');
-            console.log('Input element:', inputElement);
-            console.log('Input value:', value);
-            console.log('End date from dataset:', endDate);
+        console.log('Save button clicked:');
+        console.log('Input element:', inputElement);
+        console.log('Input value:', value);
+        console.log('End date from dataset:', endDate);
 
-            // Validate input
-            if (!isNaN(value) && value !== '') {
-                console.log('Validated input. Sending fetch request to update /api/summary/update...');
-                fetch(`/api/summary/update`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ value, end_date: endDate }),
+        // Validate input
+        if (!isNaN(value) && value !== '') {
+            console.log('Validated input. Sending fetch request to update /api/summary/update...');
+            fetch(`/api/summary/update`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ value, end_date: endDate }),
+            })
+                .then(response => {
+                    console.log('Fetch response received:', response);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
                 })
-                    .then(response => {
-                        console.log('Fetch response received:', response);
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! Status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Fetch successful. Response data:', data);
-                        updateSummaryTable();
-                    })
-                    .catch(err => {
-                        console.error('Error updating wealth already taxed:', err);
-                        alert('Failed to update the value. Please try again.');
-                    });
-            } else {
-                console.warn('Invalid input detected. Resetting to 0.00');
-                inputElement.value = '0.00'; // Restore default value on invalid input
-            }
-        });
-    }
+                .then(data => {
+                    console.log('Fetch successful. Response data:', data);
+                    updateSummaryTable();
+                })
+                .catch(err => {
+                    console.error('Error updating wealth already taxed:', err);
+                    alert('Failed to update the value. Please try again.');
+                });
+        } else {
+            console.warn('Invalid input detected. Resetting to 0.00');
+            inputElement.value = '0.00'; // Restore default value on invalid input
+        }
+    });
 });
-
 
