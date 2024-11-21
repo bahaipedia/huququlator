@@ -104,10 +104,7 @@ document.querySelectorAll('.add-item-button').forEach(button => {
             // Disable the save button while processing
             const saveButton = newRow.querySelector('.save-item-button');
             saveButton.disabled = true;
-
-console.log('Category:', category);
-console.log('Label:', label);
-            
+           
             fetch('/api/labels', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -162,5 +159,45 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
                 console.error('Error deleting label:', err);
                 alert('Failed to delete the label.');
             });
+    }
+});
+
+// Handle focus event to clear "0.00" values
+document.querySelectorAll('.financial-input').forEach(input => {
+    input.addEventListener('focus', (event) => {
+        if (event.target.value === '0.00') {
+            event.target.value = ''; // Clear the input for easier typing
+        }
+    });
+
+    // Restore "0.00" if left empty on blur
+    input.addEventListener('blur', (event) => {
+        if (event.target.value.trim() === '') {
+            event.target.value = '0.00';
+        }
+    });
+});
+
+// Custom "Tab" behavior for navigating vertically
+document.querySelector('.dashboard-table').addEventListener('keydown', (event) => {
+    if (event.key === 'Tab') {
+        const currentInput = event.target;
+        if (currentInput.classList.contains('financial-input')) {
+            event.preventDefault(); // Stop default tab behavior
+
+            const currentDate = currentInput.dataset.reportingDate;
+            const currentLabelId = currentInput.dataset.labelId;
+
+            // Get all inputs in the current column (same reporting_date)
+            const columnInputs = Array.from(document.querySelectorAll(`.financial-input[data-reporting-date="${currentDate}"]`));
+
+            // Find the next input in the same column
+            const currentIndex = columnInputs.findIndex(input => input === currentInput);
+            const nextInput = columnInputs[currentIndex + 1] || columnInputs[0]; // Wrap around if at the bottom
+
+            if (nextInput) {
+                nextInput.focus();
+            }
+        }
     }
 });
