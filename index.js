@@ -537,7 +537,7 @@ app.put('/api/labels/:id', checkLoginStatus, async (req, res) => {
         const { id } = req.params;
         const { value } = req.body;
 
-        // Update the value in financial_entries
+        // Step 1: Update the value in financial_entries
         const updateValueQuery = `
             UPDATE financial_entries
             SET value = ?
@@ -545,9 +545,13 @@ app.put('/api/labels/:id', checkLoginStatus, async (req, res) => {
                 SELECT id FROM financial_labels WHERE user_id = ?
             )
         `;
-        await pool.query(updateValueQuery, [value, id, req.userId]);
+        const [updateResult] = await pool.query(updateValueQuery, [value, id, req.userId]);
 
-        // Get the reporting_date and label_id for the updated entry
+        if (updateResult.affectedRows === 0) {
+            return res.status(404).json({ error: 'Entry not found or unauthorized' });
+        }
+
+        // Step 2: Retrieve reporting_date and label_id for the updated entry
         const [entry] = await pool.query(`
             SELECT reporting_date, label_id
             FROM financial_entries
@@ -562,7 +566,7 @@ app.put('/api/labels/:id', checkLoginStatus, async (req, res) => {
 
         const { reporting_date } = entry[0];
 
-        // Aggregate totals for the reporting_date
+        // Step 3: Aggregate totals for the reporting_date
         const [totals] = await pool.query(`
             SELECT 
                 SUM(CASE WHEN l.category = 'Assets' THEN v.value ELSE 0 END) AS total_assets,
@@ -573,9 +577,13 @@ app.put('/api/labels/:id', checkLoginStatus, async (req, res) => {
             WHERE l.user_id = ? AND v.reporting_date = ?
         `, [req.userId, reporting_date]);
 
+        if (totals.length === 0) {
+            return res.status(404).json({ error: 'No data available for aggregation' });
+        }
+
         const { total_assets, total_debts, unnecessary_expenses } = totals[0];
 
-        // Update the financial_summary table
+        // Step 4: Update the financial_summary table
         const updateSummaryQuery = `
             UPDATE financial_summary
             SET total_assets = ?, total_debts = ?, unnecessary_expenses = ?
