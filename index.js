@@ -599,19 +599,25 @@ app.delete('/api/labels/:id', checkLoginStatus, async (req, res) => {
         const { id } = req.params;
         const userId = req.userId;
 
+        // Log the request
+        logger.info('Received request to delete label.', { labelId: id, userId });
+
         // Delete associated entries from financial_entries
-        await pool.query(
+        logger.info('Deleting financial_entries for label_id:', id);
+        const [entriesResult] = await pool.query(
             `
             DELETE FROM financial_entries
-            WHERE label_id = ? AND label_id IN (
-                SELECT id FROM financial_labels WHERE user_id = ?
+            WHERE label_id = ? AND EXISTS (
+                SELECT 1 FROM financial_labels WHERE id = ? AND user_id = ?
             )
             `,
-            [id, userId]
+            [id, id, userId]
         );
+        logger.info('Deleted entries result:', entriesResult);
 
         // Delete the label itself
-        const [result] = await pool.query(
+        logger.info('Deleting financial_labels for label_id:', id);
+        const [labelResult] = await pool.query(
             `
             DELETE FROM financial_labels
             WHERE id = ? AND user_id = ?
@@ -619,13 +625,15 @@ app.delete('/api/labels/:id', checkLoginStatus, async (req, res) => {
             [id, userId]
         );
 
-        if (result.affectedRows === 0) {
+        if (labelResult.affectedRows === 0) {
+            logger.warn('Label not found or not authorized to delete:', { labelId: id, userId });
             return res.status(404).json({ error: 'Label not found or not authorized to delete' });
         }
 
+        logger.info('Successfully deleted label and associated entries:', { labelId: id, userId });
         res.status(200).json({ message: 'Label and associated entries deleted successfully' });
     } catch (error) {
-        console.error('Error deleting label:', error);
+        logger.error('Error deleting label:', error);
         res.status(500).send('Server Error');
     }
 });
