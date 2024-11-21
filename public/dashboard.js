@@ -366,7 +366,6 @@ document.querySelectorAll('.save-huquq-payments').forEach(button => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                console.log('Update successful for Huquq Payments Made:', { endDate, value });
                 updateSummaryTable(); // Recalculate all fields after the update
             })
             .catch(err => {
