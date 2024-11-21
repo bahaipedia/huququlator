@@ -202,7 +202,37 @@ document.querySelector('.dashboard-table').addEventListener('keydown', (event) =
     }
 });
 
-// Automatically save input values on blur
+// Allow for automatic updates to the summary table 
+function updateSummaryTable() {
+    fetch('/api/summary', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const summaries = data.summaries;
+
+            // Update the summary table rows dynamically
+            summaries.forEach(summary => {
+                document.querySelector(`.total-assets[data-end-date="${summary.end_date}"]`).textContent =
+                    summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00';
+                document.querySelector(`.total-debts[data-end-date="${summary.end_date}"]`).textContent =
+                    summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00';
+                document.querySelector(`.unnecessary-expenses[data-end-date="${summary.end_date}"]`).textContent =
+                    summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00';
+            });
+        })
+        .catch(err => {
+            console.error('Error fetching summary data:', err);
+        });
+}
+
+// Automatically save input values and refresh the summary
 document.querySelectorAll('.financial-input').forEach(input => {
     input.addEventListener('blur', (event) => {
         const inputElement = event.target;
@@ -225,6 +255,7 @@ document.querySelectorAll('.financial-input').forEach(input => {
                 })
                 .then(() => {
                     console.log(`Value for Label ID ${labelId} on ${reportingDate} saved successfully.`);
+                    updateSummaryTable(); 
                 })
                 .catch(err => {
                     console.error('Error saving value:', err);
