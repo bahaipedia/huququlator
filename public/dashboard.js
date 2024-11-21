@@ -313,34 +313,60 @@ document.querySelectorAll('.financial-input').forEach(input => {
     });
 });
 
-// Save values and refresh the summary
-document.querySelectorAll('.save-button, .save-huquq-payments').forEach(button => {
+// Save wealth-already-taxed values and refresh the summary
+document.querySelectorAll('.save-button').forEach(button => {
     button.addEventListener('click', (event) => {
-        const row = event.target.closest('tr');
-        const isWealthTaxed = button.classList.contains('save-button');
-        const field = isWealthTaxed ? 'wealth_already_taxed' : 'huquq_payments_made';
-
-        const endDate = row.querySelector(isWealthTaxed ? '.wealth-already-taxed' : '.huquq-payments-made').dataset.endDate;
-        const value = row.querySelector(isWealthTaxed ? '.wealth-already-taxed' : '.huquq-payments-made').value;
+        const endDate = event.target.closest('tr').querySelector('.wealth-already-taxed').dataset.endDate;
+        const value = event.target.closest('tr').querySelector('.wealth-already-taxed').value;
 
         // Send the update to the server
         fetch('/api/summary/update', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ field, value, end_date: endDate })
+            body: JSON.stringify({ value, end_date: endDate })
         })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                return response.json();
-            })
-            .then(() => {
-                recalculateSummaryFields(); // Recalculate all fields after the update
+                updateSummaryTable(); // Recalculate all the fields after the update
             })
             .catch(err => {
-                console.error(`Error updating ${field}:`, err);
+                console.error('Error updating summary fields:', err);
             });
     });
 });
 
+// Save Huquq payments and refresh the summary
+document.querySelectorAll('.save-huquq-payments').forEach(button => {
+    button.addEventListener('click', (event) => {
+        const parentTd = event.target.closest('td');
+        const endDate = parentTd.dataset.endDate;
+        const inputElement = parentTd.querySelector('input');
+        const value = inputElement ? inputElement.value.trim() : null;
+
+        if (!value || isNaN(value)) {
+            console.warn('Invalid value detected:', value);
+            alert('Please enter a valid amount.');
+            return;
+        }
+
+        // Send the update to the server
+        fetch('/api/summary/update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ field: 'huquq_payments_made', value, end_date: endDate }),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                console.log('Update successful for Huquq Payments Made:', { endDate, value });
+                recalculateSummaryFields(); // Recalculate all fields after the update
+            })
+            .catch(err => {
+                console.error('Error updating Huquq Payments Made:', err);
+                alert('Failed to save Huquq Payments Made. Please try again.');
+            });
+    });
+});
