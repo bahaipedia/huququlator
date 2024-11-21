@@ -458,11 +458,8 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
                 values: summaries.map(summary => {
                     const match = labelEntries.find(entry => entry.reporting_date === summary.end_date);
                     return match
-                         ? {
-                              value: parseFloat(match.value).toFixed(2),
-                              reportingDate: summary.end_date,
-                           }
-                           : { value: '0.00', reportingDate: summary.end_date };
+                         ? { value: parseFloat(match.value).toFixed(2), reportingDate: summary.end_date }
+                         : { value: '0.00', reportingDate: summary.end_date };
                 }),
             };
         });
