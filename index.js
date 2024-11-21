@@ -359,6 +359,8 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
     try {
         const userId = req.userId;
 
+        logger.info('Fetching labels for user:', { userId });
+
         // Fetch all labels for the user
         const [labels] = await pool.query(
             `
@@ -374,7 +376,11 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
+        logger.info('Fetched labels:', { labels });
+
         // Fetch all financial entries with normalized reporting_date
+        logger.info('Fetching financial entries for user:', { userId });
+
         const [entries] = await pool.query(
             `
             SELECT 
@@ -393,54 +399,63 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-// Check if entries exist
-if (entries.length === 0) {
-    // Render only labels, as no summaries or entries exist
-    return res.render('dashboard', {
-        loggedIn: req.loggedIn,
-        username: req.username,
-        summaries: [], // No summaries because no entries exist
-        labels,
-        entries: [], // No entries
-        entryMap: [], // No entryMap since there are no entries
-    });
-}
+        logger.info('Fetched entries:', { entries });
 
-// Fetch financial summaries only if entries exist
-const [summaries] = await pool.query(
-    `
-    SELECT 
-        id, 
-        user_id, 
-        DATE_FORMAT(start_date, '%Y-%m-%d') AS start_date, 
-        DATE_FORMAT(end_date, '%Y-%m-%d') AS end_date, 
-        total_assets, 
-        total_debts, 
-        unnecessary_expenses, 
-        wealth_already_taxed, 
-        gold_rate, 
-        huquq_payments_made 
-    FROM financial_summary 
-    WHERE user_id = ? 
-    ORDER BY end_date ASC
-    `,
-    [userId]
-);
+        // Check if entries exist
+        if (entries.length === 0) {
+            logger.info('No financial entries found. Rendering labels only.');
+            return res.render('dashboard', {
+                loggedIn: req.loggedIn,
+                username: req.username,
+                summaries: [], // No summaries because no entries exist
+                labels,
+                entries: [], // No entries
+                entryMap: [], // No entryMap since there are no entries
+            });
+        }
+
+        // Fetch financial summaries only if entries exist
+        logger.info('Fetching financial summaries for user:', { userId });
+
+        const [summaries] = await pool.query(
+            `
+            SELECT 
+                id, 
+                user_id, 
+                DATE_FORMAT(start_date, '%Y-%m-%d') AS start_date, 
+                DATE_FORMAT(end_date, '%Y-%m-%d') AS end_date, 
+                total_assets, 
+                total_debts, 
+                unnecessary_expenses, 
+                wealth_already_taxed, 
+                gold_rate, 
+                huquq_payments_made 
+            FROM financial_summary 
+            WHERE user_id = ? 
+            ORDER BY end_date ASC
+            `,
+            [userId]
+        );
+
+        logger.info('Fetched summaries:', { summaries });
 
         // Transform the data for easier rendering
-const entryMap = labels.map(label => {
-    const labelEntries = entries.filter(entry => entry.label_id === label.id);
-    return {
-        id: label.id,
-        category: label.category,
-        label: label.label,
-        values: summaries.map(summary => {
-            const match = labelEntries.find(entry => entry.reporting_date === summary.end_date);
-            return match ? parseFloat(match.value).toFixed(2) : '0.00';
-        }),
-    };
-});
-        
+        logger.info('Constructing entryMap...');
+        const entryMap = labels.map(label => {
+            const labelEntries = entries.filter(entry => entry.label_id === label.id);
+            return {
+                id: label.id,
+                category: label.category,
+                label: label.label,
+                values: summaries.map(summary => {
+                    const match = labelEntries.find(entry => entry.reporting_date === summary.end_date);
+                    return match ? parseFloat(match.value).toFixed(2) : '0.00';
+                }),
+            };
+        });
+
+        logger.info('Constructed entryMap:', { entryMap });
+
         // Render the dashboard page with the fetched data
         res.render('dashboard', {
             loggedIn: req.loggedIn,
@@ -451,7 +466,7 @@ const entryMap = labels.map(label => {
             entryMap,
         });
     } catch (error) {
-        console.error('Error loading dashboard:', error);
+        logger.error('Error loading dashboard:', error);
         res.status(500).send('Server Error');
     }
 });
