@@ -1004,6 +1004,31 @@ app.put('/api/summary/:id', checkLoginStatus, async (req, res) => {
     }
 });
 
+// Route used for when the user updates their previous Huquq payments
+app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { value, end_date } = req.body; // Value and reporting period
+        const userId = req.userId;
+
+        const updateQuery = `
+            UPDATE financial_summary
+            SET wealth_already_taxed = ?
+            WHERE user_id = ? AND end_date = ?
+        `;
+
+        await pool.query(updateQuery, [parseFloat(value), userId, end_date]);
+
+        res.status(200).json({ message: 'Wealth already taxed updated successfully' });
+    } catch (error) {
+        console.error('Error updating wealth already taxed:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
 app.get('/upload', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.redirect('/login');
