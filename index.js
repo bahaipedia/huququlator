@@ -768,33 +768,65 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
     }
 });
 
-app.put('/api/entries/update', checkLoginStatus, async (req, res) => {
+// Route used by dashboard.js "Automatically save input values on blur"
+app.put('/api/entries/:labelId', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
     }
 
     try {
-        const { label_id, value } = req.body;
+        const { labelId } = req.params;
+        const { value, reporting_date } = req.body;
         const userId = req.userId;
 
-        // Update the financial entry with the given label
-        const result = await pool.query(
-            `
+        // Update the financial entry
+        const updateEntryQuery = `
             UPDATE financial_entries
             SET value = ?
-            WHERE user_id = ? AND label_id = ?
-            `,
-            [value, userId, label_id]
-        );
+            WHERE label_id = ? AND reporting_date = ? AND user_id = ?
+        `;
+        const [entryResult] = await pool.query(updateEntryQuery, [value, labelId, reporting_date, userId]);
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Entry not found or not authorized to update.' });
+        if (entryResult.affectedRows === 0) {
+            return res.status(404).json({ error: 'Financial entry not found or not authorized to update' });
         }
 
-        res.status(200).json({ message: 'Entry updated successfully.' });
+        // Aggregate totals for the reporting_date
+        const aggregateQuery = `
+            SELECT 
+                SUM(CASE WHEN fl.category = 'Assets' THEN fe.value ELSE 0 END) AS total_assets,
+                SUM(CASE WHEN fl.category = 'Debts' THEN fe.value ELSE 0 END) AS total_debts,
+                SUM(CASE WHEN fl.category = 'Expenses' THEN fe.value ELSE 0 END) AS unnecessary_expenses
+            FROM financial_entries fe
+            JOIN financial_labels fl ON fe.label_id = fl.id
+            WHERE fe.user_id = ? AND fe.reporting_date = ?
+        `;
+        const [totals] = await pool.query(aggregateQuery, [userId, reporting_date]);
+
+        const { total_assets, total_debts, unnecessary_expenses } = totals[0];
+
+        // Update the financial_summary table
+        const updateSummaryQuery = `
+            UPDATE financial_summary
+            SET total_assets = ?, total_debts = ?, unnecessary_expenses = ?
+            WHERE user_id = ? AND end_date = ?
+        `;
+        const [summaryResult] = await pool.query(updateSummaryQuery, [
+            total_assets || 0.00,
+            total_debts || 0.00,
+            unnecessary_expenses || 0.00,
+            userId,
+            reporting_date,
+        ]);
+
+        if (summaryResult.affectedRows === 0) {
+            return res.status(404).json({ error: 'Summary not found or not authorized to update' });
+        }
+
+        res.status(200).json({ message: 'Value and summary updated successfully' });
     } catch (error) {
-        console.error('Error updating entry:', error);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Error updating financial entry and summary:', error);
+        res.status(500).json({ error: 'Server Error' });
     }
 });
 
