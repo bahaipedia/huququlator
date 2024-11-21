@@ -33,7 +33,6 @@
     position: sticky;
     left: 0;
     z-index: 1;
-    background-color: #f8f9fa;
     width: 140px; 
 }
 .summary-table td:first-child,
@@ -41,11 +40,10 @@
     position: sticky;
     left: 0;
     z-index: 1;
-    background-color: #f8f9fa;
 }
 .dashboard-table th,
 .summary-table th {
-    background-color: #f8f9fa;
+    background-color: #f1f3f5;
     color: #222;
     font-weight: bold;
     text-align: left;
