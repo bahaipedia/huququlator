@@ -423,9 +423,8 @@ const entryMap = labels.map(label => {
         label: label.label,
         values: summaries.map(summary => {
             const match = labelEntries.find(entry => entry.reporting_date === summary.end_date);
-            return match ? parseFloat(match.value).toFixed(2) : null; // Null indicates no financial_entry exists
+            return match ? parseFloat(match.value).toFixed(2) : '0.00'; // Always return 0.00 if no entry exists
         }),
-        hasEntries: labelEntries.length > 0 // Indicates if this label has any entries
     };
 });
         
