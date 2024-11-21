@@ -16,15 +16,27 @@
     position: relative;
 }
 
-.dashboard-table,
+.dashboard-table {
+    border-collapse: collapse;
+    min-width: auto;
+    border: 1px solid #ccc;
+    width: auto;
+}
+
 .summary-table {
     border-collapse: collapse;
-    min-width: 100%;
+    width: 100%; /* Make summary table span the full container width */
     border: 1px solid #ccc;
 }
 
 .dashboard-table th,
-.dashboard-table td,
+.dashboard-table td {
+    white-space: nowrap;
+    text-align: left;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+}
+
 .summary-table th,
 .summary-table td {
     white-space: nowrap;
@@ -50,7 +62,17 @@
     background-color: #f8f9fa;
 }
 
-.dashboard-table th,
+.dashboard-table th {
+    background-color: #f8f9fa;
+    color: #222;
+    font-weight: bold;
+    text-align: left;
+    border-bottom: 2px solid #ccc;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
 .summary-table th {
     background-color: #f8f9fa;
     color: #222;
@@ -68,6 +90,17 @@
     font-weight: bold;
 }
 
+.section-row {
+    background-color: #f1f3f5;
+    font-weight: bold;
+}
+.section-title {
+    padding: 10px;
+    text-align: left;
+    font-size: 1rem;
+    background-color: #f0f0f0;
+    color: #444;
+}
 .add-item-button {
     font-size: 0.85rem;
     background-color: #ffffff;
