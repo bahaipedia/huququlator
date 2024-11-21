@@ -50,13 +50,13 @@
                                 </button>
                             </td>
                             <% if (summaries.length > 0) { %>
-                                <% entry.values.forEach(value => { %>
+                                <% entry.values.forEach(item => { %>
                                 <td>
                                     <input 
                                         type="text" 
-                                        value="<%= value %>" 
+                                        value="<%= item.value %>" 
                                         data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= reportingDate %>"
+                                        data-reporting-date="<%= item.reportingDate %>"
                                         class="financial-input"
                                     />
                                 </td>
@@ -86,13 +86,13 @@
                                 </button>
                             </td>
                             <% if (summaries.length > 0) { %>
-                                <% entry.values.forEach(value => { %>
+                                <% entry.values.forEach(item => { %>
                                 <td>
                                     (<input 
                                         type="text" 
-                                        value="<%= value %>" 
+                                        value="<%= item.value %>" 
                                         data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= reportingDate %>"
+                                        data-reporting-date="<%= item.reportingDate %>"
                                         class="financial-input debt-input"
                                     />)
                                 </td>
@@ -122,13 +122,13 @@
                                 </button>
                             </td>
                             <% if (summaries.length > 0) { %>
-                                <% entry.values.forEach(value => { %>
+                                <% entry.values.forEach(item => { %>
                                 <td>
                                     <input 
                                         type="text" 
-                                        value="<%= value %>" 
+                                        value="<%= item.value %>" 
                                         data-label-id="<%= entry.id %>" 
-                                        data-reporting-date="<%= reportingDate %>"
+                                        data-reporting-date="<%= item.reportingDate %>"
                                         class="financial-input expense-input"
                                     />
                                 </td>
