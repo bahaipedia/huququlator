@@ -101,96 +101,77 @@ app.get('/', checkLoginStatus, (req, res) => {
     res.render('index', { loggedIn: req.loggedIn, username: req.username });
 });
 
-app.get('/wealthtracker', async (req, res) => {
-    try {
-        const userId = 1; // Replace with the actual logged-in user ID
-
-        // Fetch financial labels grouped by category
-        const [labels] = await pool.query(
-            `SELECT id, category, label FROM financial_labels WHERE user_id = ? ORDER BY category, id`,
-            [userId]
-        );
-
-        // Fetch financial entries with formatted reporting_date
-        const [entries] = await pool.query(
-            `SELECT 
-                label_id, 
-                DATE_FORMAT(reporting_date, '%Y-%m-%d') AS reporting_date, 
-                value 
-             FROM financial_entries 
-             WHERE user_id = ? 
-             ORDER BY reporting_date`,
-            [userId]
-        );
-
-        // Group entries by reporting date for table columns
-        const groupedEntries = {};
-        entries.forEach(entry => {
-            if (!groupedEntries[entry.reporting_date]) {
-                groupedEntries[entry.reporting_date] = {};
-            }
-            groupedEntries[entry.reporting_date][entry.label_id] = entry.value;
-        });
-
-        // Organize labels by category
-        const categorizedLabels = {
-            Assets: [],
-            Debts: [],
-            Expenses: [],
-        };
-        labels.forEach(label => {
-            if (categorizedLabels[label.category]) {
-                categorizedLabels[label.category].push(label);
-            }
-        });
-
-        res.render('wealthtracker', {
-            categorizedLabels,
-            groupedEntries,
-            reportingDates: Object.keys(groupedEntries), // Dates will already be formatted as 'YYYY-MM-DD'
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
-    }
-});
-
 // Get the value of 2.25 troy ounces of gold
 app.get('/api/gold-price', async (req, res) => {
     try {
         const now = Date.now();
         const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-        const today = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Format: YYYYMMDD
+        const today = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Format: YYYYMMDD for GoldAPI
 
         const { date = today } = req.query; // Default to today's date
+        const formattedGoldApiDate = date; // GoldAPI format: YYYYMMDD
+        const formattedMetalPriceDate = `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6)}`; // MetalPriceAPI format: YYYY-MM-DD
 
-        // If the same date is requested and cached, return the cached value
+        // Check cache
         if (cache.goldPrice && cache.timestamp && cache.date === date && now - cache.timestamp < oneDay) {
             logger.info(`Serving cached gold price for date: ${date}`);
             return res.json({ value: cache.goldPrice });
         }
 
-        const apiKey = process.env.GOLD_API_KEY;
-        const apiUrl = date === today
-            ? `https://www.goldapi.io/api/XAU/USD` // Current price endpoint
-            : `https://www.goldapi.io/api/XAU/USD/${date}`; // Historical price endpoint
+        let goldPrice;
 
-        const response = await axios.get(apiUrl, {
-            headers: {
-                'x-access-token': apiKey,
-                'Content-Type': 'application/json',
-            },
-        });
+        // Primary API: MetalPriceAPI
+        try {
+            const apiKeyMetalPriceApi = process.env.METAL_PRICE_API_KEY;
+            const apiUrlMetalPriceApi = date === today
+                ? `https://api.metalpriceapi.com/v1/latest?api_key=${apiKeyMetalPriceApi}&base=USD&currencies=XAU`
+                : `https://api.metalpriceapi.com/v1/${formattedMetalPriceDate}?api_key=${apiKeyMetalPriceApi}&base=USD&currencies=XAU`;
 
-        // Ensure the response contains a valid price
-        const goldPrice = response.data.price; // Price in troy ounces
-        if (!goldPrice) {
-            throw new Error('Gold price is missing in the API response.');
+            const responseMetalPriceApi = await axios.get(apiUrlMetalPriceApi);
+            goldPrice = responseMetalPriceApi.data.rates?.XAU;
+
+            if (!goldPrice) {
+                throw new Error('Gold price is missing in MetalPriceAPI response.');
+            }
+
+            logger.info(`Fetched gold price from MetalPriceAPI for date: ${date}`);
+        } catch (metalPriceApiError) {
+            logger.error('MetalPriceAPI failed, switching to GoldAPI', { error: metalPriceApiError.message });
+
+            // Fallback API: GoldAPI
+            try {
+                const apiKeyGoldApi = process.env.GOLD_API_KEY;
+                const apiUrlGoldApi = date === today
+                    ? `https://www.goldapi.io/api/XAU/USD` // Current price endpoint
+                    : `https://www.goldapi.io/api/XAU/USD/${formattedGoldApiDate}`; // Historical price endpoint
+
+                const responseGoldApi = await axios.get(apiUrlGoldApi, {
+                    headers: {
+                        'x-access-token': apiKeyGoldApi,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                goldPrice = responseGoldApi.data.price;
+
+                if (!goldPrice) {
+                    throw new Error('Gold price is missing in GoldAPI response.');
+                }
+
+                logger.info(`Fetched gold price from GoldAPI for date: ${date}`);
+            } catch (goldApiError) {
+                logger.error('Both MetalPriceAPI and GoldAPI failed', {
+                    metalPriceApiError: metalPriceApiError.message,
+                    goldApiError: goldApiError.message,
+                });
+                return res.status(500).json({ value: null, error: 'Gold price unavailable' });
+            }
         }
 
-        const mithqalPrice = goldPrice * 2.22456; // Calculate mithqal price
+        // Calculate mithqal price
+        const mithqalPrice = goldPrice * 2.22456;
 
-        // Update the cache
+        // Update cache
         cache.goldPrice = mithqalPrice;
         cache.timestamp = now;
         cache.date = date;
@@ -198,7 +179,7 @@ app.get('/api/gold-price', async (req, res) => {
         logger.info(`Fetched and cached gold price for date: ${date}`);
         return res.json({ value: mithqalPrice });
     } catch (error) {
-        logger.error('Error fetching gold price', { error });
+        logger.error('Unexpected error fetching gold price', { error });
         res.status(500).json({ value: null, error: 'Gold price unavailable' });
     }
 });
