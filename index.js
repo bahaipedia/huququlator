@@ -939,30 +939,6 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
     }
 });
 
-app.put('/api/summary/:id', checkLoginStatus, async (req, res) => {
-    if (!req.loggedIn) {
-        return res.status(403).send('Unauthorized');
-    }
-
-    try {
-        const { id } = req.params;
-        const { huquq_payments_made } = req.body;
-
-        const query = `
-            UPDATE financial_summary
-            SET huquq_payments_made = ?
-            WHERE id = ? AND user_id = ?
-        `;
-
-        await pool.query(query, [huquq_payments_made, id, req.userId]);
-
-        res.status(200).json({ message: 'Summary updated successfully' });
-    } catch (error) {
-        console.error('Error updating summary:', error);
-        res.status(500).send('Server Error');
-    }
-});
-
 // Route used for when the user updates their previous Huquq payments
 app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
