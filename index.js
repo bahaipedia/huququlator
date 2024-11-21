@@ -877,7 +877,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
     }
 });
 
-// Route used for when the user updates their previous Huquq payments
+// Route used for when the user updates their wealth previously paid on
 app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
@@ -912,6 +912,45 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
         res.status(200).json({ message: 'Wealth already taxed updated successfully.' });
     } catch (error) {
         logger.error('Error updating wealth already taxed:', { error: error.message, stack: error.stack });
+        res.status(500).send('Server Error');
+    }
+});
+
+// Route used for when the user updates their payments to Huquq
+app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
+    if (!req.loggedIn) {
+        return res.status(403).send('Unauthorized');
+    }
+
+    try {
+        const { value, end_date } = req.body; // Value and reporting period
+        const userId = req.userId;
+
+        // Validate input
+        if (!value || !end_date) {
+            logger.warn('Missing value or end_date in request:', { value, end_date });
+            return res.status(400).json({ error: 'Value and end_date are required.' });
+        }
+
+        const parsedValue = parseFloat(value);
+
+        const updateQuery = `
+            UPDATE financial_summary
+            SET huquq_payments_made = ?
+            WHERE user_id = ? AND end_date = ?
+        `;
+
+        // Execute query
+        const [result] = await pool.query(updateQuery, [parsedValue, userId, end_date]);
+
+        if (result.affectedRows === 0) {
+            logger.warn('No matching summary found to update:', { userId, end_date });
+            return res.status(404).json({ error: 'No matching summary found to update.' });
+        }
+
+        res.status(200).json({ message: 'Huquq payments made updated successfully.' });
+    } catch (error) {
+        logger.error('Error updating Huquq payments made:', { error: error.message, stack: error.stack });
         res.status(500).send('Server Error');
     }
 });
