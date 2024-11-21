@@ -199,14 +199,28 @@
                         <% }); %>
                     </tr>
                     <tr>
-                        <td>Wealth being taxed today:</td>
-                        <% summaries.forEach(summary => { %>
-                            <td class="summary-value">
-                                <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed 
-                                    ? (summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed).toFixed(2) 
-                                    : '0.00' %>
-                            </td>
-                        <% }); %>
+<td>Wealth being taxed today:</td>
+<% summaries.forEach(summary => { %>
+    <td class="summary-value">
+        <% 
+            // Debugging the values used in the calculation
+            let totalAssets = summary.total_assets ? parseFloat(summary.total_assets) : 0;
+            let totalDebts = summary.total_debts ? parseFloat(summary.total_debts) : 0;
+            let unnecessaryExpenses = summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses) : 0;
+            let wealthAlreadyTaxed = summary.wealth_already_taxed ? parseFloat(summary.wealth_already_taxed) : 0;
+
+            console.log('Debugging Wealth Calculation:');
+            console.log('Total Assets:', totalAssets);
+            console.log('Total Debts:', totalDebts);
+            console.log('Unnecessary Expenses:', unnecessaryExpenses);
+            console.log('Wealth Already Taxed:', wealthAlreadyTaxed);
+
+            // Calculate wealth being taxed today
+            let wealthBeingTaxed = totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed;
+        %>
+        <%= wealthBeingTaxed.toFixed(2) %>
+    </td>
+<% }); %>
                     </tr>
                     <tr>
                         <td>Gold Rate:</td>
