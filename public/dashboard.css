@@ -33,7 +33,6 @@
     position: sticky;
     left: 0;
     z-index: 1;
-    width: 152px; 
 }
 .summary-table td:first-child,
 .summary-table th:first-child {
@@ -43,6 +42,7 @@
 }
 .dashboard-table th,
 .summary-table th {
+    min-width: 170px;
     background-color: #f8f9fa;
     color: #222;
     font-weight: bold;
