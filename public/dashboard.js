@@ -290,7 +290,7 @@ function recalculateSummaryFields() {
 
         // Update Wealth being taxed today
         const wealthBeingTaxedToday = (totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed).toFixed(2);
-        document.querySelector(`.summary-value[data-end-date="${endDate}"].wealth-being-taxed`).textContent = wealthBeingTaxedToday;
+        document.querySelector(`.summary-value[data-end-date="${endDate}"]`).textContent = wealthBeingTaxedToday;
 
         // Update Units of Huquq
         const unitsOfHuquq = (goldRate > 0) ? ((totalAssets - totalDebts + unnecessaryExpenses - wealthAlreadyTaxed) / goldRate).toFixed(2) : '0.00';
