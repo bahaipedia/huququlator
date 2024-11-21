@@ -219,12 +219,20 @@ function updateSummaryTable() {
 
             // Update the summary table rows dynamically
             summaries.forEach(summary => {
-                document.querySelector(`.total-assets[data-end-date="${summary.end_date}"]`).textContent =
-                    summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00';
-                document.querySelector(`.total-debts[data-end-date="${summary.end_date}"]`).textContent =
-                    summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00';
-                document.querySelector(`.unnecessary-expenses[data-end-date="${summary.end_date}"]`).textContent =
-                    summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00';
+                const totalAssetsCell = document.querySelector(`.total-assets[data-end-date="${summary.end_date}"]`);
+                const totalDebtsCell = document.querySelector(`.total-debts[data-end-date="${summary.end_date}"]`);
+                const unnecessaryExpensesCell = document.querySelector(`.unnecessary-expenses[data-end-date="${summary.end_date}"]`);
+
+                // Only update if the corresponding cell exists in the DOM
+                if (totalAssetsCell) {
+                    totalAssetsCell.textContent = summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00';
+                }
+                if (totalDebtsCell) {
+                    totalDebtsCell.textContent = summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00';
+                }
+                if (unnecessaryExpensesCell) {
+                    unnecessaryExpensesCell.textContent = summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00';
+                }
             });
         })
         .catch(err => {
