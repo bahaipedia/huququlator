@@ -1,6 +1,7 @@
 .dashboard-page-wrapper {
     padding: 0px 10px 15px 0px;
     margin-left: 250px;
+    position: relative;
 }
 .table-container {
     display: flex;
@@ -79,10 +80,10 @@
 }
 .add-year-button-wrapper {
     position: absolute;
-    right: -150px;
-    top: 0;
+    top: 60px; 
+    right: 10px;
+    z-index: 10;
 }
-
 .add-year-button {
     background-color: #f8f9fa;
     color: #444;
