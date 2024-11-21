@@ -217,7 +217,9 @@
                     <tr>
                         <td>Gold Rate:</td>
                         <% summaries.forEach(summary => { %>
-                            <td class="gold-rate"><%= summary.gold_rate ? parseFloat(summary.gold_rate).toFixed(2) : '0.00' %></td>
+                            <td class="gold-rate" data-end-date="<%= summary.end_date %>">
+                                <%= summary.gold_rate ? parseFloat(summary.gold_rate).toFixed(2) : '0.00' %>
+                            </td>
                         <% }); %>
                     </tr>
                     <tr>
