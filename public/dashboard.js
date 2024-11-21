@@ -203,6 +203,7 @@ document.querySelector('.dashboard-table').addEventListener('keydown', (event) =
 });
 
 // Allow for automatic updates to the summary table 
+// Allow for automatic updates to the summary table 
 function updateSummaryTable() {
     fetch('/api/summary', {
         method: 'GET',
@@ -221,11 +222,11 @@ function updateSummaryTable() {
             summaries.forEach(summary => {
                 const formattedEndDate = new Date(summary.end_date).toISOString().split('T')[0]; // Format as YYYY-MM-DD
 
+                // Update Total Assets, Debts, and Expenses
                 const totalAssetsCell = document.querySelector(`.total-assets[data-end-date="${formattedEndDate}"]`);
                 const totalDebtsCell = document.querySelector(`.total-debts[data-end-date="${formattedEndDate}"]`);
                 const unnecessaryExpensesCell = document.querySelector(`.unnecessary-expenses[data-end-date="${formattedEndDate}"]`);
 
-                // Only update if the corresponding cell exists in the DOM
                 if (totalAssetsCell) {
                     totalAssetsCell.textContent = summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00';
                 }
@@ -234,6 +235,54 @@ function updateSummaryTable() {
                 }
                 if (unnecessaryExpensesCell) {
                     unnecessaryExpensesCell.textContent = summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00';
+                }
+
+                // Update Wealth being taxed today
+                const wealthBeingTaxedTodayCell = document.querySelector(`.summary-value[data-end-date="${formattedEndDate}"]`);
+                if (wealthBeingTaxedTodayCell) {
+                    wealthBeingTaxedTodayCell.textContent = 
+                        (parseFloat(summary.total_assets) || 0) - 
+                        (parseFloat(summary.total_debts) || 0) + 
+                        (parseFloat(summary.unnecessary_expenses) || 0) - 
+                        (parseFloat(summary.wealth_already_taxed) || 0) 
+                        ? (parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)).toFixed(2)
+                        : '0.00';
+                }
+
+                // Update Units of Huquq
+                const unitsOfHuquqCell = document.querySelector(`.units-of-huquq[data-end-date="${formattedEndDate}"]`);
+                if (unitsOfHuquqCell) {
+                    unitsOfHuquqCell.textContent = 
+                        (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
+                        ? ((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)).toFixed(2)
+                        : '0.00';
+                }
+
+                // Update Rounded Units
+                const roundedUnitsCell = document.querySelector(`.rounded-units[data-end-date="${formattedEndDate}"]`);
+                if (roundedUnitsCell) {
+                    roundedUnitsCell.textContent = 
+                        (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
+                        ? Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate))
+                        : '0';
+                }
+
+                // Update Huquq Payment Owed
+                const paymentOwedCell = document.querySelector(`.payment-owed[data-end-date="${formattedEndDate}"]`);
+                if (paymentOwedCell) {
+                    paymentOwedCell.textContent = 
+                        (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
+                        ? (0.19 * Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed) ) / parseFloat(summary.gold_rate)) * parseFloat(summary.gold_rate)).toFixed(2)
+                        : '0.00';
+                }
+
+                // Update Remainder Due
+                const remainderDueCell = document.querySelector(`.remainder-due[data-end-date="${formattedEndDate}"]`);
+                if (remainderDueCell) {
+                    remainderDueCell.textContent = 
+                        (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate && summary.huquq_payments_made) 
+                        ? ((0.19 * Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)) * parseFloat(summary.gold_rate)) - parseFloat(summary.huquq_payments_made)).toFixed(2) 
+                        : '0.00';
                 }
             });
         })
