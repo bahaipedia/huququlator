@@ -313,7 +313,6 @@ document.querySelectorAll('.financial-input').forEach(input => {
     });
 });
 
-// Save wealth-already-taxed values and refresh the summary
 // Save values and refresh the summary
 document.querySelectorAll('.save-button, .save-huquq-payments').forEach(button => {
     button.addEventListener('click', (event) => {
