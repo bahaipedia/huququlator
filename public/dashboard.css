@@ -16,27 +16,15 @@
     position: relative;
 }
 
-.dashboard-table {
-    border-collapse: collapse;
-    min-width: auto;
-    border: 1px solid #ccc;
-    width: auto;
-}
-
+.dashboard-table,
 .summary-table {
     border-collapse: collapse;
-    width: 100%; /* Make summary table span the full container width */
     border: 1px solid #ccc;
+    width: auto; /* Allow the table width to grow based on content */
 }
 
 .dashboard-table th,
-.dashboard-table td {
-    white-space: nowrap;
-    text-align: left;
-    padding: 8px 10px;
-    border: 1px solid #ddd;
-}
-
+.dashboard-table td,
 .summary-table th,
 .summary-table td {
     white-space: nowrap;
@@ -51,7 +39,7 @@
     left: 0;
     z-index: 1;
     background-color: #f8f9fa;
-    width: 135px;
+    width: 135px; /* Fixed width for the first column of the dashboard table */
 }
 
 .summary-table td:first-child,
@@ -62,17 +50,7 @@
     background-color: #f8f9fa;
 }
 
-.dashboard-table th {
-    background-color: #f8f9fa;
-    color: #222;
-    font-weight: bold;
-    text-align: left;
-    border-bottom: 2px solid #ccc;
-    position: sticky;
-    top: 0;
-    z-index: 2;
-}
-
+.dashboard-table th,
 .summary-table th {
     background-color: #f8f9fa;
     color: #222;
