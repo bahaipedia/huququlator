@@ -290,3 +290,39 @@ document.querySelectorAll('.financial-input').forEach(input => {
         }
     });
 });
+
+document.querySelectorAll('.wealth-already-taxed').forEach(input => {
+    if (!input.disabled) { // Ensure only enabled input can trigger updates
+        input.addEventListener('blur', (event) => {
+            const inputElement = event.target;
+            const value = inputElement.value.trim();
+            const endDate = inputElement.dataset.endDate;
+
+            // Validate input
+            if (!isNaN(value) && value !== '') {
+                fetch(`/api/summary/update`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value, end_date: endDate }),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(() => {
+                        console.log(`Wealth already taxed updated for ${endDate}: ${value}`);
+                        updateSummaryTable();
+                    })
+                    .catch(err => {
+                        console.error('Error updating wealth already taxed:', err);
+                        alert('Failed to update the value. Please try again.');
+                    });
+            } else {
+                inputElement.value = '0.00'; // Restore default value on invalid input
+            }
+        });
+    }
+});
+
