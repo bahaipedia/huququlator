@@ -2,66 +2,66 @@
     padding: 0px 10px 15px 0px;
     margin-left: 250px;
 }
-
 .table-container {
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    gap: 20px;
-}
-
-.dashboard-table-wrapper {
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
     gap: 20px;
+    width: 100%;
 }
-
+.dashboard-table-wrapper {
+    overflow-x: auto;
+    position: relative;
+}
 .dashboard-table,
 .summary-table {
-    width: 500px;
     border-collapse: collapse;
     border: 1px solid #ccc;
-    margin-bottom: 20px;
-    table-layout: fixed;
+    width: auto; /* Allow the table width to grow based on content */
 }
-
+.dashboard-table th,
+.dashboard-table td,
+.summary-table th,
+.summary-table td {
+    white-space: nowrap;
+    text-align: left;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+}
+.dashboard-table td:first-child,
+.dashboard-table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: #f8f9fa;
+    width: 140px; 
+}
+.summary-table td:first-child,
+.summary-table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: #f8f9fa;
+}
 .dashboard-table th,
 .summary-table th {
-    background-color: #f8f9fa; /* Neutral light background */
-    color: #222; /* Dark text for better readability */
-    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #222;
+    font-weight: bold;
     text-align: left;
-    padding: 10px;
     border-bottom: 2px solid #ccc;
-    font-size: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
-
-.dashboard-table td,
-.summary-table td {
-    padding: 8px 10px;
-    border-bottom: 1px solid #ddd;
-    vertical-align: middle;
-    font-size: 0.9rem;
-    color: #444; /* Subtle text color */
-}
-
-.dashboard-table tr:last-child td,
-.summary-table tr:last-child td {
-    border-bottom: none;
-}
-
-.section-row {
-    background-color: #f1f3f5;
+.dashboard-title {
+    margin-bottom: 20px;
+    font-size: 2rem;
     font-weight: bold;
 }
-.section-title {
-    padding: 10px;
-    text-align: left;
-    font-size: 1rem;
-    background-color: #f0f0f0;
-    color: #444;
+.section-row {
+    font-weight: bold;
 }
-
 .add-item-button {
     font-size: 0.85rem;
     background-color: #ffffff;
