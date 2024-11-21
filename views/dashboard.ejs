@@ -199,17 +199,17 @@
                         <% }); %>
                     </tr>
                     <tr>
-                        <td>Wealth being taxed today:</td>
-                        <% summaries.forEach(summary => { %>
-                            <td class="summary-value">
-                                <%= (parseFloat(summary.total_assets) || 0) - 
-                                    (parseFloat(summary.total_debts) || 0) + 
-                                    (parseFloat(summary.unnecessary_expenses) || 0) - 
-                                    (parseFloat(summary.wealth_already_taxed) || 0)
-                                    ? (parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)).toFixed(2)
-                                    : '0.00' %>
-                            </td>
-                        <% }); %>
+                    <td>Wealth being taxed today:</td>
+                    <% summaries.forEach(summary => { %>
+                        <td class="summary-value">
+                            <%= (parseFloat(summary.total_assets) || 0) - 
+                                (parseFloat(summary.total_debts) || 0) + 
+                                (parseFloat(summary.unnecessary_expenses) || 0) - 
+                                (parseFloat(summary.wealth_already_taxed) || 0)
+                                ? (parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)).toFixed(2)
+                                : '0.00' %>
+                        </td>
+                    <% }); %>
                     </tr>
                     <tr>
                         <td>Gold Rate:</td>
@@ -222,7 +222,7 @@
                         <% summaries.forEach(summary => { %>
                             <td class="units-of-huquq">
                                 <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate 
-                                    ? ((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)).toFixed(2) 
+                                    ? ((summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed) / summary.gold_rate).toFixed(2) 
                                     : '0.00' %>
                             </td>
                         <% }); %>
@@ -232,7 +232,7 @@
                         <% summaries.forEach(summary => { %>
                             <td class="rounded-units">
                                 <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate 
-                                    ? Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)) 
+                                    ? Math.floor((summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed) / summary.gold_rate) 
                                     : '0' %>
                             </td>
                         <% }); %>
@@ -242,7 +242,7 @@
                         <% summaries.forEach(summary => { %>
                             <td class="payment-owed">
                                 <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate 
-                                    ? (0.19 * Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)) * parseFloat(summary.gold_rate)).toFixed(2) 
+                                    ? (0.19 * Math.floor((summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed) / summary.gold_rate) * summary.gold_rate).toFixed(2) 
                                     : '0.00' %>
                             </td>
                         <% }); %>
@@ -264,7 +264,7 @@
                         <% summaries.forEach(summary => { %>
                             <td class="remainder-due">
                                 <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate && summary.huquq_payments_made 
-                                    ? ((0.19 * Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)) * parseFloat(summary.gold_rate) - parseFloat(summary.huquq_payments_made)).toFixed(2) 
+                                    ? ((0.19 * Math.floor((summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed) / summary.gold_rate) * summary.gold_rate) - summary.huquq_payments_made).toFixed(2) 
                                     : '0.00' %>
                             </td>
                         <% }); %>
