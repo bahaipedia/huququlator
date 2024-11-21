@@ -201,3 +201,38 @@ document.querySelector('.dashboard-table').addEventListener('keydown', (event) =
         }
     }
 });
+
+// Automatically save input values on blur
+document.querySelectorAll('.financial-input').forEach(input => {
+    input.addEventListener('blur', (event) => {
+        const inputElement = event.target;
+        const value = inputElement.value.trim();
+        const labelId = inputElement.dataset.labelId;
+        const reportingDate = inputElement.dataset.reportingDate;
+
+        // Only save if the value is valid
+        if (!isNaN(value) && value !== '') {
+            fetch(`/api/entries/${labelId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ value, reporting_date: reportingDate }),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    console.log(`Value for Label ID ${labelId} on ${reportingDate} saved successfully.`);
+                })
+                .catch(err => {
+                    console.error('Error saving value:', err);
+                    alert('Failed to save the value. Please try again.');
+                });
+        } else {
+            // Restore "0.00" if input is left invalid or empty
+            inputElement.value = '0.00';
+        }
+    });
+});
