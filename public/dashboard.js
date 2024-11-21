@@ -1,12 +1,12 @@
-/* Add a New Reporting Period1 */
+/* Add a New Reporting Period */
 document.querySelector('.add-year-button').addEventListener('click', () => {
     const endDate = prompt('Enter the end date for the new reporting period (YYYY-MM-DD):');
     if (endDate) {
-        // Step 1: Add a new reporting period to financial_summary
-        fetch('/api/summary', {
+        // Step 1: Add financial entries for each label for the new reporting period
+        fetch('/api/entries', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ end_date: endDate }),
+            body: JSON.stringify({ reporting_date: endDate }),
         })
             .then(response => {
                 if (!response.ok) {
@@ -14,12 +14,12 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
                 }
                 return response.json();
             })
-            .then(data => {
-                // Step 2: Add financial entries for each label for the new reporting period
-                return fetch('/api/entries', {
+            .then(() => {
+                // Step 2: Add a new reporting period to financial_summary
+                return fetch('/api/summary', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ reporting_date: endDate }),
+                    body: JSON.stringify({ end_date: endDate }),
                 });
             })
             .then(response => {
@@ -28,7 +28,7 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
                 }
                 return response.json();
             })
-            .then(data => {
+            .then(() => {
                 alert('New reporting period and entries added successfully!');
                 location.reload(); // Reload to reflect the new column
             })
