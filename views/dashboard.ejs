@@ -221,8 +221,8 @@
                         <td>Units of Huquq:</td>
                         <% summaries.forEach(summary => { %>
                             <td class="units-of-huquq">
-                                <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate 
-                                    ? ((summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed) / summary.gold_rate).toFixed(2) 
+                                <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
+                                    ? ((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)).toFixed(2)
                                     : '0.00' %>
                             </td>
                         <% }); %>
