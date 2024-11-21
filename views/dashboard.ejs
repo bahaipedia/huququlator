@@ -206,6 +206,12 @@
                                     ? (summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed).toFixed(2) 
                                     : '0.00' %>
                             </td>
+                            <script>
+                                console.log('Total Assets:', <%= summary.total_assets %>);
+                                console.log('Total Debts:', <%= summary.total_debts %>);
+                                console.log('Unnecessary Expenses:', <%= summary.unnecessary_expenses %>);
+                                console.log('Wealth Already Taxed:', <%= summary.wealth_already_taxed %>);
+                            </script>
                         <% }); %>
                     </tr>
                     <tr>
