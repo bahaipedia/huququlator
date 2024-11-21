@@ -268,7 +268,7 @@ function updateSummaryTable() {
                 if (huquqPaymentOwedCell) huquqPaymentOwedCell.textContent = huquqPaymentOwed;
 
                 // Remainder Due
-                const huquqPaymentsInputValue = huquqPaymentsMadeInput 
+                const huquqPaymentsInputValue = huquqPaymentsMade 
                     ? parseFloat(inputHuquqPayments.value) || 0 
                     : 0;
                 const remainderDue = (0.19 * roundedUnits * goldRateValue - huquqPaymentsInputValue).toFixed(2);
