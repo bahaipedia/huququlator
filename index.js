@@ -359,8 +359,6 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
     try {
         const userId = req.userId;
 
-        logger.info('Fetching labels for user:', { userId });
-
         // Fetch all labels for the user
         const [labels] = await pool.query(
             `
@@ -376,11 +374,7 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        logger.info('Fetched labels:', { labels });
-
         // Fetch all financial entries with normalized reporting_date
-        logger.info('Fetching financial entries for user:', { userId });
-
         const [entries] = await pool.query(
             `
             SELECT 
@@ -399,12 +393,8 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        logger.info('Fetched entries:', { entries });
-
         // Check if entries exist
         if (entries.length === 0) {
-            logger.info('No financial entries found. Rendering labels only.');
-
             const entryMap = labels.map(label => ({
                 id: label.id,
                 category: label.category,
@@ -423,8 +413,6 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
         }
 
         // Fetch financial summaries only if entries exist
-        logger.info('Fetching financial summaries for user:', { userId });
-
         const [summaries] = await pool.query(
             `
             SELECT 
@@ -445,10 +433,7 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        logger.info('Fetched summaries:', { summaries });
-
         // Transform the data for easier rendering
-        logger.info('Constructing entryMap...');
         const entryMap = labels.map(label => {
             const labelEntries = entries.filter(entry => entry.label_id === label.id);
             return {
@@ -463,8 +448,6 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
                 }),
             };
         });
-
-        logger.info('Constructed entryMap:', { entryMap });
 
         // Render the dashboard page with the fetched data
         res.render('dashboard', {
@@ -483,15 +466,12 @@ app.get('/dashboard', checkLoginStatus, async (req, res) => {
 
 app.post('/api/labels', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
-        logger.info('Unauthorized access attempt.');
         return res.status(403).send('Unauthorized');
     }
 
     try {
         const { category, label } = req.body;
         const userId = req.userId;
-
-        logger.info('Received request to add label.', { category, label, userId });
 
         // Check if the label already exists
         let [labelResult] = await pool.query(
@@ -507,21 +487,17 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
 
         if (labelResult.length === 0) {
             // Insert the new label
-            logger.info('Label does not exist. Inserting new label...');
             const insertLabelQuery = `
                 INSERT INTO financial_labels (user_id, category, label)
                 VALUES (?, ?, ?)
             `;
             const result = await pool.query(insertLabelQuery, [userId, category, label]);
             labelId = result[0].insertId; // Get the inserted label's ID
-            logger.info('Inserted new label with ID:', labelId);
         } else {
             labelId = labelResult[0].id; // Use existing label's ID
-            logger.info('Label already exists with ID:', labelId);
         }
 
         // Get all existing reporting_dates for the user
-        logger.info('Fetching existing reporting dates...');
         const [datesResult] = await pool.query(
             `
             SELECT DISTINCT reporting_date 
@@ -530,7 +506,6 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
             `,
             [userId]
         );
-        logger.info('Existing reporting dates:', datesResult);
 
         // Insert entries for the new label for all existing reporting_dates
         if (datesResult.length > 0) {
@@ -547,12 +522,8 @@ app.post('/api/labels', checkLoginStatus, async (req, res) => {
                 0.00, // Default value
             ]);
 
-            logger.info('Running query:', insertEntryQuery);
-            logger.info('With values:', entries);
-
             try {
                 await pool.query(insertEntryQuery, entries);
-                logger.info('Successfully inserted financial entries for the new label.');
             } catch (err) {
                 logger.error('Error inserting financial entries:', err);
             }
@@ -645,11 +616,7 @@ app.delete('/api/labels/:id', checkLoginStatus, async (req, res) => {
         const { id } = req.params;
         const userId = req.userId;
 
-        // Log the request
-        logger.info('Received request to delete label.', { labelId: id, userId });
-
         // Delete associated entries from financial_entries
-        logger.info('Deleting financial_entries for label_id:', id);
         const [entriesResult] = await pool.query(
             `
             DELETE FROM financial_entries
@@ -659,10 +626,8 @@ app.delete('/api/labels/:id', checkLoginStatus, async (req, res) => {
             `,
             [id, id, userId]
         );
-        logger.info('Deleted entries result:', entriesResult);
 
         // Delete the label itself
-        logger.info('Deleting financial_labels for label_id:', id);
         const [labelResult] = await pool.query(
             `
             DELETE FROM financial_labels
@@ -676,7 +641,6 @@ app.delete('/api/labels/:id', checkLoginStatus, async (req, res) => {
             return res.status(404).json({ error: 'Label not found or not authorized to delete' });
         }
 
-        logger.info('Successfully deleted label and associated entries:', { labelId: id, userId });
         res.status(200).json({ message: 'Label and associated entries deleted successfully' });
     } catch (error) {
         logger.error('Error deleting label:', error);
@@ -725,14 +689,12 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
             logger.warn('Reporting date is missing in request body', { userId });
             return res.status(400).json({ error: 'Reporting date is required' });
         }
-        logger.info('Adding entries for reporting_date:', { reporting_date, userId });
 
         // Step 2: Fetch all labels for the user
         const [labels] = await pool.query(
             'SELECT id FROM financial_labels WHERE user_id = ?',
             [userId]
         );
-        logger.info('Fetched labels for user:', { labels });
 
         if (labels.length === 0) {
             logger.warn('No financial labels found for user:', { userId });
@@ -751,10 +713,7 @@ app.post('/api/entries', checkLoginStatus, async (req, res) => {
             INSERT INTO financial_entries (user_id, label_id, reporting_date, value)
             VALUES ${placeholders}
         `;
-
-        logger.info('Executing batch insert query for financial entries', { insertQuery });
         await pool.query(insertQuery, insertValues);
-        logger.info('Batch insert completed successfully for financial entries', { reporting_date, userId });
 
         // Step 5: Send success response
         res.status(201).json({ message: 'New financial entries added for the reporting period successfully!' });
