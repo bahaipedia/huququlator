@@ -973,7 +973,18 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
         const { value, end_date } = req.body; // Value and reporting period
         const userId = req.userId;
 
-        console.log('Updating wealth_already_taxed:', { userId, value, end_date });
+        logger.info('Received request to update wealth_already_taxed:', { userId, value, end_date });
+
+        // Validate input
+        if (!value || !end_date) {
+            logger.warn('Missing value or end_date in request:', { value, end_date });
+            return res.status(400).json({ error: 'Value and end_date are required.' });
+        }
+
+        const parsedValue = parseFloat(value);
+
+        // Log parsed value
+        logger.info('Parsed value for wealth_already_taxed:', { parsedValue });
 
         const updateQuery = `
             UPDATE financial_summary
@@ -981,17 +992,21 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
             WHERE user_id = ? AND end_date = ?
         `;
 
-        const [result] = await pool.query(updateQuery, [parseFloat(value), userId, end_date]);
+        // Execute query
+        const [result] = await pool.query(updateQuery, [parsedValue, userId, end_date]);
 
-        console.log('Update query result:', result);
+        // Log query execution result
+        logger.info('Update query executed:', { query: updateQuery, params: [parsedValue, userId, end_date], result });
 
         if (result.affectedRows === 0) {
+            logger.warn('No matching summary found to update:', { userId, end_date });
             return res.status(404).json({ error: 'No matching summary found to update.' });
         }
 
+        logger.info('Wealth already taxed updated successfully:', { userId, end_date, parsedValue });
         res.status(200).json({ message: 'Wealth already taxed updated successfully.' });
     } catch (error) {
-        console.error('Error updating wealth already taxed:', error);
+        logger.error('Error updating wealth already taxed:', { error: error.message, stack: error.stack });
         res.status(500).send('Server Error');
     }
 });
