@@ -203,14 +203,18 @@
                     </tr>
                     <tr>
                         <td>Wealth being taxed today:</td>
-                        <% summaries.forEach(summary => { %>
+                        <% 
+                            let runningTotal = 0; // Initialize the running total
+                            summaries.forEach((summary, index) => { 
+                                const wealthBeingTaxed = (parseFloat(summary.total_assets) || 0) - 
+                                                         (parseFloat(summary.total_debts) || 0) + 
+                                                         (parseFloat(summary.unnecessary_expenses) || 0) - 
+                                                         (index === 0 ? (parseFloat(summary.wealth_already_taxed) || 0) : runningTotal);
+
+                                runningTotal = wealthBeingTaxed; // Update the running total
+                        %>
                             <td class="summary-value" data-end-date="<%= summary.end_date %>">
-                                <%= (parseFloat(summary.total_assets) || 0) - 
-                                    (parseFloat(summary.total_debts) || 0) + 
-                                    (parseFloat(summary.unnecessary_expenses) || 0) - 
-                                    (parseFloat(summary.wealth_already_taxed) || 0)
-                                    ? (parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)).toFixed(2)
-                                    : '0.00' %>
+                                <%= wealthBeingTaxed.toFixed(2) %>
                             </td>
                         <% }); %>
                     </tr>
