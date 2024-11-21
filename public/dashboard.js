@@ -228,14 +228,14 @@ function updateSummaryTable() {
                 const goldRateCell = document.querySelector(`.gold-rate[data-end-date="${formattedEndDate}"]`);
                 const wealthAlreadyTaxedInput = document.querySelector(`.wealth-already-taxed[data-end-date="${formattedEndDate}"]`);
                 const huquqPaymentsMadeInput = document.querySelector(`.huquq-payments-made[data-end-date="${formattedEndDate}"]`);
-
+                
                 const totalAssets = summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00';
                 const totalDebts = summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00';
                 const unnecessaryExpenses = summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00';
                 const goldRate = summary.gold_rate ? parseFloat(summary.gold_rate).toFixed(2) : '0.00';
                 const wealthAlreadyTaxed = parseFloat(wealthAlreadyTaxedInput?.value || 0) || 0;
                 const huquqPaymentsMade = parseFloat(huquqPaymentsMadeInput?.value || 0) || 0;
-
+                
                 if (totalAssetsCell) totalAssetsCell.textContent = totalAssets;
                 if (totalDebtsCell) totalDebtsCell.textContent = totalDebts;
                 if (unnecessaryExpensesCell) unnecessaryExpensesCell.textContent = unnecessaryExpenses;
@@ -268,7 +268,7 @@ function updateSummaryTable() {
                 if (huquqPaymentOwedCell) huquqPaymentOwedCell.textContent = huquqPaymentOwed;
 
                 // Remainder Due
-                const huquqPaymentsInputValue = inputHuquqPayments 
+                const huquqPaymentsInputValue = huquqPaymentsMadeInput 
                     ? parseFloat(inputHuquqPayments.value) || 0 
                     : 0;
                 const remainderDue = (0.19 * roundedUnits * goldRateValue - huquqPaymentsInputValue).toFixed(2);
