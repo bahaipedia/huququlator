@@ -314,25 +314,35 @@ document.querySelectorAll('.financial-input').forEach(input => {
 });
 
 // Save wealth-already-taxed values and refresh the summary
-document.querySelectorAll('.save-button').forEach(button => {
+// Save values and refresh the summary
+document.querySelectorAll('.save-button, .save-huquq-payments').forEach(button => {
     button.addEventListener('click', (event) => {
-        const endDate = event.target.closest('tr').querySelector('.wealth-already-taxed').dataset.endDate;
-        const value = event.target.closest('tr').querySelector('.wealth-already-taxed').value;
+        const parentCell = event.target.closest('td'); 
+        const endDate = parentCell.dataset.endDate; 
+        const input = parentCell.querySelector('input');
+        const value = input ? input.value : null; 
 
-        // Send the update to the server
-        fetch('/api/summary/update', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ value, end_date: endDate })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                updateSummaryTable(); // Recalculate all the fields after the update
+        if (value !== null) {
+            // Determine the field to update based on the button clicked
+            const field = parentCell.classList.contains('wealth-already-taxed') ? 'wealth_already_taxed' : 'huquq_payments_made';
+
+            // Send the update to the server
+            fetch('/api/summary/update', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ field, value, end_date: endDate })
             })
-            .catch(err => {
-                console.error('Error updating summary fields:', err);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    recalculateSummaryFields(); // Recalculate all the fields after the update
+                })
+                .catch(err => {
+                    console.error('Error updating summary fields:', err);
+                });
+        } else {
+            console.warn('No value to save.');
+        }
     });
 });
