@@ -231,8 +231,8 @@
                         <td>Rounded Units:</td>
                         <% summaries.forEach(summary => { %>
                             <td class="rounded-units">
-                                <%= summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate 
-                                    ? Math.floor((summary.total_assets - summary.total_debts + summary.unnecessary_expenses - summary.wealth_already_taxed) / summary.gold_rate) 
+                                <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
+                                    ? Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate))
                                     : '0' %>
                             </td>
                         <% }); %>
