@@ -831,18 +831,9 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             [userId]
         );
 
-        const previousWealthAlreadyTaxed = previousSummary.length > 0 
+        const wealthAlreadyTaxed = previousSummary.length > 0 
             ? parseFloat(previousSummary[0].wealth_already_taxed) || 0 
             : 0;
-
-        // Calculate wealth_already_taxed for the new period
-        const [prevSummaries] = await pool.query(
-            'SELECT total_assets - total_debts + unnecessary_expenses AS summary FROM financial_summary WHERE user_id = ? AND end_date < ?',
-            [userId, end_date]
-        );
-
-        const currentWealthAlreadyTaxed = prevSummaries.reduce((acc, row) => acc + (parseFloat(row.summary) || 0), 0);
-        const wealthAlreadyTaxed = parseFloat((previousWealthAlreadyTaxed + currentWealthAlreadyTaxed).toFixed(5));
 
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
