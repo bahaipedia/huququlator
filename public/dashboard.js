@@ -255,7 +255,7 @@ function updateSummaryTable() {
         });
 }
 
-// Automatically save input values and refresh the summary
+// Automatically save financial-input values and refresh the summary
 document.querySelectorAll('.financial-input').forEach(input => {
     input.addEventListener('blur', (event) => {
         const inputElement = event.target;
@@ -277,7 +277,6 @@ document.querySelectorAll('.financial-input').forEach(input => {
                     return response.json();
                 })
                 .then(() => {
-                    console.log(`Value for Label ID ${labelId} on ${reportingDate} saved successfully.`);
                     updateSummaryTable(); 
                 })
                 .catch(err => {
@@ -291,6 +290,7 @@ document.querySelectorAll('.financial-input').forEach(input => {
     });
 });
 
+// Automatically save wealth-already-taxed values and refresh the summary
 document.querySelectorAll('.wealth-already-taxed').forEach(input => {
     if (!input.disabled) { // Ensure only enabled input can trigger updates
         input.addEventListener('blur', (event) => {
@@ -298,21 +298,28 @@ document.querySelectorAll('.wealth-already-taxed').forEach(input => {
             const value = inputElement.value.trim();
             const endDate = inputElement.dataset.endDate;
 
+            console.log('Input blur triggered:');
+            console.log('Input element:', inputElement);
+            console.log('Input value:', value);
+            console.log('End date from dataset:', endDate);
+
             // Validate input
             if (!isNaN(value) && value !== '') {
+                console.log('Validated input. Sending fetch request to update /api/summary/update...');
                 fetch(`/api/summary/update`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ value, end_date: endDate }),
                 })
                     .then(response => {
+                        console.log('Fetch response received:', response);
                         if (!response.ok) {
                             throw new Error(`HTTP error! Status: ${response.status}`);
                         }
                         return response.json();
                     })
-                    .then(() => {
-                        console.log(`Wealth already taxed updated for ${endDate}: ${value}`);
+                    .then(data => {
+                        console.log('Fetch successful. Response data:', data);
                         updateSummaryTable();
                     })
                     .catch(err => {
@@ -320,9 +327,11 @@ document.querySelectorAll('.wealth-already-taxed').forEach(input => {
                         alert('Failed to update the value. Please try again.');
                     });
             } else {
+                console.warn('Invalid input detected. Resetting to 0.00');
                 inputElement.value = '0.00'; // Restore default value on invalid input
             }
         });
     }
 });
+
 
