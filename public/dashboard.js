@@ -268,14 +268,14 @@ function updateSummaryTable() {
                 if (huquqPaymentOwedCell) huquqPaymentOwedCell.textContent = huquqPaymentOwed;
 
                 // Remainder Due
-                const huquqPaymentsMadeValue = huquqPaymentsMadeInput 
-                    ? parseFloat(huquqPaymentsMadeInput.value) || 0 
-                    : 0;
-                const remainderDue = (parseFloat(huquqPaymentOwed) - huquqPaymentsMadeValue).toFixed(2);
-                const remainderDueCell = document.querySelector(`.remainder-due[data-end-date="${formattedEndDate}"]`);
-                if (remainderDueCell) {
-                    remainderDueCell.textContent = remainderDue;
-                }
+const huquqPaymentsMadeValue = huquqPaymentsMadeInput
+    ? parseFloat(huquqPaymentsMadeInput.querySelector('input').value) || 0
+    : 0; // Parse value from input field
+const remainderDue = (parseFloat(huquqPaymentOwed) - huquqPaymentsMadeValue).toFixed(2);
+const remainderDueCell = document.querySelector(`.remainder-due[data-end-date="${formattedEndDate}"]`);
+if (remainderDueCell) {
+    remainderDueCell.textContent = remainderDue; // Update the DOM with the calculated value
+}
             });
         })
         .catch(err => {
