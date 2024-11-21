@@ -271,7 +271,7 @@ function updateSummaryTable() {
                 const huquqPaymentsMadeValue = huquqPaymentsMadeInput 
                     ? parseFloat(huquqPaymentsMadeInput.value) || 0 
                     : 0;
-                const remainderDue = (0.19 * roundedUnits * goldRateValue - huquqPaymentsMadeValue).toFixed(2);
+                const remainderDue = (parseFloat(huquqPaymentOwed) - huquqPaymentsMadeValue).toFixed(2);
                 const remainderDueCell = document.querySelector(`.remainder-due[data-end-date="${formattedEndDate}"]`);
                 if (remainderDueCell) {
                     remainderDueCell.textContent = remainderDue;
