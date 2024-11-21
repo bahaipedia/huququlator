@@ -59,6 +59,7 @@
 }
 .section-row {
     font-weight: bold;
+    background-color: #F4F3F1 !important;
 }
 .add-item-button {
     font-size: 0.85rem;
