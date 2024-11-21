@@ -885,6 +885,21 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             }
         }
 
+        // Fetch the previous reporting period's end_date
+        const [previousPeriod] = await pool.query(
+            'SELECT end_date FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
+            [userId]
+        );
+
+        const lastEndDate = previousPeriod.length > 0 
+            ? new Date(previousPeriod[0].end_date) 
+            : null;
+
+        // Calculate the start_date for the new period
+        const startDate = lastEndDate 
+            ? new Date(lastEndDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] 
+            : null;
+
         // Fetch the previous reporting period's wealth_already_taxed
         const [previousSummary] = await pool.query(
             'SELECT wealth_already_taxed FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
@@ -909,7 +924,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
             VALUES (?, ?, ?, ?, ?)
         `;
-        await pool.query(insertQuery, [userId, lastEndDate, end_date, wealthAlreadyTaxed, goldRate]);
+        await pool.query(insertQuery, [userId, startDate, end_date, wealthAlreadyTaxed, goldRate]);
 
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
