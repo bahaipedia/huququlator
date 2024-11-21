@@ -37,6 +37,11 @@
     font-size: 1rem;
 }
 
+.dashboard-table td:first-child,
+.dashboard-table th:first-child {
+    width: 150px; 
+}
+
 .dashboard-table td,
 .summary-table td {
     padding: 8px 10px;
