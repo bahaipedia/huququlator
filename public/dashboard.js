@@ -222,11 +222,12 @@ function updateSummaryTable() {
 
             // Update the summary table rows dynamically
             summaries.forEach(summary => {
+                const formattedEndDate = new Date(summary.end_date).toISOString().split('T')[0]; // Format as YYYY-MM-DD
                 console.log('Processing summary:', summary);
 
-                const totalAssetsCell = document.querySelector(`.total-assets[data-end-date="${summary.end_date}"]`);
-                const totalDebtsCell = document.querySelector(`.total-debts[data-end-date="${summary.end_date}"]`);
-                const unnecessaryExpensesCell = document.querySelector(`.unnecessary-expenses[data-end-date="${summary.end_date}"]`);
+                const totalAssetsCell = document.querySelector(`.total-assets[data-end-date="${formattedEndDate}"]`);
+                const totalDebtsCell = document.querySelector(`.total-debts[data-end-date="${formattedEndDate}"]`);
+                const unnecessaryExpensesCell = document.querySelector(`.unnecessary-expenses[data-end-date="${formattedEndDate}"]`);
 
                 console.log('Cells:', {
                     totalAssetsCell,
@@ -236,15 +237,15 @@ function updateSummaryTable() {
 
                 // Only update if the corresponding cell exists in the DOM
                 if (totalAssetsCell) {
-                    console.log(`Updating total assets for ${summary.end_date}:`, summary.total_assets);
+                    console.log(`Updating total assets for ${formattedEndDate}:`, summary.total_assets);
                     totalAssetsCell.textContent = summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00';
                 }
                 if (totalDebtsCell) {
-                    console.log(`Updating total debts for ${summary.end_date}:`, summary.total_debts);
+                    console.log(`Updating total debts for ${formattedEndDate}:`, summary.total_debts);
                     totalDebtsCell.textContent = summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00';
                 }
                 if (unnecessaryExpensesCell) {
-                    console.log(`Updating unnecessary expenses for ${summary.end_date}:`, summary.unnecessary_expenses);
+                    console.log(`Updating unnecessary expenses for ${formattedEndDate}:`, summary.unnecessary_expenses);
                     unnecessaryExpensesCell.textContent = summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00';
                 }
             });
