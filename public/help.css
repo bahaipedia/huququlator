@@ -97,3 +97,17 @@
         opacity: 1;
     }
 }
+
+/* Styling for the external link note */
+.note-link {
+    font-size: 14px; 
+    font-family: "Arial", sans-serif; 
+    color: #0056A8;
+    text-decoration: none; 
+    margin-left: 5px;
+}
+
+.note-link:hover {
+    text-decoration: underline;
+    color: #003F7E;
+}
