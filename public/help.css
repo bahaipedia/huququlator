@@ -30,22 +30,23 @@
 
 .faq-item {
     margin-bottom: 15px;
-    padding: 3px; /* Thin padding around content */
+    padding: 3px;
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #f9f9f9;
     position: relative;
-    overflow: hidden; /* Prevent overlap */
+    overflow: hidden;
 }
 
 .faq-item h2 {
+    font-family: "Merriweather", serif;
     font-size: 20px;
     cursor: pointer;
-    margin: 10px 0; /* Add margin for breathing space */
+    margin: 10px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 10px; /* Add padding for a less squished appearance */
+    padding: 0 10px; 
 }
 
 .faq-item h2:hover {
