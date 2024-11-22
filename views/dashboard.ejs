@@ -11,10 +11,7 @@
     <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
     <div class="dashboard-page-wrapper">
         <h1 class="dashboard-title">Dashboard</h1>
-        <!-- Add Year Button -->
-        <div class="add-year-button-wrapper">
-            <button class="add-year-button">Add a New Year</button>
-        </div>
+
         <!-- Table Container -->
         <div class="table-container">
             <!-- Dashboard Table -->
@@ -33,6 +30,12 @@
                                     </button>
                                 </th>
                             <% }); %>
+                            <!-- Add Year Button -->
+                            <th class="add-year-column">
+                               <div class="add-year-button-wrapper">
+                                  <button class="add-year-button">Add a New Year</button>
+                               </div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
