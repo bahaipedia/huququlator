@@ -59,6 +59,9 @@
     font-size: 2rem;
     font-weight: bold;
 }
+.dashboard-table th:last-of-type:not(.add-year-column) {
+    border-right: none; 
+}
 .section-row {
     font-weight: bold;
     background-color: #E9ECEF;
