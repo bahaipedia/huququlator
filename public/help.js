@@ -8,6 +8,6 @@ function toggleFaq(id) {
         button.textContent = 'View More';
     } else {
         faqContent.classList.add('expanded');
-        button.textContent = 'View Less';
+        button.textContent = 'Collapse';
     }
 }
