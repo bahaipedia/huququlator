@@ -1,8 +1,10 @@
 function toggleFaq(id) {
     const faqItem = document.getElementById(id);
-    if (faqItem.classList.contains('expanded')) {
-        faqItem.classList.remove('expanded');
+    const faqContent = faqItem.querySelector('.faq-content'); // Select the content element within the FAQ item
+
+    if (faqContent.classList.contains('expanded')) {
+        faqContent.classList.remove('expanded');
     } else {
-        faqItem.classList.add('expanded');
+        faqContent.classList.add('expanded');
     }
 }
