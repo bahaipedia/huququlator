@@ -18,8 +18,7 @@
 .dashboard-table,
 .summary-table {
     border-collapse: collapse;
-    border: 1px solid #ccc;
-    width: auto; /* Allow the table width to grow based on content */
+    width: auto; 
 }
 .dashboard-table th,
 .dashboard-table td,
@@ -54,6 +53,12 @@
     top: 0;
     z-index: 2;
 }
+.dashboard-table::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    border-top: 1px solid #ddd; 
+}
 .dashboard-title {
     margin-bottom: 20px;
     font-size: 2rem;
@@ -79,10 +84,7 @@
     border-color: #aaa;
 }
 .add-year-column {
-    border-left: none !important;
-    border-right: none !important; 
-    border-top: none !important; 
-    border-bottom: none !important; 
+    border: none !important;
     text-align: center !important; 
     vertical-align: middle; 
     background-color: transparent !important;
