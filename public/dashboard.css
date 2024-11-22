@@ -79,10 +79,10 @@
     border-color: #aaa;
 }
 .add-year-column {
-    border-left: none;
-    border-right: none; 
-    border-top: none; 
-    border-bottom: none; 
+    border-left: none !important;
+    border-right: none !important; 
+    border-top: none !important; 
+    border-bottom: none !important; 
     text-align: center !important; 
     vertical-align: middle; 
     background-color: transparent !important;
