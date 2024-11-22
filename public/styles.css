@@ -250,7 +250,7 @@ table {
     border-collapse: collapse;
 }
 table, th, td {
-    border: 1px solid #ddd;
+    /* border: 1px solid #ddd;  give the table a name later so this doesn't target all other tables */
 }
 th, td {
     padding: 8px;
