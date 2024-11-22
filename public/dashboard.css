@@ -79,10 +79,10 @@
     border-color: #aaa;
 }
 .add-year-column {
-    border: none;
-    text-align: center; 
+    border: none !important;
+    text-align: center !important; 
     vertical-align: middle; 
-    background-color: transparent;
+    background-color: transparent !important;
 }
 .add-year-button {
     background-color: #f8f9fa;
