@@ -58,6 +58,7 @@
     border: 1px solid #ddd; /* Border around the content */
     border-radius: 4px;
     background-color: #ffffff;
+    text-align: left;
 }
 
 .faq-content.expanded {
@@ -67,9 +68,9 @@
 
 /* "View More" Button */
 .view-more {
-    position: absolute; /* Position button outside of content area */
-    right: 15px; /* Align to the right of the FAQ item */
-    bottom: 15px; /* Align to the bottom of the FAQ item */
+    position: absolute; 
+    right: 15px; 
+    bottom: 9px; 
     background-color: #0056A8;
     color: white;
     border: none;
