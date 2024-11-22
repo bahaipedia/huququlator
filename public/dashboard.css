@@ -78,8 +78,11 @@
     background-color: #F1F3F5;
     border-color: #aaa;
 }
-.add-year-button-wrapper {
-    align-self: flex-start;
+.add-year-column {
+    width: auto;
+    text-align: center; 
+    vertical-align: middle; 
+    background-color: transparent;
 }
 .add-year-button {
     background-color: #f8f9fa;
