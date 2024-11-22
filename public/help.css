@@ -104,6 +104,7 @@
     font-family: "Arial", sans-serif; 
     color: #0056A8;
     text-decoration: none; 
+    vertical-align: super;
     margin-left: 5px;
 }
 
