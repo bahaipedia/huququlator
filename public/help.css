@@ -1,5 +1,4 @@
 /* Help page styling */
-/* FAQ Section */
 .faq-section {
     margin-top: 20px;
 }
@@ -38,7 +37,7 @@
 
 .view-more {
     margin-top: 10px;
-    background-color: #007BFF;
+    background-color: #0056A8;
     color: white;
     border: none;
     border-radius: 5px;
@@ -48,7 +47,7 @@
 }
 
 .view-more:hover {
-    background-color: #0056b3;
+    background-color: #003F7E;
 }
 
 /* FAQ Expand Animation */
