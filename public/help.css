@@ -1,4 +1,15 @@
-/* Help page styling */
+/* Main Content */
+.main-content {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd; /* Add border around the main content */
+}
+
+/* FAQ Section */
 .faq-section {
     margin-top: 20px;
 }
@@ -9,39 +20,48 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #f9f9f9;
+    position: relative; /* Ensures button positioning works */
 }
 
 .faq-item h2 {
     font-size: 20px;
     cursor: pointer;
-    margin: 0;
+    margin: 0 0 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .faq-item h2:hover {
-    color: #007BFF;
+    color: #0056A8;
 }
 
 .faq-content {
     margin-top: 10px;
-    display: none; /* Hidden by default */
     font-size: 16px;
     line-height: 1.6;
+    display: none; /* Hidden by default */
+    padding: 10px; /* Add padding inside the content area */
+    border: 1px solid #ddd; /* Add border around the content */
+    border-radius: 4px;
+    background-color: #ffffff;
 }
 
-.faq-content p {
-    margin: 5px 0;
+.faq-content.expanded {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
+/* "View More" Button */
 .view-more {
-    margin-top: 10px;
+    position: absolute; /* Position to the right */
+    right: 15px; /* Align with padding of the FAQ item */
+    top: 15px; /* Align vertically with the heading */
     background-color: #0056A8;
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 10px 15px;
+    padding: 8px 12px;
     cursor: pointer;
     font-size: 14px;
 }
@@ -50,12 +70,7 @@
     background-color: #003F7E;
 }
 
-/* FAQ Expand Animation */
-.faq-content.expanded {
-    display: block;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
+/* Animation */
 @keyframes fadeIn {
     from {
         opacity: 0;
