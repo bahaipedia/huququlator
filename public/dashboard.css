@@ -79,7 +79,7 @@
     border-color: #aaa;
 }
 .add-year-column {
-    width: auto;
+    border: none;
     text-align: center; 
     vertical-align: middle; 
     background-color: transparent;
