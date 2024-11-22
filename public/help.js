@@ -5,7 +5,7 @@ function toggleFaq(id) {
 
     if (faqContent.classList.contains('expanded')) {
         faqContent.classList.remove('expanded');
-        button.textContent = 'View More';
+        button.textContent = 'View';
     } else {
         faqContent.classList.add('expanded');
         button.textContent = 'Collapse';
