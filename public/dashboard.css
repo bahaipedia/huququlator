@@ -59,9 +59,6 @@
     font-size: 2rem;
     font-weight: bold;
 }
-.dashboard-table th:last-of-type:not(.add-year-column) {
-    border-right: none; 
-}
 .section-row {
     font-weight: bold;
     background-color: #E9ECEF;
@@ -82,7 +79,10 @@
     border-color: #aaa;
 }
 .add-year-column {
-    border: none !important;
+    border-left: none;
+    border-right: none; 
+    border-top: none; 
+    border-bottom: none; 
     text-align: center !important; 
     vertical-align: middle; 
     background-color: transparent !important;
