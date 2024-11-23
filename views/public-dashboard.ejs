@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline Financial Dashboard</title>
+    <title>Financial Dashboard</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/dashboard.css">
 </head>
 <body>
+    <%- include('partials/sidebar', { loggedIn: loggedIn }) %>
     <div class="dashboard-page-wrapper">
         <h1 class="dashboard-title">Dashboard</h1>
 
+        <!-- Table Container -->
         <div class="table-container">
+            <!-- Dashboard Table -->
             <div class="dashboard-table-wrapper">
                 <table class="dashboard-table">
                     <thead>
@@ -20,17 +23,13 @@
                             <% summaries.forEach(summary => { %>
                                 <th data-date="<%= summary.end_date %>">
                                     <%= new Date(summary.end_date).toISOString().split('T')[0] %>
-                                    <button class="delete-year-button" data-entry-id="<%= summary.id %>">Delete</button>
+                                    <button 
+                                        class="delete-year-button" 
+                                        data-entry-id="<%= summary.id %>">
+                                        Delete
+                                    </button>
                                 </th>
                             <% }); %>
-                            <th>
-                                <input 
-                                    type="date" 
-                                    class="new-year-input" 
-                                    placeholder="Select a reporting date"
-                                    onchange="addNewYearColumn(event)"
-                                />
-                            </th>
                             <!-- Add Year Button -->
                             <th class="add-year-column">
                                <button class="add-year-button">Add a New Year</button>
@@ -38,30 +37,10 @@
                         </tr>
                     </thead>
                     <tbody>
+
                         <!-- Assets Section -->
                         <tr class="section-row">
-                            <td colspan="<%= summaries.length + 2 %>" class="section-title">Assets</td>
-                        </tr>
-                        <tr>
-                            <td>Total Assets</td>
-                            <% summaries.forEach(() => { %>
-                                <td>
-                                    <input 
-                                        type="text" 
-                                        class="financial-input"
-                                        placeholder="Enter total assets"
-                                    />
-                                </td>
-                            <% }); %>
-                            <td>
-                                <input 
-                                    type="text" 
-                                    class="financial-input" 
-                                    disabled 
-                                    placeholder="New entry" 
-                                    data-editable="false" 
-                                />
-                            </td>
+                            <td colspan="<%= summaries.length + 1 %>" class="section-title">Assets</td>
                         </tr>
                         <% entryMap.filter(entry => entry.category === 'Assets').forEach(entry => { %>
                         <tr>
@@ -70,248 +49,239 @@
                                 <button 
                                     class="delete-item-button" 
                                     data-label-id="<%= entry.id %>" 
-                                    style="float: right;">D</button>
+                                    style="float: right;">
+                                    D
+                                </button>
                             </td>
-                            <% summaries.forEach(() => { %>
+                            <% if (summaries.length > 0) { %>
+                                <% entry.values.forEach(item => { %>
                                 <td>
                                     <input 
                                         type="text" 
-                                        value="<%= entry.value %>"
-                                        data-label-id="<%= entry.id %>"
+                                        value="<%= item.value %>" 
+                                        data-label-id="<%= entry.id %>" 
+                                        data-reporting-date="<%= item.reportingDate %>"
                                         class="financial-input"
                                     />
                                 </td>
-                            <% }); %>
+                                <% }); %>
+                            <% } %>
                         </tr>
                         <% }); %>
                         <tr>
-                            <td colspan="<%= summaries.length + 2 %>">
+                            <td colspan="<%= summaries.length + 1 %>">
                                 <button class="add-item-button asset-button">Add a New Asset</button>
                             </td>
                         </tr>
 
-                        <!-- Repeat Similar Structure for Debts -->
+                        <!-- Debts Section -->
                         <tr class="section-row">
-                            <td colspan="<%= summaries.length + 2 %>" class="section-title">Debts</td>
-                        </tr>
-                        <tr>
-                            <td>Total Debts</td>
-                            <% summaries.forEach(() => { %>
-                                <td>
-                                    <input 
-                                        type="text" 
-                                        class="financial-input debt-input"
-                                        placeholder="Enter total debts"
-                                    />
-                                </td>
-                            <% }); %>
-                            <td>
-                                <input type="text" class="financial-input" disabled placeholder="New entry" />
-                            </td>
+                            <td colspan="<%= summaries.length + 1 %>" class="section-title">Debts</td>
                         </tr>
                         <% entryMap.filter(entry => entry.category === 'Debts').forEach(entry => { %>
                         <tr>
                             <td>
                                 <%= entry.label %>
-                                <button class="delete-item-button" data-label-id="<%= entry.id %>" style="float: right;">D</button>
+                                <button 
+                                    class="delete-item-button" 
+                                    data-label-id="<%= entry.id %>" 
+                                    style="float: right;">
+                                    D
+                                </button>
                             </td>
-                            <% summaries.forEach(() => { %>
+                            <% if (summaries.length > 0) { %>
+                                <% entry.values.forEach(item => { %>
                                 <td>
-                                    <input 
+                                    (<input 
                                         type="text" 
-                                        value="<%= entry.value %>"
-                                        data-label-id="<%= entry.id %>"
+                                        value="<%= item.value %>" 
+                                        data-label-id="<%= entry.id %>" 
+                                        data-reporting-date="<%= item.reportingDate %>"
                                         class="financial-input debt-input"
-                                    />
+                                    />)
                                 </td>
-                            <% }); %>
+                                <% }); %>
+                            <% } %>
                         </tr>
                         <% }); %>
                         <tr>
-                            <td colspan="<%= summaries.length + 2 %>">
+                            <td colspan="<%= summaries.length + 1 %>">
                                 <button class="add-item-button debt-button">Add a New Debt</button>
                             </td>
                         </tr>
 
-                        <!-- Repeat for Expenses -->
+                        <!-- Expenses Section -->
                         <tr class="section-row">
-                            <td colspan="<%= summaries.length + 2 %>" class="section-title">Unnecessary Expenses</td>
-                        </tr>
-                        <tr>
-                            <td>Total Expenses</td>
-                            <% summaries.forEach(() => { %>
-                                <td>
-                                    <input 
-                                        type="text" 
-                                        class="financial-input expense-input"
-                                        placeholder="Enter total expenses"
-                                    />
-                                </td>
-                            <% }); %>
-                            <td>
-                                <input type="text" class="financial-input" disabled placeholder="New entry" />
-                            </td>
+                            <td colspan="<%= summaries.length + 1 %>" class="section-title">Expenses</td>
                         </tr>
                         <% entryMap.filter(entry => entry.category === 'Expenses').forEach(entry => { %>
                         <tr>
                             <td>
                                 <%= entry.label %>
-                                <button class="delete-item-button" data-label-id="<%= entry.id %>" style="float: right;">D</button>
+                                <button 
+                                    class="delete-item-button" 
+                                    data-label-id="<%= entry.id %>" 
+                                    style="float: right;">
+                                    D
+                                </button>
                             </td>
-                            <% summaries.forEach(() => { %>
+                            <% if (summaries.length > 0) { %>
+                                <% entry.values.forEach(item => { %>
                                 <td>
                                     <input 
                                         type="text" 
-                                        value="<%= entry.value %>"
-                                        data-label-id="<%= entry.id %>"
+                                        value="<%= item.value %>" 
+                                        data-label-id="<%= entry.id %>" 
+                                        data-reporting-date="<%= item.reportingDate %>"
                                         class="financial-input expense-input"
                                     />
                                 </td>
-                            <% }); %>
+                                <% }); %>
+                            <% } %>
                         </tr>
                         <% }); %>
                         <tr>
-                            <td colspan="<%= summaries.length + 2 %>">
+                            <td colspan="<%= summaries.length + 1 %>">
                                 <button class="add-item-button expense-button">Add a New Expense</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-
-                <!-- Summary Table -->
-                <!-- Summary Table -->
-                <table class="summary-table">
-                    <thead>
-                        <tr>
-                            <th>Summary</th>
-                            <% summaries.forEach(summary => { %>
-                                <th><%= new Date(summary.end_date).toLocaleDateString() %></th>
-                            <% }); %>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Total Assets:</td>
-                            <% summaries.forEach(summary => { %>
-                                <td class="total-assets" data-end-date="<%= summary.end_date %>">
-                                    <%= summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00' %>
-                                </td>
-                            <% }); %>
-                        </tr>
-                        <tr>
-                            <td>Total Debts:</td>
-                            <% summaries.forEach(summary => { %>
-                                <td class="total-debts" data-end-date="<%= summary.end_date %>">
-                                    <%= summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00' %>
-                                </td>
-                            <% }); %>
-                        </tr>
-                        <tr>
-                            <td>Unnecessary Expenses:</td>
-                            <% summaries.forEach(summary => { %>
-                                <td class="unnecessary-expenses" data-end-date="<%= summary.end_date %>">
-                                    <%= summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00' %>
-                                </td>
-                            <% }); %>
-                        </tr>
-                        <tr>
-                            <td>Wealth previously taxed:</td>
-                            <% summaries.forEach((summary, index) => { %>
-                                <td>
-                                    <input 
-                                        type="text" 
-                                        value="<%= summary.wealth_already_taxed ? parseFloat(summary.wealth_already_taxed).toFixed(2) : '0.00' %>"
-                                        class="wealth-already-taxed"
-                                        data-end-date="<%= summary.end_date %>"
-                                        <%= index === 0 ? '' : 'disabled' %>
-                                    />
-                                    <% if (index === 0) { %>
-                                        <button class="save-button" data-end-date="<%= summary.end_date %>">S</button>
-                                    <% } %>
-                                </td>
-                            <% }); %>
-                        </tr>
-                        <tr>
-                            <td>Wealth being taxed today:</td>
-                            <% summaries.forEach(summary => { %>
-                                <td class="summary-value" data-end-date="<%= summary.end_date %>">
-                                    <%= (parseFloat(summary.total_assets || 0) - 
-                                        parseFloat(summary.total_debts || 0) + 
-                                        parseFloat(summary.unnecessary_expenses || 0) - 
-                                        parseFloat(summary.wealth_already_taxed || 0)).toFixed(2) %>
-                                </td>
-                            <% }); %>
-                        </tr>
-                        <tr>
-                            <td>Gold Rate:</td>
-                            <% summaries.forEach(summary => { %>
-                                <td class="gold-rate" data-end-date="<%= summary.end_date %>">
-                                    <%= summary.gold_rate ? parseFloat(summary.gold_rate).toFixed(2) : '0.00' %>
-                                </td>
-                            <% }); %>
-                        </tr>
-                        <tr>
-                            <td>Units of Huquq:</td>
-                            <% summaries.forEach(summary => { %>
-                                <td class="units-of-huquq" data-end-date="<%= summary.end_date %>">
-                                    <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
-                                        ? ((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)).toFixed(2)
-                                        : '0.00' %>
-                                </td>
-                            <% }); %>
-                        </tr>
-                        <tr>
-                            <td>Rounded Units:</td>
-                            <% summaries.forEach(summary => { %>
-                                <td class="rounded-units" data-end-date="<%= summary.end_date %>">
-                                    <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
-                                        ? Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate))
-                                        : '0' %>
-                                </td>
-                            <% }); %>
-                        </tr>
-                        <tr>
-                            <td>Huquq Payment Owed:</td>
-                            <% summaries.forEach(summary => { %>
-                                <td class="payment-owed" data-end-date="<%= summary.end_date %>">
-                                    <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
-                                        ? (0.19 * Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)) * parseFloat(summary.gold_rate)).toFixed(2) 
-                                        : '0.00' %>
-                                </td>
-                            <% }); %>
-                        </tr>
-                        <tr>
-                            <td>Huquq Payments Made:</td>
-                            <% summaries.forEach(summary => { %>
-                                <td class="huquq-payments-made" data-end-date="<%= summary.end_date %>">
-                                    <input 
-                                        type="text" 
-                                        value="<%= summary.huquq_payments_made ? parseFloat(summary.huquq_payments_made).toFixed(2) : '0.00' %>" 
-                                        data-end-date="<%= summary.end_date %>"
-                                    />
-                                    <button class="save-huquq-payments" data-end-date="<%= summary.end_date %>">S</button>
-                                </td>
-                            <% }); %>
-                        </tr>
-                        <tr>
-                            <td>Remainder Due:</td>
-                            <% summaries.forEach(summary => { %>
-                                <td class="remainder-due" data-end-date="<%= summary.end_date %>">
-                                    <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate && summary.huquq_payments_made) 
-                                        ? ((0.19 * Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)) * parseFloat(summary.gold_rate)) - parseFloat(summary.huquq_payments_made)).toFixed(2) 
-                                        : '0.00' %>
-                                </td>
-                            <% }); %>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
+
+            <!-- Summary Table -->
+            <table class="summary-table" data-summary-id="<%= summaries[summaries.length - 1]?.id %>">
+                <thead>
+                    <tr>
+                        <th>Summary</th>
+                        <% summaries.forEach((summary) => { %>
+                            <th><%= new Date(summary.end_date).toLocaleDateString() %></th>
+                        <% }); %>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Total Assets:</td>
+                        <% summaries.forEach((summary) => { %>
+                            <td class="total-assets" data-end-date="<%= summary.end_date %>">
+                                <%= summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Total Debts:</td>
+                        <% summaries.forEach((summary) => { %>
+                            <td class="total-debts" data-end-date="<%= summary.end_date %>">
+                                <%= summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Unnecessary Expenses:</td>
+                        <% summaries.forEach((summary) => { %>
+                            <td class="unnecessary-expenses" data-end-date="<%= summary.end_date %>">
+                                <%= summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Wealth previously taxed:</td>
+                        <% summaries.forEach((summary, index) => { %>
+                            <td>
+                                <input 
+                                    type="text" 
+                                    value="<%= summary.wealth_already_taxed ? parseFloat(summary.wealth_already_taxed).toFixed(2) : '0.00' %>"
+                                    class="wealth-already-taxed"
+                                    data-end-date="<%= summary.end_date %>"
+                                    <%= index === 0 ? '' : 'disabled' %>
+                                />
+                                <% if (index === 0) { %>
+                                    <button class="save-button" data-end-date="<%= summary.end_date %>">S</button>
+                                <% } %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Wealth being taxed today:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="summary-value" data-end-date="<%= summary.end_date %>">
+                                <%= (parseFloat(summary.total_assets) || 0) - 
+                                    (parseFloat(summary.total_debts) || 0) + 
+                                    (parseFloat(summary.unnecessary_expenses) || 0) - 
+                                    (parseFloat(summary.wealth_already_taxed) || 0)
+                                    ? (parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)).toFixed(2)
+                                    : '0.00' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Gold Rate:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="gold-rate" data-end-date="<%= summary.end_date %>">
+                                <%= summary.gold_rate ? parseFloat(summary.gold_rate).toFixed(2) : '0.00' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Units of Huquq:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="units-of-huquq" data-end-date="<%= summary.end_date %>">
+                                <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
+                                    ? ((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)).toFixed(2)
+                                    : '0.00' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Rounded Units:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="rounded-units" data-end-date="<%= summary.end_date %>">
+                                <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
+                                    ? Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate))
+                                    : '0' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Huquq Payment Owed:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="payment-owed" data-end-date="<%= summary.end_date %>">
+                                <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
+                                    ? (0.19 * Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)) * parseFloat(summary.gold_rate)).toFixed(2) 
+                                    : '0.00' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Huquq Payments Made:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="huquq-payments-made" data-end-date="<%= summary.end_date %>">
+                                <input 
+                                    type="text" 
+                                    value="<%= summary.huquq_payments_made ? parseFloat(summary.huquq_payments_made).toFixed(2) : '0.00' %>" 
+                                    data-end-date="<%= summary.end_date %>"
+                                />
+                                <button class="save-huquq-payments" data-end-date="<%= summary.end_date %>">S</button>
+                            </td>
+                        <% }); %>
+                    </tr>
+                    <tr>
+                        <td>Remainder Due:</td>
+                        <% summaries.forEach(summary => { %>
+                            <td class="remainder-due" data-end-date="<%= summary.end_date %>">
+                                <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate && summary.huquq_payments_made) 
+                                    ? ((0.19 * Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)) * parseFloat(summary.gold_rate)) - parseFloat(summary.huquq_payments_made)).toFixed(2) 
+                                    : '0.00' %>
+                            </td>
+                        <% }); %>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
     <script>
         const summaries = <%- JSON.stringify(summaries) %>;
-        const entryMap = <%- JSON.stringify(entryMap) %>;
     </script>
-    <script src="/public-dashboard.js"></script>
+    <script src="/dashboard.js"></script>
 </body>
 </html>
