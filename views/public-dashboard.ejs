@@ -165,15 +165,133 @@
                     </tbody>
                 </table>
 
-                <!-- Gold API Placeholder -->
-                <script>
-                    function addNewYearColumn(event) {
-                        const date = event.target.value;
-                        if (!date) return;
-                        alert(`Retrieve gold rate for ${date}`); // Placeholder for gold API call
-                        // Implement gold API logic here for offline mode
-                    }
-                </script>
+                <!-- Summary Table -->
+                <!-- Summary Table -->
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Summary</th>
+                            <% summaries.forEach(summary => { %>
+                                <th><%= new Date(summary.end_date).toLocaleDateString() %></th>
+                            <% }); %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Total Assets:</td>
+                            <% summaries.forEach(summary => { %>
+                                <td class="total-assets" data-end-date="<%= summary.end_date %>">
+                                    <%= summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00' %>
+                                </td>
+                            <% }); %>
+                        </tr>
+                        <tr>
+                            <td>Total Debts:</td>
+                            <% summaries.forEach(summary => { %>
+                                <td class="total-debts" data-end-date="<%= summary.end_date %>">
+                                    <%= summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00' %>
+                                </td>
+                            <% }); %>
+                        </tr>
+                        <tr>
+                            <td>Unnecessary Expenses:</td>
+                            <% summaries.forEach(summary => { %>
+                                <td class="unnecessary-expenses" data-end-date="<%= summary.end_date %>">
+                                    <%= summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00' %>
+                                </td>
+                            <% }); %>
+                        </tr>
+                        <tr>
+                            <td>Wealth previously taxed:</td>
+                            <% summaries.forEach((summary, index) => { %>
+                                <td>
+                                    <input 
+                                        type="text" 
+                                        value="<%= summary.wealth_already_taxed ? parseFloat(summary.wealth_already_taxed).toFixed(2) : '0.00' %>"
+                                        class="wealth-already-taxed"
+                                        data-end-date="<%= summary.end_date %>"
+                                        <%= index === 0 ? '' : 'disabled' %>
+                                    />
+                                    <% if (index === 0) { %>
+                                        <button class="save-button" data-end-date="<%= summary.end_date %>">S</button>
+                                    <% } %>
+                                </td>
+                            <% }); %>
+                        </tr>
+                        <tr>
+                            <td>Wealth being taxed today:</td>
+                            <% summaries.forEach(summary => { %>
+                                <td class="summary-value" data-end-date="<%= summary.end_date %>">
+                                    <%= (parseFloat(summary.total_assets || 0) - 
+                                        parseFloat(summary.total_debts || 0) + 
+                                        parseFloat(summary.unnecessary_expenses || 0) - 
+                                        parseFloat(summary.wealth_already_taxed || 0)).toFixed(2) %>
+                                </td>
+                            <% }); %>
+                        </tr>
+                        <tr>
+                            <td>Gold Rate:</td>
+                            <% summaries.forEach(summary => { %>
+                                <td class="gold-rate" data-end-date="<%= summary.end_date %>">
+                                    <%= summary.gold_rate ? parseFloat(summary.gold_rate).toFixed(2) : '0.00' %>
+                                </td>
+                            <% }); %>
+                        </tr>
+                        <tr>
+                            <td>Units of Huquq:</td>
+                            <% summaries.forEach(summary => { %>
+                                <td class="units-of-huquq" data-end-date="<%= summary.end_date %>">
+                                    <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
+                                        ? ((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)).toFixed(2)
+                                        : '0.00' %>
+                                </td>
+                            <% }); %>
+                        </tr>
+                        <tr>
+                            <td>Rounded Units:</td>
+                            <% summaries.forEach(summary => { %>
+                                <td class="rounded-units" data-end-date="<%= summary.end_date %>">
+                                    <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
+                                        ? Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate))
+                                        : '0' %>
+                                </td>
+                            <% }); %>
+                        </tr>
+                        <tr>
+                            <td>Huquq Payment Owed:</td>
+                            <% summaries.forEach(summary => { %>
+                                <td class="payment-owed" data-end-date="<%= summary.end_date %>">
+                                    <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate) 
+                                        ? (0.19 * Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)) * parseFloat(summary.gold_rate)).toFixed(2) 
+                                        : '0.00' %>
+                                </td>
+                            <% }); %>
+                        </tr>
+                        <tr>
+                            <td>Huquq Payments Made:</td>
+                            <% summaries.forEach(summary => { %>
+                                <td class="huquq-payments-made" data-end-date="<%= summary.end_date %>">
+                                    <input 
+                                        type="text" 
+                                        value="<%= summary.huquq_payments_made ? parseFloat(summary.huquq_payments_made).toFixed(2) : '0.00' %>" 
+                                        data-end-date="<%= summary.end_date %>"
+                                    />
+                                    <button class="save-huquq-payments" data-end-date="<%= summary.end_date %>">S</button>
+                                </td>
+                            <% }); %>
+                        </tr>
+                        <tr>
+                            <td>Remainder Due:</td>
+                            <% summaries.forEach(summary => { %>
+                                <td class="remainder-due" data-end-date="<%= summary.end_date %>">
+                                    <%= (summary.total_assets && summary.total_debts && summary.unnecessary_expenses && summary.wealth_already_taxed && summary.gold_rate && summary.huquq_payments_made) 
+                                        ? ((0.19 * Math.floor((parseFloat(summary.total_assets) - parseFloat(summary.total_debts) + parseFloat(summary.unnecessary_expenses) - parseFloat(summary.wealth_already_taxed)) / parseFloat(summary.gold_rate)) * parseFloat(summary.gold_rate)) - parseFloat(summary.huquq_payments_made)).toFixed(2) 
+                                        : '0.00' %>
+                                </td>
+                            <% }); %>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
