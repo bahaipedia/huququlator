@@ -180,11 +180,15 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
 // Add a new label
 document.querySelector('.dashboard-table').addEventListener('click', event => {
     if (event.target.classList.contains('add-item-button')) {
-        const category = event.target.classList.contains('asset-button')
-            ? 'Assets'
-            : event.target.classList.contains('debt-button')
-            ? 'Debts'
-            : 'Expenses';
+        let category = '';
+
+        if (event.target.classList.contains('asset-button')) {
+            category = 'Assets';
+        } else if (event.target.classList.contains('debt-button')) {
+            category = 'Debts';
+        } else if (event.target.classList.contains('expense-button')) {
+            category = 'Expenses';
+        }
 
         const label = prompt(`Enter the label name for the new ${category}:`);
         if (label) {
