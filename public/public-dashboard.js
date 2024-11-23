@@ -1,24 +1,38 @@
-// Add a New Reporting Period
 document.querySelector('.add-year-button').addEventListener('click', () => {
     const endDate = prompt('Enter the end date for the new reporting period (YYYY-MM-DD):');
-    if (endDate) {
-        // Simulate adding the new reporting period locally
-        summaries.push({
-            id: Date.now(), // Generate unique ID
-            end_date: endDate,
-            total_assets: 0,
-            total_debts: 0,
-            unnecessary_expenses: 0,
-            wealth_already_taxed: 0,
-            gold_rate: 0,
-            huquq_payments_made: 0,
-        });
-
-        // Re-render the table to show the new column
-        renderTable();
-        alert('New reporting period added successfully!');
+    if (!endDate) {
+        alert('Please select a valid date.');
+        return;
     }
+
+    if (summaries.some(summary => summary.end_date === endDate)) {
+        alert('This date already exists.');
+        return;
+    }
+
+    // Simulate adding the new reporting period locally
+    summaries.push({
+        id: Date.now(), // Generate unique ID
+        end_date: endDate,
+        total_assets: 0,
+        total_debts: 0,
+        unnecessary_expenses: 0,
+        wealth_already_taxed: 0,
+        gold_rate: 0,
+        huquq_payments_made: 0,
+    });
+
+    // Enable previously disabled inputs
+    const tableBody = document.querySelector('.dashboard-table tbody');
+    const newInputs = tableBody.querySelectorAll('input[data-editable="false"]');
+    newInputs.forEach(input => {
+        input.disabled = false;
+        input.setAttribute('data-editable', 'true');
+    });
+
+    renderTable(); // Update the UI to include the new column
 });
+
 
 // Render the updated table
 function renderTable() {
