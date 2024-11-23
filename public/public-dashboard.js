@@ -1,3 +1,36 @@
+// Add a new reporting period when the user selects a date
+function addNewYearColumn(event) {
+    const endDate = event.target.value;
+
+    // Validate the selected date
+    if (!endDate) {
+        return; // Exit if no date is provided
+    }
+
+    // Check if the date already exists
+    if (summaries.some(summary => summary.end_date === endDate)) {
+        return; // Exit if the date already exists
+    }
+
+    // Add the new reporting period to the summaries array
+    summaries.push({
+        id: Date.now(), // Generate a unique ID
+        end_date: endDate,
+        total_assets: 0,
+        total_debts: 0,
+        unnecessary_expenses: 0,
+        wealth_already_taxed: 0,
+        gold_rate: 0,
+        huquq_payments_made: 0,
+    });
+
+    // Re-render the table to include the new column
+    renderTable();
+
+    // Clear the input value
+    event.target.value = '';
+}
+
 document.querySelector('.add-year-button').addEventListener('click', () => {
     const endDate = prompt('Enter the end date for the new reporting period (YYYY-MM-DD):');
     if (!endDate) {
@@ -32,7 +65,6 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
 
     renderTable(); // Update the UI to include the new column
 });
-
 
 // Render the updated table
 function renderTable() {
@@ -160,38 +192,3 @@ document.querySelectorAll('.financial-input').forEach(input => {
     });
 });
 
-// Add a new reporting period when the user selects a date
-function addNewYearColumn(event) {
-    const endDate = event.target.value;
-
-    // Validate the selected date
-    if (!endDate) {
-        alert('Please select a valid date.');
-        return;
-    }
-
-    // Check if the date already exists
-    if (summaries.some(summary => summary.end_date === endDate)) {
-        alert('This date already exists.');
-        return;
-    }
-
-    // Add the new reporting period to the summaries array
-    summaries.push({
-        id: Date.now(), // Generate a unique ID
-        end_date: endDate,
-        total_assets: 0,
-        total_debts: 0,
-        unnecessary_expenses: 0,
-        wealth_already_taxed: 0,
-        gold_rate: 0,
-        huquq_payments_made: 0,
-    });
-
-    // Re-render the table to include the new column
-    renderTable();
-
-    // Clear the input value
-    event.target.value = '';
-    alert('New reporting period added successfully!');
-}
