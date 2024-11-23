@@ -69,6 +69,9 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
 // Render the updated table
 function renderTable() {
     const tableHead = document.querySelector('.dashboard-table thead tr');
+    const tableBody = document.querySelector('.dashboard-table tbody');
+
+    // Update the table header
     tableHead.innerHTML = `
         <th>Accounts</th>
         ${summaries.map(summary => `
@@ -78,11 +81,50 @@ function renderTable() {
             </th>
         `).join('')}
         <th>
-            <input type="date" class="new-year-input" onchange="addNewYearColumn(event)" />
+            <input 
+                type="date" 
+                class="new-year-input" 
+                placeholder="Select a reporting date" 
+                onchange="addNewYearColumn(event)" 
+            />
         </th>
     `;
 
-    // You can expand this to include body rows as needed.
+    // Clear and re-render body rows for Assets, Debts, and Expenses
+    tableBody.innerHTML = ''; // Clear existing rows
+    ['Assets', 'Debts', 'Expenses'].forEach(category => {
+        const categoryEntries = entryMap.filter(entry => entry.category === category);
+
+        tableBody.innerHTML += `
+            <tr class="section-row">
+                <td colspan="${summaries.length + 2}" class="section-title">${category}</td>
+            </tr>
+            ${categoryEntries.map(entry => `
+                <tr>
+                    <td>
+                        ${entry.label}
+                        <button class="delete-item-button" data-label-id="${entry.id}">D</button>
+                    </td>
+                    ${summaries.map(summary => `
+                        <td>
+                            <input 
+                                type="text" 
+                                class="financial-input" 
+                                data-label-id="${entry.id}" 
+                                data-reporting-date="${summary.end_date}" 
+                                value="${entry.values.find(v => v.reportingDate === summary.end_date)?.value || '0.00'}" 
+                            />
+                        </td>
+                    `).join('')}
+                </tr>
+            `).join('')}
+            <tr>
+                <td colspan="${summaries.length + 2}">
+                    <button class="add-item-button ${category.toLowerCase()}-button">Add a New ${category.slice(0, -1)}</button>
+                </td>
+            </tr>
+        `;
+    });
 }
 
 // Delete a Reporting Period
