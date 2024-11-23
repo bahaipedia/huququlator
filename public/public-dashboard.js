@@ -1,64 +1,58 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Add a New Reporting Period
-    const addYearButton = document.querySelector('.add-year-button');
-    if (addYearButton) {
-        addYearButton.addEventListener('click', () => {
-            const endDate = prompt('Enter the end date for the new reporting period (YYYY-MM-DD):');
-            if (endDate) {
-                if (summaries.some(summary => summary.end_date === endDate)) {
-                    alert('This date already exists.');
-                    return;
-                }
-
-                summaries.push({
-                    id: Date.now(),
-                    end_date: endDate,
-                    total_assets: 0,
-                    total_debts: 0,
-                    unnecessary_expenses: 0,
-                    wealth_already_taxed: 0,
-                    gold_rate: 0,
-                    huquq_payments_made: 0,
-                });
-
-                renderTable();
-                alert('New reporting period added successfully!');
-            }
+// Add a New Reporting Period
+document.querySelector('.add-year-button').addEventListener('click', () => {
+    const endDate = prompt('Enter the end date for the new reporting period (YYYY-MM-DD):');
+    if (endDate) {
+        // Simulate adding the new reporting period locally
+        summaries.push({
+            id: Date.now(), // Generate unique ID
+            end_date: endDate,
+            total_assets: 0,
+            total_debts: 0,
+            unnecessary_expenses: 0,
+            wealth_already_taxed: 0,
+            gold_rate: 0,
+            huquq_payments_made: 0,
         });
+
+        // Re-render the table to show the new column
+        renderTable();
+        alert('New reporting period added successfully!');
     }
+});
 
-    // Render the updated table
-    function renderTable() {
-        const tableHead = document.querySelector('.dashboard-table thead tr');
-        const tableBody = document.querySelector('.dashboard-table tbody');
-
-        if (!tableHead || !tableBody) return;
-
-        tableHead.innerHTML = `
-            <th>Accounts</th>
-            ${summaries.map(summary => `
-                <th data-date="${summary.end_date}">
-                    ${new Date(summary.end_date).toISOString().split('T')[0]}
-                    <button class="delete-year-button" data-entry-id="${summary.id}">Delete</button>
-                </th>
-            `).join('')}
-            <th>
-                <input type="date" class="new-year-input" onchange="addNewYearColumn(event)" />
+// Render the updated table
+function renderTable() {
+    const tableHead = document.querySelector('.dashboard-table thead tr');
+    tableHead.innerHTML = `
+        <th>Accounts</th>
+        ${summaries.map(summary => `
+            <th data-date="${summary.end_date}">
+                ${new Date(summary.end_date).toISOString().split('T')[0]}
+                <button class="delete-year-button" data-entry-id="${summary.id}">Delete</button>
             </th>
-        `;
+        `).join('')}
+        <th>
+            <input type="date" class="new-year-input" onchange="addNewYearColumn(event)" />
+        </th>
+    `;
 
-        // Add logic for table body updates as necessary
-    }
+    // You can expand this to include body rows as needed.
+}
 
-    // Delete a Reporting Period
-    document.querySelector('.dashboard-table').addEventListener('click', (event) => {
-        if (event.target.classList.contains('delete-year-button')) {
-            const entryId = event.target.dataset.entryId;
+// Delete a Reporting Period
+document.querySelector('.dashboard-table').addEventListener('click', (event) => {
+    if (event.target.classList.contains('delete-year-button')) {
+        const entryId = event.target.dataset.entryId;
+
+        if (confirm('Are you sure you want to delete this year? This action cannot be undone.')) {
+            // Simulate deletion by removing the entry from summaries
             summaries = summaries.filter(summary => summary.id !== parseInt(entryId, 10));
+
+            // Re-render the table to reflect changes
             renderTable();
-            alert('Reporting period deleted successfully!');
+            alert('Reporting period deleted.');
         }
-    });
+    }
 });
 
 // Add a New Asset, Debt, or Expense
