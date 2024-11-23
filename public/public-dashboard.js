@@ -1,236 +1,212 @@
-// Add a new reporting period when the user selects a date
-function addNewYearColumn(event) {
-    const endDate = event.target.value;
+// Use variables passed from the server
+let localSummaries = summaries; // Passed from the EJS template
+let localLabels = labels; // Passed from the EJS template
+let localEntries = {}; // Dynamically built from entryMap
 
-    // Validate the selected date
-    if (!endDate) {
-        return; // Exit if no date is provided
-    }
-
-    // Check if the date already exists
-    if (summaries.some(summary => summary.end_date === endDate)) {
-        return; // Exit if the date already exists
-    }
-
-    // Add the new reporting period to the summaries array
-    summaries.push({
-        id: Date.now(), // Generate a unique ID
-        end_date: endDate,
-        total_assets: 0,
-        total_debts: 0,
-        unnecessary_expenses: 0,
-        wealth_already_taxed: 0,
-        gold_rate: 0,
-        huquq_payments_made: 0,
-    });
-
-    // Re-render the table to include the new column
-    renderTable();
-
-    // Clear the input value
-    event.target.value = '';
-}
-
-document.querySelector('.add-year-button').addEventListener('click', () => {
-    const endDate = prompt('Enter the end date for the new reporting period (YYYY-MM-DD):');
-    if (!endDate) {
-        alert('Please select a valid date.');
-        return;
-    }
-
-    if (summaries.some(summary => summary.end_date === endDate)) {
-        alert('This date already exists.');
-        return;
-    }
-
-    // Simulate adding the new reporting period locally
-    summaries.push({
-        id: Date.now(), // Generate unique ID
-        end_date: endDate,
-        total_assets: 0,
-        total_debts: 0,
-        unnecessary_expenses: 0,
-        wealth_already_taxed: 0,
-        gold_rate: 0,
-        huquq_payments_made: 0,
-    });
-
-    // Enable previously disabled inputs
-    const tableBody = document.querySelector('.dashboard-table tbody');
-    const newInputs = tableBody.querySelectorAll('input[data-editable="false"]');
-    newInputs.forEach(input => {
-        input.disabled = false;
-        input.setAttribute('data-editable', 'true');
-    });
-
-    renderTable(); // Update the UI to include the new column
+// Initialize localEntries based on the entryMap
+entryMap.forEach(entry => {
+    localEntries[entry.id] = {
+        category: entry.category,
+        label: entry.label,
+        values: entry.values.map(value => ({
+            reportingDate: value.reportingDate,
+            value: parseFloat(value.value) || 0,
+        })),
+    };
 });
 
-// Render the updated table
-function renderTable() {
-    const tableHead = document.querySelector('.dashboard-table thead tr');
+// Utility function to render the dashboard
+function renderDashboard() {
     const tableBody = document.querySelector('.dashboard-table tbody');
+    const summaryTableBody = document.querySelector('.summary-table tbody');
 
-    // Update the table header
-    tableHead.innerHTML = `
-        <th>Accounts</th>
-        ${summaries.map(summary => `
-            <th data-date="${summary.end_date}">
-                ${new Date(summary.end_date).toISOString().split('T')[0]}
-                <button class="delete-year-button" data-entry-id="${summary.id}">Delete</button>
-            </th>
-        `).join('')}
-        <th>
-            <input 
-                type="date" 
-                class="new-year-input" 
-                placeholder="Select a reporting date" 
-                onchange="addNewYearColumn(event)" 
-            />
-        </th>
-    `;
+    // Clear existing rows
+    tableBody.innerHTML = '';
+    summaryTableBody.innerHTML = '';
 
-    // Clear and re-render body rows for Assets, Debts, and Expenses
-    tableBody.innerHTML = ''; // Clear existing rows
+    // Render sections for Assets, Debts, and Expenses
     ['Assets', 'Debts', 'Expenses'].forEach(category => {
-        const categoryEntries = entryMap.filter(entry => entry.category === category);
+        // Section row
+        const sectionRow = document.createElement('tr');
+        sectionRow.classList.add('section-row');
+        sectionRow.innerHTML = `
+            <td colspan="${localSummaries.length + 1}" class="section-title">${category}</td>
+        `;
+        tableBody.appendChild(sectionRow);
 
-        tableBody.innerHTML += `
-            <tr class="section-row">
-                <td colspan="${summaries.length + 2}" class="section-title">${category}</td>
-            </tr>
-            ${categoryEntries.map(entry => `
-                <tr>
-                    <td>
-                        ${entry.label}
-                        <button class="delete-item-button" data-label-id="${entry.id}">D</button>
-                    </td>
-                    ${summaries.map(summary => `
+        // Entries for the category
+        localLabels.filter(label => label.category === category).forEach(label => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    ${label.label}
+                    <button 
+                        class="delete-item-button" 
+                        data-label-id="${label.id}" 
+                        style="float: right;">
+                        D
+                    </button>
+                </td>
+                ${localSummaries.map(summary => {
+                    const entry = localEntries[label.id]?.values.find(
+                        v => v.reportingDate === summary.end_date
+                    );
+                    return `
                         <td>
                             <input 
                                 type="text" 
-                                class="financial-input" 
-                                data-label-id="${entry.id}" 
-                                data-reporting-date="${summary.end_date}" 
-                                value="${entry.values.find(v => v.reportingDate === summary.end_date)?.value || '0.00'}" 
+                                value="${entry ? entry.value.toFixed(2) : '0.00'}"
+                                data-label-id="${label.id}"
+                                data-reporting-date="${summary.end_date}"
+                                class="financial-input"
                             />
-                        </td>
-                    `).join('')}
-                </tr>
-            `).join('')}
+                        </td>`;
+                }).join('')}
+            `;
+            tableBody.appendChild(row);
+        });
+
+        // Add button for adding a new label
+        const addRow = document.createElement('tr');
+        addRow.innerHTML = `
+            <td colspan="${localSummaries.length + 1}">
+                <button class="add-item-button ${category.toLowerCase()}-button">Add a New ${category}</button>
+            </td>
+        `;
+        tableBody.appendChild(addRow);
+    });
+
+    // Render summary table rows
+    const summariesHtml = localSummaries.map(summary => {
+        const totalAssets = localLabels
+            .filter(label => label.category === 'Assets')
+            .reduce((sum, label) => {
+                const entry = localEntries[label.id]?.values.find(
+                    v => v.reportingDate === summary.end_date
+                );
+                return sum + (entry ? parseFloat(entry.value) : 0);
+            }, 0);
+
+        const totalDebts = localLabels
+            .filter(label => label.category === 'Debts')
+            .reduce((sum, label) => {
+                const entry = localEntries[label.id]?.values.find(
+                    v => v.reportingDate === summary.end_date
+                );
+                return sum + (entry ? parseFloat(entry.value) : 0);
+            }, 0);
+
+        const unnecessaryExpenses = localLabels
+            .filter(label => label.category === 'Expenses')
+            .reduce((sum, label) => {
+                const entry = localEntries[label.id]?.values.find(
+                    v => v.reportingDate === summary.end_date
+                );
+                return sum + (entry ? parseFloat(entry.value) : 0);
+            }, 0);
+
+        const goldRate = summary.gold_rate || 0;
+        const wealthTaxed = summary.wealth_already_taxed || 0;
+        const wealthBeingTaxed =
+            totalAssets - totalDebts + unnecessaryExpenses - wealthTaxed;
+
+        const unitsOfHuquq = goldRate > 0 ? wealthBeingTaxed / goldRate : 0;
+        const roundedUnits = Math.floor(unitsOfHuquq);
+        const huquqPaymentOwed = 0.19 * roundedUnits * goldRate;
+        const huquqPaymentsMade = summary.huquq_payments_made || 0;
+        const remainderDue = huquqPaymentOwed - huquqPaymentsMade;
+
+        return `
             <tr>
-                <td colspan="${summaries.length + 2}">
-                    <button class="add-item-button ${category.toLowerCase()}-button">Add a New ${category.slice(0, -1)}</button>
-                </td>
+                <td>Total Assets:</td>
+                <td>${totalAssets.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td>Total Debts:</td>
+                <td>${totalDebts.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td>Unnecessary Expenses:</td>
+                <td>${unnecessaryExpenses.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td>Wealth Being Taxed Today:</td>
+                <td>${wealthBeingTaxed.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td>Units of Huquq:</td>
+                <td>${unitsOfHuquq.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td>Rounded Units:</td>
+                <td>${roundedUnits}</td>
+            </tr>
+            <tr>
+                <td>Huquq Payment Owed:</td>
+                <td>${huquqPaymentOwed.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td>Huquq Payments Made:</td>
+                <td>${huquqPaymentsMade.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td>Remainder Due:</td>
+                <td>${remainderDue.toFixed(2)}</td>
             </tr>
         `;
-    });
+    }).join('');
+
+    summaryTableBody.innerHTML = summariesHtml;
 }
 
-// Delete a Reporting Period
-document.querySelector('.dashboard-table').addEventListener('click', (event) => {
-    if (event.target.classList.contains('delete-year-button')) {
-        const entryId = event.target.dataset.entryId;
-
-        if (confirm('Are you sure you want to delete this year? This action cannot be undone.')) {
-            // Simulate deletion by removing the entry from summaries
-            summaries = summaries.filter(summary => summary.id !== parseInt(entryId, 10));
-
-            // Re-render the table to reflect changes
-            renderTable();
-            alert('Reporting period deleted.');
-        }
+// Add a new reporting period
+document.querySelector('.add-year-button').addEventListener('click', () => {
+    const endDate = prompt('Enter the end date for the new reporting period (YYYY-MM-DD):');
+    if (endDate) {
+        localSummaries.push({
+            id: localSummaries.length + 1,
+            end_date: endDate,
+            total_assets: 0,
+            total_debts: 0,
+            unnecessary_expenses: 0,
+            wealth_already_taxed: 0,
+            gold_rate: 0,
+            huquq_payments_made: 0,
+        });
+        renderDashboard();
     }
 });
 
-// Add a New Asset, Debt, or Expense
-document.querySelectorAll('.add-item-button').forEach(button => {
-    button.addEventListener('click', () => {
-        const category = button.classList.contains('asset-button')
+// Add a new label
+document.querySelector('.dashboard-table').addEventListener('click', event => {
+    if (event.target.classList.contains('add-item-button')) {
+        const category = event.target.classList.contains('asset-button')
             ? 'Assets'
-            : button.classList.contains('debt-button')
+            : event.target.classList.contains('debt-button')
             ? 'Debts'
             : 'Expenses';
 
-        const buttonRow = button.closest('tr');
-        const newRow = document.createElement('tr');
-
-        // Temporary row for adding a new label
-        newRow.innerHTML = `
-            <td>
-                <input type="text" placeholder="Label" class="new-item-label" />
-                <button class="save-item-button">Save</button>
-            </td>
-            ${summaries.map(() => `
-                <td>
-                    <input type="number" value="0.00" disabled />
-                </td>
-            `).join('')}
-        `;
-
-        buttonRow.parentNode.insertBefore(newRow, buttonRow);
-
-        // Handle saving the new label
-        newRow.querySelector('.save-item-button').addEventListener('click', () => {
-            const label = newRow.querySelector('.new-item-label').value.trim();
-
-            if (!label) {
-                alert('Please enter a valid label.');
-                return;
-            }
-
-            // Add the new label locally
-            entryMap.push({
-                id: Date.now(),
+        const label = prompt(`Enter the label name for the new ${category}:`);
+        if (label) {
+            localLabels.push({
+                id: localLabels.length + 1,
                 category,
                 label,
-                values: summaries.map(summary => ({
-                    reportingDate: summary.end_date,
-                    value: 0,
-                })),
             });
-
-            // Re-render the table or dynamically update rows
-            renderTable();
-            alert(`${category} label added successfully!`);
-        });
-    });
-});
-
-// Delete an Asset, Debt, or Expense
-document.querySelector('.dashboard-table').addEventListener('click', (event) => {
-    if (event.target.classList.contains('delete-item-button')) {
-        const labelId = event.target.dataset.labelId;
-
-        if (confirm('Are you sure you want to delete this label and all associated entries?')) {
-            // Simulate deletion by removing the label from entryMap
-            entryMap = entryMap.filter(entry => entry.id !== parseInt(labelId, 10));
-
-            // Re-render the table to reflect changes
-            renderTable();
-            alert('Label deleted successfully.');
+            renderDashboard();
         }
     }
 });
 
-// Handle financial input updates
-document.querySelectorAll('.financial-input').forEach(input => {
-    input.addEventListener('blur', (event) => {
-        const inputElement = event.target;
-        const value = inputElement.value.trim();
-        const labelId = inputElement.dataset.labelId;
-        const reportingDate = inputElement.dataset.reportingDate;
-
-        // Find the entry and update its value locally
-        const entry = entryMap.find(entry => entry.id === parseInt(labelId, 10));
-        if (entry) {
-            const valueEntry = entry.values.find(v => v.reportingDate === reportingDate);
-            if (valueEntry) {
-                valueEntry.value = parseFloat(value) || 0;
-            }
-        }
-
-        // Optionally recalculate summaries here
-    });
+// Delete a label
+document.querySelector('.dashboard-table').addEventListener('click', event => {
+    if (event.target.classList.contains('delete-item-button')) {
+        const labelId = parseInt(event.target.dataset.labelId, 10);
+        localLabels = localLabels.filter(label => label.id !== labelId);
+        delete localEntries[labelId];
+        renderDashboard();
+    }
 });
 
+// Initial rendering
+renderDashboard();
