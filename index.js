@@ -196,11 +196,18 @@ app.get('/public-dashboard', checkLoginStatus, (req, res) => {
     const summaries = [
         { end_date: '2023-12-31', id: 1, total_assets: 0, total_debts: 0, unnecessary_expenses: 0, wealth_already_taxed: 0, gold_rate: 0, huquq_payments_made: 0 }
     ];
+    
+    const entryMap = [
+        { id: 1, category: 'Assets', label: 'Total assets', values: [{ reportingDate: '2023-12-31', value: 0 }] },
+        { id: 2, category: 'Debts', label: 'Total debts', values: [{ reportingDate: '2023-12-31', value: 0 }] },
+        { id: 3, category: 'Expenses', label: 'Total expenses', values: [{ reportingDate: '2023-12-31', value: 0 }] }
+    ];
 
     res.render('public-dashboard', { 
         loggedIn: req.loggedIn, 
         username: req.username, 
-        summaries 
+        summaries,
+        entryMap 
     });
 });
 
