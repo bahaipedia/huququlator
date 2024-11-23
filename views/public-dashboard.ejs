@@ -54,14 +54,23 @@
                                 </td>
                             <% }); %>
                             <td>
-                                <input type="text" class="financial-input" disabled placeholder="New entry" />
+                                <input 
+                                    type="text" 
+                                    class="financial-input" 
+                                    disabled 
+                                    placeholder="New entry" 
+                                    data-editable="false" 
+                                />
                             </td>
                         </tr>
                         <% entryMap.filter(entry => entry.category === 'Assets').forEach(entry => { %>
                         <tr>
                             <td>
                                 <%= entry.label %>
-                                <button class="delete-item-button" data-label-id="<%= entry.id %>" style="float: right;">D</button>
+                                <button 
+                                    class="delete-item-button" 
+                                    data-label-id="<%= entry.id %>" 
+                                    style="float: right;">D</button>
                             </td>
                             <% summaries.forEach(() => { %>
                                 <td>
