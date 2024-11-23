@@ -180,9 +180,9 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
 // Add a new label
 document.querySelector('.dashboard-table').addEventListener('click', event => {
     if (event.target.classList.contains('add-item-button')) {
-        const category = event.target.classList.contains('asset-button')
+        const category = event.target.classList.contains('assets-button')
             ? 'Assets'
-            : event.target.classList.contains('debt-button')
+            : event.target.classList.contains('debts-button')
             ? 'Debts'
             : 'Expenses';
 
