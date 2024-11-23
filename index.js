@@ -191,6 +191,10 @@ app.get('/help', checkLoginStatus, (req, res) => {
     res.render('help', { loggedIn: req.loggedIn, username: req.username });
 });
 
+app.get('/public-dashboard', checkLoginStatus, (req, res) => {
+    res.render('public-dashboard', { loggedIn: req.loggedIn, username: req.username });
+});
+
 app.get('/register', (req, res) => {
     res.render('register', { loggedIn: false });
 });
@@ -828,10 +832,10 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
-            INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
+            INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, _rate)
             VALUES (?, ?, ?, ?, ?)
         `;
-        await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, goldRate]);
+        await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, Rate]);
 
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
