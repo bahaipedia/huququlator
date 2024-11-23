@@ -192,7 +192,16 @@ app.get('/help', checkLoginStatus, (req, res) => {
 });
 
 app.get('/public-dashboard', checkLoginStatus, (req, res) => {
-    res.render('public-dashboard', { loggedIn: req.loggedIn, username: req.username });
+    // Placeholder data for offline use
+    const summaries = [
+        { end_date: '2023-12-31', id: 1, total_assets: 0, total_debts: 0, unnecessary_expenses: 0, wealth_already_taxed: 0, gold_rate: 0, huquq_payments_made: 0 }
+    ];
+
+    res.render('public-dashboard', { 
+        loggedIn: req.loggedIn, 
+        username: req.username, 
+        summaries 
+    });
 });
 
 app.get('/register', (req, res) => {
