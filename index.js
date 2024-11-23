@@ -192,16 +192,29 @@ app.get('/help', checkLoginStatus, (req, res) => {
 });
 
 app.get('/public-dashboard', checkLoginStatus, (req, res) => {
-    // Placeholder data for offline use
-    const summaries = [];
-    
-    const entryMap = [];
+    const labels = [
+        // Example placeholder labels for demonstration
+        { id: 1, category: 'Assets', label: 'Total' },
+        { id: 2, category: 'Debts', label: 'Total' },
+        { id: 3, category: 'Expenses', label: 'Total' },
+    ];
 
-    res.render('public-dashboard', { 
-        loggedIn: req.loggedIn, 
-        username: req.username, 
+    const summaries = [];
+    const entries = [];
+    const entryMap = labels.map(label => ({
+        id: label.id,
+        category: label.category,
+        label: label.label,
+        values: [], // Start with no values
+    }));
+
+    res.render('public-dashboard', {
+        loggedIn: false,
+        username: null,
         summaries,
-        entryMap 
+        labels,
+        entries,
+        entryMap,
     });
 });
 
