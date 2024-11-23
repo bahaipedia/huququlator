@@ -212,18 +212,19 @@ document.querySelector('.dashboard-table').addEventListener('click', event => {
 renderDashboard();
 
 // Handle focus event to clear "0.00" values
-document.querySelectorAll('.financial-input').forEach(input => {
-    input.addEventListener('focus', (event) => {
-        if (event.target.value === '0.00') {
-            event.target.value = ''; // Clear the input for easier typing
-        }
-    });
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.financial-input').forEach(input => {
+        input.addEventListener('focus', (event) => {
+            if (event.target.value === '0.00') {
+                event.target.value = ''; // Clear the input for easier typing
+            }
+        });
 
-    // Restore "0.00" if left empty on blur
-    input.addEventListener('blur', (event) => {
-        if (event.target.value.trim() === '') {
-            event.target.value = '0.00';
-        }
+        input.addEventListener('blur', (event) => {
+            if (event.target.value.trim() === '') {
+                event.target.value = '0.00'; // Restore "0.00" if left empty
+            }
+        });
     });
 });
 
