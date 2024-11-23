@@ -180,16 +180,54 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
 // Add a new label
 document.querySelector('.dashboard-table').addEventListener('click', event => {
     if (event.target.classList.contains('add-item-button')) {
-        const category = event.target.getAttribute('data-category');
-        const label = prompt(`Enter the label name for the new ${category}:`);
-        if (label) {
+        // Determine the category of the clicked button
+        const category = event.target.classList.contains('asset-button')
+            ? 'Assets'
+            : event.target.classList.contains('debt-button')
+            ? 'Debts'
+            : 'Expenses';
+
+        // Find the correct section in the table
+        const sectionRows = Array.from(document.querySelectorAll('.section-title'));
+        const sectionRow = sectionRows.find(row => row.textContent.trim() === category);
+        const tbody = sectionRow.closest('tbody');
+
+        // Create a new row for the label
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>
+                <input type="text" placeholder="Label" class="new-item-label" />
+                <button class="save-item-button">Save</button>
+            </td>
+            ${localSummaries.map(() => `
+                <td>
+                    <input type="number" value="0.00" disabled />
+                </td>`).join('')}
+        `;
+
+        // Append the row after the section title row
+        tbody.insertBefore(newRow, sectionRow.nextSibling);
+
+        // Handle saving the new label
+        newRow.querySelector('.save-item-button').addEventListener('click', () => {
+            const label = newRow.querySelector('.new-item-label').value.trim();
+
+            if (!label) {
+                alert('Please enter a valid label.');
+                return;
+            }
+
+            // Add the label to the correct category
             localLabels.push({
                 id: localLabels.length + 1,
                 category,
                 label,
             });
+
+            // Remove the temporary input row and re-render the table
+            newRow.remove();
             renderDashboard();
-        }
+        });
     }
 });
 
