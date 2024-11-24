@@ -849,17 +849,17 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         const huquqPaymentsMade = previousSummary.length > 0 
             ? parseFloat(previousSummary[0].huquq_payments_made) || 0 
             : 0;
-logger.info('area4');  
+
         // Calculate the new wealth_already_taxed by adding the payment adjustment
         const updatedWealthAlreadyTaxed = wealthAlreadyTaxed + (huquqPaymentsMade * (100 / 19));
-logger.info('area5');  
+logger.info(`updatedWealthAlreadyTaxed: ${updatedWealthAlreadyTaxed}`);
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
-            INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, _rate)
+            INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
             VALUES (?, ?, ?, ?, ?)
         `;
         await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, Rate]);
-logger.info('area6');  
+ 
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
             SELECT 
