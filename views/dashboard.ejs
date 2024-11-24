@@ -155,7 +155,7 @@
                     <tr>
                         <th>Summary</th>
                         <% summaries.forEach((summary) => { %>
-                            <th><%= new Date(summary.end_date).toLocaleDateString() %></th>
+                            <th><%= new Date(summary.end_date).toISOString().split('T')[0] %></th>
                         <% }); %>
                     </tr>
                 </thead>
