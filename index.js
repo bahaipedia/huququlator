@@ -858,7 +858,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
             VALUES (?, ?, ?, ?, ?)
         `;
-logger.info(`Executing query: ${insertQuery} with values: userId=${userId}, startDate=${startDate}, end_date=${end_date}, updatedWealthAlreadyTaxed=${updatedWealthAlreadyTaxed}, gold_rate=${goldRate}`);
+
         await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, goldRate]);
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
@@ -870,7 +870,7 @@ logger.info(`Executing query: ${insertQuery} with values: userId=${userId}, star
             JOIN financial_labels fl ON fv.label_id = fl.id
             WHERE fl.user_id = ? AND fv.reporting_date = ?
         `, [userId, end_date]);
-logger.info(`area4`);
+
         const { total_assets, total_debts, unnecessary_expenses } = totals[0];
 
         // Update the new reporting period with calculated totals
