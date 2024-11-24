@@ -849,18 +849,19 @@ logger.info(`aread`);
         const huquqPaymentsMade = previousSummary.length > 0 
             ? parseFloat(previousSummary[0].huquq_payments_made) || 0 
             : 0;
-logger.info(`areae ${wealthAlreadyTaxed} and ${huquqPaymentsMade}`);
+logger.info(`area1 ${wealthAlreadyTaxed} and ${huquqPaymentsMade}`);
         // Calculate the new wealth_already_taxed by adding the payment adjustment
         const updatedWealthAlreadyTaxed = wealthAlreadyTaxed + (huquqPaymentsMade * (100 / 19));
+logger.info(`area2`);   
 logger.info(`Inserting into financial_summary: user_id=${userId}, start_date=${startDate}, end_date=${endDate}, wealth_already_taxed=${wealthAlreadyTaxed}, gold_rate=${goldRate}`);
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
             VALUES (?, ?, ?, ?, ?)
         `;
-logger.info(`area2`);
+logger.info(`area2a`);
         await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, Rate]);
-logger.info(`area3`);
+logger.info(`area3b`);
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
             SELECT 
