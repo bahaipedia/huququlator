@@ -853,7 +853,6 @@ logger.info(`area1 ${wealthAlreadyTaxed} and ${huquqPaymentsMade}`);
         // Calculate the new wealth_already_taxed by adding the payment adjustment
         const updatedWealthAlreadyTaxed = wealthAlreadyTaxed + (huquqPaymentsMade * (100 / 19));
 logger.info(`area2`);   
-logger.info(`Inserting into financial_summary: user_id=${userId}, start_date=${startDate}, end_date=${endDate}, wealth_already_taxed=${wealthAlreadyTaxed}, gold_rate=${goldRate}`);
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
