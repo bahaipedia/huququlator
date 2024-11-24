@@ -799,7 +799,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
     }
-
+logger.info(area1);
     try {
         const { end_date } = req.body; // Expected format: YYYY-MM-DD
         const userId = req.userId;
@@ -820,7 +820,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
                 throw new Error('Failed to fetch gold rate.');
             }
         }
-
+logger.info(area2);
         // Fetch the previous reporting period's end_date
         const [previousPeriod] = await pool.query(
             'SELECT end_date FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
@@ -835,7 +835,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         const startDate = lastEndDate 
             ? new Date(lastEndDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] 
             : null;
-
+logger.info(area3);
         // Fetch the previous reporting period's wealth_already_taxed and huquq_payments_made
         const [previousSummary] = await pool.query(
             'SELECT wealth_already_taxed, huquq_payments_made FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
@@ -852,14 +852,14 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
 
         // Calculate the new wealth_already_taxed by adding the payment adjustment
         const updatedWealthAlreadyTaxed = wealthAlreadyTaxed + (huquqPaymentsMade * (100 / 19));
-        
+   logger.info(area4);     
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, _rate)
             VALUES (?, ?, ?, ?, ?)
         `;
         await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, Rate]);
-
+logger.info(area5);
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
             SELECT 
@@ -872,7 +872,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
         `, [userId, end_date]);
 
         const { total_assets, total_debts, unnecessary_expenses } = totals[0];
-
+logger.info(area6);
         // Update the new reporting period with calculated totals
         const updateQuery = `
             UPDATE financial_summary
@@ -880,7 +880,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             WHERE user_id = ? AND end_date = ?
         `;
         await pool.query(updateQuery, [total_assets, total_debts, unnecessary_expenses, userId, end_date]);
-
+logger.info(area7);
         res.status(201).json({ message: 'New reporting period added successfully!' });
     } catch (error) {
         console.error('Error adding reporting period:', error.message, error.stack);
