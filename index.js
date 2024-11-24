@@ -835,13 +835,17 @@ logger.info('area2');
         const startDate = lastEndDate 
             ? new Date(lastEndDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] 
             : null;
-logger.info('area3');
+logger.info('area3: Fetching previous reporting period\'s wealth_already_taxed and huquq_payments_made for user_id:', userId);
         // Fetch the previous reporting period's wealth_already_taxed and huquq_payments_made
         const [previousSummary] = await pool.query(
             'SELECT wealth_already_taxed, huquq_payments_made FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
             [userId]
         );
-
+if (previousSummary) {
+    logger.info(`area3: Fetched values - wealth_already_taxed: ${previousSummary.wealth_already_taxed}, huquq_payments_made: ${previousSummary.huquq_payments_made}`);
+} else {
+    logger.info('area3: No previous summary found for user_id:', userId);
+}
         const wealthAlreadyTaxed = previousSummary.length > 0 
             ? parseFloat(previousSummary[0].wealth_already_taxed) || 0 
             : 0;
