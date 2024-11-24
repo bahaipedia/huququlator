@@ -858,14 +858,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
             VALUES (?, ?, ?, ?, ?)
         `;
-logger.info(`Executing query: ${insertQuery}`);
-logger.info('With values:', {
-    userId,
-    startDate,
-    end_date,
-    updatedWealthAlreadyTaxed,
-    gold_rate
-});
+logger.info(`Executing query: ${insertQuery} with values: userId=${userId}, startDate=${startDate}, end_date=${end_date}, updatedWealthAlreadyTaxed=${updatedWealthAlreadyTaxed}, gold_rate=${gold_rate}`);
         await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, gold_rate]);
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
