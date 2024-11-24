@@ -865,14 +865,7 @@ logger.info('Attempting to insert with values:', {
             VALUES (?, ?, ?, ?, ?)
         `;
         await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, Rate]);
-} catch (error) {
-    logger.error('Database insertion failed:', {
-        error: error.message,
-        code: error.code,
-        sqlMessage: error.sqlMessage
-    });
-    throw error;
-}
+logger.info('area5');
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
             SELECT 
