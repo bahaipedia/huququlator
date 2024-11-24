@@ -852,14 +852,15 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
 
         // Calculate the new wealth_already_taxed by adding the payment adjustment
         const updatedWealthAlreadyTaxed = wealthAlreadyTaxed + (huquqPaymentsMade * (100 / 19));
-logger.info(`updatedWealthAlreadyTaxed: ${updatedWealthAlreadyTaxed}`);
+logger.info(`area1`);
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
             VALUES (?, ?, ?, ?, ?)
         `;
+logger.info(`area2`);
         await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, Rate]);
- 
+logger.info(`area3`);
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
             SELECT 
@@ -870,7 +871,7 @@ logger.info(`updatedWealthAlreadyTaxed: ${updatedWealthAlreadyTaxed}`);
             JOIN financial_labels fl ON fv.label_id = fl.id
             WHERE fl.user_id = ? AND fv.reporting_date = ?
         `, [userId, end_date]);
-
+logger.info(`area4`);
         const { total_assets, total_debts, unnecessary_expenses } = totals[0];
 
         // Update the new reporting period with calculated totals
