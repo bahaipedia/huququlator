@@ -826,41 +826,47 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
             'SELECT end_date FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
             [userId]
         );
-logger.info(`Previous known end_date: ${end_date}`);
+
         const lastEndDate = previousPeriod.length > 0 
             ? new Date(previousPeriod[0].end_date) 
             : null;
-logger.info(`areaa`);
+
         // Calculate the start_date for the new period
         const startDate = lastEndDate 
             ? new Date(lastEndDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] 
             : null;
-logger.info(`areab`);
+
         // Fetch the previous reporting period's wealth_already_taxed and huquq_payments_made
         const [previousSummary] = await pool.query(
             'SELECT wealth_already_taxed, huquq_payments_made FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
             [userId]
         );
-logger.info(`areac`);
+
         const wealthAlreadyTaxed = previousSummary.length > 0 
             ? parseFloat(previousSummary[0].wealth_already_taxed) || 0 
             : 0;
-logger.info(`aread`);
+
         const huquqPaymentsMade = previousSummary.length > 0 
             ? parseFloat(previousSummary[0].huquq_payments_made) || 0 
             : 0;
-logger.info(`area1 ${wealthAlreadyTaxed} and ${huquqPaymentsMade}`);
+
         // Calculate the new wealth_already_taxed by adding the payment adjustment
         const updatedWealthAlreadyTaxed = wealthAlreadyTaxed + (huquqPaymentsMade * (100 / 19));
-logger.info(`area2`);   
+
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, gold_rate)
             VALUES (?, ?, ?, ?, ?)
         `;
-logger.info(`area2a`);
-        await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, Rate]);
-logger.info(`area3b`);
+logger.info(`Executing query: ${insertQuery}`);
+logger.info('With values:', {
+    userId,
+    startDate,
+    end_date,
+    updatedWealthAlreadyTaxed,
+    gold_rate
+});
+        await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, gold_rate]);
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
             SELECT 
