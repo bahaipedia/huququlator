@@ -799,7 +799,7 @@ app.post('/api/summary', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
     }
-logger.info('area1');
+
     try {
         const { end_date } = req.body; // Expected format: YYYY-MM-DD
         const userId = req.userId;
@@ -820,7 +820,7 @@ logger.info('area1');
                 throw new Error('Failed to fetch gold rate.');
             }
         }
-logger.info('area2');
+
         // Fetch the previous reporting period's end_date
         const [previousPeriod] = await pool.query(
             'SELECT end_date FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
@@ -835,7 +835,7 @@ logger.info('area2');
         const startDate = lastEndDate 
             ? new Date(lastEndDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] 
             : null;
-logger.info('area3');
+
         // Fetch the previous reporting period's wealth_already_taxed and huquq_payments_made
         const [previousSummary] = await pool.query(
             'SELECT wealth_already_taxed, huquq_payments_made FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
@@ -852,14 +852,27 @@ logger.info('area3');
 
         // Calculate the new wealth_already_taxed by adding the payment adjustment
         const updatedWealthAlreadyTaxed = wealthAlreadyTaxed + (huquqPaymentsMade * (100 / 19));
-   logger.info('area4');     
+logger.info('Attempting to insert with values:', {
+    userId,
+    startDate,
+    end_date,
+    updatedWealthAlreadyTaxed,
+    Rate
+});
         // Insert a new reporting period with placeholder totals
         const insertQuery = `
             INSERT INTO financial_summary (user_id, start_date, end_date, wealth_already_taxed, _rate)
             VALUES (?, ?, ?, ?, ?)
         `;
         await pool.query(insertQuery, [userId, startDate, end_date, updatedWealthAlreadyTaxed, Rate]);
-logger.info('area5');
+} catch (error) {
+    logger.error('Database insertion failed:', {
+        error: error.message,
+        code: error.code,
+        sqlMessage: error.sqlMessage
+    });
+    throw error;
+}
         // Aggregate totals for the new reporting date
         const [totals] = await pool.query(`
             SELECT 
