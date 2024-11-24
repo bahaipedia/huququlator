@@ -849,7 +849,7 @@ logger.info(`aread`);
         const huquqPaymentsMade = previousSummary.length > 0 
             ? parseFloat(previousSummary[0].huquq_payments_made) || 0 
             : 0;
-logger.info(`areae`);
+logger.info(`areae ${wealthAlreadyTaxed} and ${huquqPaymentsMade}`);
         // Calculate the new wealth_already_taxed by adding the payment adjustment
         const updatedWealthAlreadyTaxed = wealthAlreadyTaxed + (huquqPaymentsMade * (100 / 19));
 logger.info(`Inserting into financial_summary: user_id=${userId}, start_date=${startDate}, end_date=${endDate}, wealth_already_taxed=${wealthAlreadyTaxed}, gold_rate=${goldRate}`);
