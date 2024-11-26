@@ -316,10 +316,15 @@ document.querySelectorAll('.financial-input').forEach(input => {
         const labelId = inputElement.dataset.labelId;
         const reportingDate = inputElement.dataset.reportingDate;
 
-        // Only save if the value is valid
+        // Ensure the value is a valid number
         if (!isNaN(value) && value !== '') {
-            value = Math.abs(parseFloat(value)); // Convert to positive
+            // Convert to positive if the value is negative
+            value = Math.abs(parseFloat(value)).toFixed(2);
 
+            // Update the input field with the corrected value
+            inputElement.value = value;
+
+            // Save the corrected value to the backend
             fetch(`/api/entries/${labelId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -332,14 +337,14 @@ document.querySelectorAll('.financial-input').forEach(input => {
                     return response.json();
                 })
                 .then(() => {
-                    updateSummaryTable(); 
+                    updateSummaryTable(); // Recalculate and refresh summary table
                 })
                 .catch(err => {
                     console.error('Error saving value:', err);
                     alert('Failed to save the value. Please try again.');
                 });
         } else {
-            // Restore "0.00" if input is left invalid or empty
+            // Restore "0.00" if input is invalid or empty
             inputElement.value = '0.00';
         }
     });
