@@ -311,6 +311,7 @@ function updateSummaryTable() {
 // Automatically save financial-input values and refresh the summary
 document.querySelectorAll('.financial-input').forEach(input => {
     input.addEventListener('blur', (event) => {
+        event.target.value = event.target.value.replace(/-/g, '');
         const inputElement = event.target;
         let value = inputElement.value.trim();
         const labelId = inputElement.dataset.labelId;
