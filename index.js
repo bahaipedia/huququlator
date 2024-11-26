@@ -671,8 +671,11 @@ app.put('/api/entries/:labelId', checkLoginStatus, async (req, res) => {
 
     try {
         const { labelId } = req.params;
-        const { value, reporting_date } = req.body;
+        let { value, reporting_date } = req.body;
         const userId = req.userId;
+
+        // Convert value to positive
+        value = Math.abs(parseFloat(value));
 
         // Update the financial entry
         const updateEntryQuery = `
