@@ -69,37 +69,52 @@ document.querySelectorAll('.delete-year-button').forEach(button => {
 /* Add a New Asset, Debt, or Expense */
 document.querySelectorAll('.add-item-button').forEach(button => {
     button.addEventListener('click', () => {
+        // Disable the add button immediately when clicked
+        button.disabled = true;
+
         const category = button.classList.contains('asset-button')
             ? 'Assets'
             : button.classList.contains('debt-button')
             ? 'Debts'
             : 'Expenses';
-
         const buttonRow = button.closest('tr');
         const newRow = document.createElement('tr');
+        
+        // Create inputs for each summary column
+        const summaryInputs = summaries.map(() => `
+            <td>
+                <input type="number" value="0.00" class="new-item-value" />
+            </td>
+        `).join('');
 
-        // Create a temporary row for adding a label
+        // Create the new row with label input and value inputs
         newRow.innerHTML = `
             <td>
                 <input type="text" placeholder="Label" class="new-item-label" />
                 <button class="save-item-button">Save</button>
             </td>
-            ${summaries.map(() => `
-                <td>
-                    <input type="number" value="0.00" disabled />
-                </td>`).join('')}
+            ${summaryInputs}
         `;
-
+        
         buttonRow.parentNode.insertBefore(newRow, buttonRow);
+        
+        // Automatically focus on the new label input
+        const labelInput = newRow.querySelector('.new-item-label');
+        labelInput.focus();
 
         // Handle saving the new label
         newRow.querySelector('.save-item-button').addEventListener('click', () => {
-            const label = newRow.querySelector('.new-item-label').value.trim();
-
+            const label = labelInput.value.trim();
             if (!label) {
                 alert('Please enter a valid label.');
                 return;
             }
+
+            // Collect value inputs
+            const valueInputs = Array.from(newRow.querySelectorAll('.new-item-value'));
+            const values = valueInputs.map(input => ({
+                value: input.value,
+            }));
 
             // Disable the save button while processing
             const saveButton = newRow.querySelector('.save-item-button');
@@ -110,7 +125,8 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     category,
-                    label
+                    label,
+                    values
                 }),
             })
                 .then(response => {
@@ -127,6 +143,7 @@ document.querySelectorAll('.add-item-button').forEach(button => {
                     console.error(`Error adding ${category.toLowerCase()} label:`, err);
                     alert(`Failed to add the ${category.toLowerCase()} label. Please try again.`);
                     saveButton.disabled = false; // Re-enable the button if there was an error
+                    button.disabled = false; // Re-enable the add button if there's an error
                 });
         });
     });
