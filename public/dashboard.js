@@ -186,14 +186,21 @@ document.querySelector('.dashboard-table').addEventListener('keydown', (event) =
             event.preventDefault(); // Stop default tab behavior
 
             const currentDate = currentInput.dataset.reportingDate;
-            const currentLabelId = currentInput.dataset.labelId;
 
             // Get all inputs in the current column (same reporting_date)
             const columnInputs = Array.from(document.querySelectorAll(`.financial-input[data-reporting-date="${currentDate}"]`));
 
-            // Find the next input in the same column
+            // Find the current index of the focused input
             const currentIndex = columnInputs.findIndex(input => input === currentInput);
-            const nextInput = columnInputs[currentIndex + 1] || columnInputs[0]; // Wrap around if at the bottom
+
+            let nextInput;
+            if (event.shiftKey) {
+                // Navigate backward with Shift+Tab
+                nextInput = columnInputs[currentIndex - 1] || columnInputs[columnInputs.length - 1]; // Wrap around to the bottom
+            } else {
+                // Navigate forward with Tab
+                nextInput = columnInputs[currentIndex + 1] || columnInputs[0]; // Wrap around to the top
+            }
 
             if (nextInput) {
                 nextInput.focus();
