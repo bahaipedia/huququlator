@@ -57,7 +57,8 @@
                                 <% entry.values.forEach(item => { %>
                                 <td>
                                     <input 
-                                        type="text" 
+                                        type="number" 
+                                        min="0" 
                                         value="<%= item.value %>" 
                                         data-label-id="<%= entry.id %>" 
                                         data-reporting-date="<%= item.reportingDate %>"
