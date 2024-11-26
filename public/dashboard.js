@@ -267,9 +267,9 @@ function updateSummaryTable() {
                 if (goldRateCell) goldRateCell.textContent = goldRate;
 
                 // Perform calculations
-                const totalAssetsValue = Math.abs(parseFloat(totalAssets)) || 0;
-                const totalDebtsValue = Math.abs(parseFloat(totalDebts)) || 0;
-                const unnecessaryExpensesValue = Math.abs(parseFloat(unnecessaryExpenses)) || 0;
+                const totalAssetsValue = parseFloat(totalAssets) || 0;
+                const totalDebtsValue = parseFloat(totalDebts) || 0;
+                const unnecessaryExpensesValue = parseFloat(unnecessaryExpenses) || 0;
                 const goldRateValue = parseFloat(goldRate) || 0;
 
                 // Wealth Being Taxed Today
@@ -316,10 +316,12 @@ document.querySelectorAll('.financial-input').forEach(input => {
         const labelId = inputElement.dataset.labelId;
         const reportingDate = inputElement.dataset.reportingDate;
 
-        // Only save if the value is valid
+        // Convert to positive
         if (!isNaN(value) && value !== '') {
-            value = Math.abs(parseFloat(value)); // Convert to positive
+            value = Math.abs(parseFloat(value)).toFixed(2);
+            inputElement.value = value;
 
+            // Save the corrected value to the backend
             fetch(`/api/entries/${labelId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -332,15 +334,14 @@ document.querySelectorAll('.financial-input').forEach(input => {
                     return response.json();
                 })
                 .then(() => {
-                    updateSummaryTable(); 
+                    updateSummaryTable(); // Recalculate and refresh the summary table
                 })
                 .catch(err => {
                     console.error('Error saving value:', err);
                     alert('Failed to save the value. Please try again.');
                 });
         } else {
-            // Restore "0.00" if input is left invalid or empty
-            inputElement.value = '0.00';
+            inputElement.value = '0.00'; // Reset invalid values
         }
     });
 });
