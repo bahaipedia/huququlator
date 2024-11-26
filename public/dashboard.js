@@ -162,8 +162,9 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
     }
 });
 
-// Handle focus event to clear "0.00" values
-document.querySelectorAll('.financial-input').forEach(input => {
+// Handle focus and blur events for multiple input classes
+document.querySelectorAll('.financial-input, .wealth-already-taxed, .huquq-payments-made').forEach(input => {
+    // Clear "0.00" on focus
     input.addEventListener('focus', (event) => {
         if (event.target.value === '0.00') {
             event.target.value = ''; // Clear the input for easier typing
