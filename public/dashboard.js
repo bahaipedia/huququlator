@@ -312,12 +312,14 @@ function updateSummaryTable() {
 document.querySelectorAll('.financial-input').forEach(input => {
     input.addEventListener('blur', (event) => {
         const inputElement = event.target;
-        const value = inputElement.value.trim();
+        let value = inputElement.value.trim();
         const labelId = inputElement.dataset.labelId;
         const reportingDate = inputElement.dataset.reportingDate;
 
         // Only save if the value is valid
         if (!isNaN(value) && value !== '') {
+            value = Math.abs(parseFloat(value)); // Convert to positive
+
             fetch(`/api/entries/${labelId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
