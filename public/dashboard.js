@@ -267,9 +267,9 @@ function updateSummaryTable() {
                 if (goldRateCell) goldRateCell.textContent = goldRate;
 
                 // Perform calculations
-                const totalAssetsValue = parseFloat(summary.totalAssets) || 0;
-                const totalDebtsValue = parseFloat(summary.total_debts) || 0;
-                const unnecessaryExpensesValue = parseFloat(summary.unnecessaryExpenses) || 0;
+                const totalAssetsValue = parseFloat(totalAssets) || 0;
+                const totalDebtsValue = parseFloat(totalDebts) || 0;
+                const unnecessaryExpensesValue = parseFloat(unnecessaryExpenses) || 0;
                 const goldRateValue = parseFloat(goldRate) || 0;
 
                 // Wealth Being Taxed Today
