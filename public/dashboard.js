@@ -262,7 +262,7 @@ function updateSummaryTable() {
                 const huquqPaymentsMade = parseFloat(huquqPaymentsMadeInput?.value || 0) || 0;
                 
                 if (totalAssetsCell) totalAssetsCell.textContent = totalAssets;
-                if (totalDebtsCell) totalDebtsCell.textContent = totalDebts;
+                if (totalDebtsCell) totalDebtsCell.textContent = (totalDebts);
                 if (unnecessaryExpensesCell) unnecessaryExpensesCell.textContent = unnecessaryExpenses;
                 if (goldRateCell) goldRateCell.textContent = goldRate;
 
