@@ -268,7 +268,7 @@ function updateSummaryTable() {
 
                 // Perform calculations
                 const totalAssetsValue = parseFloat(totalAssets) || 0;
-                const totalDebtsValue = parseFloat(totalDebts) || 0;
+                const totalDebtsValue = Math.abs(parseFloat(totalDebts)) || 0;
                 const unnecessaryExpensesValue = parseFloat(unnecessaryExpenses) || 0;
                 const goldRateValue = parseFloat(goldRate) || 0;
 
