@@ -255,14 +255,14 @@ function updateSummaryTable() {
                 const huquqPaymentsMadeInput = document.querySelector(`.huquq-payments-made[data-end-date="${formattedEndDate}"]`);
                 
                 const totalAssets = summary.total_assets ? parseFloat(summary.total_assets).toFixed(2) : '0.00';
-                const totalDebts = summary.total_debts ? parseFloat(summary.total_debts).toFixed(2) : '0.00';
+                const totalDebts = summary.total_debts ? `(${parseFloat(summary.total_debts).toFixed(2)})` : '(0.00)';
                 const unnecessaryExpenses = summary.unnecessary_expenses ? parseFloat(summary.unnecessary_expenses).toFixed(2) : '0.00';
                 const goldRate = summary.gold_rate ? parseFloat(summary.gold_rate).toFixed(2) : '0.00';
                 const wealthAlreadyTaxed = parseFloat(wealthAlreadyTaxedInput?.value || 0) || 0;
                 const huquqPaymentsMade = parseFloat(huquqPaymentsMadeInput?.value || 0) || 0;
                 
                 if (totalAssetsCell) totalAssetsCell.textContent = totalAssets;
-                if (totalDebtsCell) totalDebtsCell.textContent = (totalDebts);
+                if (totalDebtsCell) totalDebtsCell.textContent = totalDebts;
                 if (unnecessaryExpensesCell) unnecessaryExpensesCell.textContent = unnecessaryExpenses;
                 if (goldRateCell) goldRateCell.textContent = goldRate;
 
