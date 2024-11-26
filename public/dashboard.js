@@ -163,7 +163,7 @@ document.querySelector('.dashboard-table').addEventListener('click', (event) => 
 });
 
 // Handle focus and blur events for multiple input classes
-document.querySelectorAll('.financial-input, .wealth-already-taxed, .huquq-payments-made').forEach(input => {
+document.querySelectorAll('.financial-input, .wealth-already-taxed, .huquq-payments-input').forEach(input => {
     // Clear "0.00" on focus
     input.addEventListener('focus', (event) => {
         if (event.target.value === '0.00') {
