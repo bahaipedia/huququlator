@@ -85,3 +85,55 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Event Listeners for user input
     [a1, a2, a3].forEach(input => input.addEventListener("input", calculate));
 });
+
+// Fetch gold price
+const dateLabel = document.getElementById('dateLabel');
+const goldDateInput = document.getElementById('goldDate');
+const goldValueInput = document.getElementById('goldValue');
+const calendarIcon = document.getElementById('calendarIcon');
+const errorSpan = document.getElementById('goldError');
+
+const formatDateForAPI = (date) => date.replace(/-/g, '');
+
+const fetchGoldPrice = async (date) => {
+    try {
+        const formattedDate = formatDateForAPI(date);
+        const response = await fetch(`/api/gold-price?date=${formattedDate}`);
+        const data = await response.json();
+
+        if (response.ok) {
+            goldValueInput.value = `$${data.value.toFixed(2)}`;
+            errorSpan.textContent = '';
+        } else {
+            throw new Error(data.error || 'Unable to fetch gold price.');
+        }
+    } catch (error) {
+        errorSpan.textContent = error.message;
+        goldValueInput.value = '';
+    }
+};
+
+const showDatePicker = () => {
+    goldDateInput.style.display = 'inline-block';
+    goldDateInput.focus();
+};
+
+dateLabel.addEventListener('click', showDatePicker);
+goldDateInput.addEventListener('change', (event) => {
+    const selectedDate = event.target.value;
+    if (selectedDate) {
+        const formattedLabelDate = new Date(selectedDate).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+        dateLabel.textContent = `[${formattedLabelDate}]`;
+        goldDateInput.style.display = 'none';
+
+        fetchGoldPrice(selectedDate);
+    }
+});
+
+const today = new Date().toISOString().split('T')[0];
+goldDateInput.value = today;
+fetchGoldPrice(today);
