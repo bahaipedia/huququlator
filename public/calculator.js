@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // New elements for date selection
     const dateLabel = document.getElementById("dateLabel");
-    const goldDateInput = document.getElementById("goldDate");
 
     let isCustomMithqalValue = false;
 
@@ -43,7 +42,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // Update the input field with the gold price
                 if (!isCustomMithqalValue) {
                     a4.value = data.value.toFixed(2);
-                    r3.textContent = `${dateLabel.textContent}'s gold rate multiplied by 2.22456.`;
+                    dateLabel.textContent = date; // Update label with selected date
+                    r3.textContent = `${date}'s gold rate multiplied by 2.22456.`;
                 }
                 calculate(); // Recalculate after updating gold price
                 return true;
@@ -60,29 +60,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // Create a hidden date input for native date picker
+    const hiddenDateInput = document.createElement('input');
+    hiddenDateInput.type = 'date';
+    hiddenDateInput.style.display = 'none';
+    document.body.appendChild(hiddenDateInput);
+
     // Fetch initial gold price for today
     const today = new Date().toISOString().split('T')[0];
     await fetchGoldPrice(today);
 
     // Show date picker when "Today" is clicked
     dateLabel.addEventListener('click', () => {
-        goldDateInput.style.display = 'inline-block';
-        goldDateInput.focus();
-        
         // Set default to today's date
         const todayDate = new Date().toISOString().split('T')[0];
-        goldDateInput.value = todayDate;
+        hiddenDateInput.value = todayDate;
+        
+        // Trigger the date picker
+        hiddenDateInput.showPicker();
     });
 
     // Handle date selection
-    goldDateInput.addEventListener('change', async (event) => {
+    hiddenDateInput.addEventListener('change', async (event) => {
         const selectedDate = event.target.value;
-        
-        // Hide the date input after selection
-        goldDateInput.style.display = 'none';
-        
-        // Update label to show selected date
-        dateLabel.textContent = selectedDate;
         
         // Fetch gold price for selected date
         await fetchGoldPrice(selectedDate);
