@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const totalWealth = numA1 + numA2;
         const taxableWealth = totalWealth - numA3;
         if (taxableWealth <= numA4) {
-            r7.textContent = "No Huququllah payment is due today because your excess wealth did not exceed 19 Mithqals of gold.";
+            r7.textContent = "No Ḥuqúqu’lláh payment is due today because your excess wealth did not exceed 19 Mithqáls of gold.";
         } else {
             const huquqUnits = Math.floor(taxableWealth / numA4);
             a5.value = huquqUnits;
