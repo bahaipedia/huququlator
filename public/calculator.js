@@ -90,7 +90,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 const dateLabel = document.getElementById('dateLabel');
 const goldDateInput = document.getElementById('goldDate');
 const goldValueInput = document.getElementById('goldValue');
-const calendarIcon = document.getElementById('calendarIcon');
 const errorSpan = document.getElementById('goldError');
 
 const formatDateForAPI = (date) => date.replace(/-/g, '');
@@ -113,12 +112,12 @@ const fetchGoldPrice = async (date) => {
     }
 };
 
-const showDatePicker = () => {
-    goldDateInput.style.display = 'inline-block';
-    goldDateInput.focus();
-};
+// Directly trigger the date picker
+dateLabel.addEventListener('click', () => {
+    goldDateInput.click(); // This directly triggers the date picker
+});
 
-dateLabel.addEventListener('click', showDatePicker);
+// Handle date selection
 goldDateInput.addEventListener('change', (event) => {
     const selectedDate = event.target.value;
     if (selectedDate) {
@@ -128,12 +127,12 @@ goldDateInput.addEventListener('change', (event) => {
             day: 'numeric',
         });
         dateLabel.textContent = `[${formattedLabelDate}]`;
-        goldDateInput.style.display = 'none';
 
         fetchGoldPrice(selectedDate);
     }
 });
 
+// Automatically fetch today's gold price on page load
 const today = new Date().toISOString().split('T')[0];
 goldDateInput.value = today;
 fetchGoldPrice(today);
