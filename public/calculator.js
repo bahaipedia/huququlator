@@ -114,7 +114,8 @@ const fetchGoldPrice = async (date) => {
 
 // Directly trigger the date picker
 dateLabel.addEventListener('click', () => {
-    goldDateInput.dispatchEvent(new MouseEvent('click', { bubbles: true })); // Simulates a click on the input
+    console.log('Today clicked'); // Debugging log
+    goldDateInput.dispatchEvent(new MouseEvent('click', { bubbles: true })); // Trigger the date picker
 });
 
 // Handle date selection
@@ -127,7 +128,6 @@ goldDateInput.addEventListener('change', (event) => {
             day: 'numeric',
         });
         dateLabel.textContent = `[${formattedLabelDate}]`;
-
         fetchGoldPrice(selectedDate);
     }
 });
