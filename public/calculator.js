@@ -114,7 +114,7 @@ const fetchGoldPrice = async (date) => {
 
 // Directly trigger the date picker
 dateLabel.addEventListener('click', () => {
-    goldDateInput.click(); // This directly triggers the date picker
+    goldDateInput.dispatchEvent(new MouseEvent('click', { bubbles: true })); // Simulates a click on the input
 });
 
 // Handle date selection
