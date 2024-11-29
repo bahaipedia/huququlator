@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const data = await response.json();
 
             if (data.value) {
-                // Update the input field with the gold price
                 if (!isCustomMithqalValue) {
                     a4.value = data.value.toFixed(2);
                     dateLabel.textContent = date === new Date().toISOString().split('T')[0] ? "Today" : date;
@@ -65,6 +64,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     hiddenDateInput.style.position = 'absolute';
     hiddenDateInput.style.opacity = 0;
     hiddenDateInput.style.pointerEvents = 'none';
+
+    // Initially position the input near the dateLabel
+    const positionDateInput = () => {
+        const rect = dateLabel.getBoundingClientRect();
+        hiddenDateInput.style.top = `${rect.top + window.scrollY}px`;
+        hiddenDateInput.style.left = `${rect.left + window.scrollX}px`;
+    };
+
+    positionDateInput(); // Set initial position
     document.body.appendChild(hiddenDateInput);
 
     // Fetch initial gold price for today
@@ -73,24 +81,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Show date picker when "Today" is clicked
     dateLabel.addEventListener('click', () => {
-        // Position the hidden input near the dateLabel
-        const rect = dateLabel.getBoundingClientRect();
-        hiddenDateInput.style.top = `${rect.top + window.scrollY}px`;
-        hiddenDateInput.style.left = `${rect.left + window.scrollX}px`;
-
-        // Set default to today's date
-        const todayDate = new Date().toISOString().split('T')[0];
-        hiddenDateInput.value = todayDate;
-
-        // Trigger the date picker
+        positionDateInput(); // Ensure correct positioning before opening
+        hiddenDateInput.value = today;
         hiddenDateInput.showPicker();
     });
 
     // Handle date selection
     hiddenDateInput.addEventListener('change', async (event) => {
         const selectedDate = event.target.value;
-
-        // Fetch gold price for selected date
         await fetchGoldPrice(selectedDate);
     });
 
