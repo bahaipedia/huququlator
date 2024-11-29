@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const r6 = document.getElementById("r6");
     const r7 = document.getElementById("r7");
 
-    // New elements for date selection
     const dateLabel = document.getElementById("dateLabel");
 
     let isCustomMithqalValue = false;
@@ -34,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             // Format date as YYYYMMDD for the API
             const formattedDate = date.replace(/-/g, '');
-            
+
             const response = await fetch(`/api/gold-price?date=${formattedDate}`);
             const data = await response.json();
 
@@ -63,7 +62,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Create a hidden date input for native date picker
     const hiddenDateInput = document.createElement('input');
     hiddenDateInput.type = 'date';
-    hiddenDateInput.style.display = 'none';
+    hiddenDateInput.style.position = 'absolute';
+    hiddenDateInput.style.opacity = 0;
+    hiddenDateInput.style.pointerEvents = 'none';
     document.body.appendChild(hiddenDateInput);
 
     // Fetch initial gold price for today
@@ -72,10 +73,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Show date picker when "Today" is clicked
     dateLabel.addEventListener('click', () => {
+        // Position the hidden input near the dateLabel
+        const rect = dateLabel.getBoundingClientRect();
+        hiddenDateInput.style.top = `${rect.top + window.scrollY}px`;
+        hiddenDateInput.style.left = `${rect.left + window.scrollX}px`;
+
         // Set default to today's date
         const todayDate = new Date().toISOString().split('T')[0];
         hiddenDateInput.value = todayDate;
-        
+
         // Trigger the date picker
         hiddenDateInput.showPicker();
     });
@@ -83,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Handle date selection
     hiddenDateInput.addEventListener('change', async (event) => {
         const selectedDate = event.target.value;
-        
+
         // Fetch gold price for selected date
         await fetchGoldPrice(selectedDate);
     });
