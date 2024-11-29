@@ -188,7 +188,7 @@ app.get('/api/gold-price', async (req, res) => {
 });
 
 app.get('/about', checkLoginStatus, (req, res) => {
-    res.render('help', { loggedIn: req.loggedIn, username: req.username });
+    res.render('about', { loggedIn: req.loggedIn, username: req.username });
 });
 
 app.get('/help', checkLoginStatus, (req, res) => {
