@@ -191,33 +191,6 @@ app.get('/help', checkLoginStatus, (req, res) => {
     res.render('help', { loggedIn: req.loggedIn, username: req.username });
 });
 
-app.get('/public-dashboard', checkLoginStatus, (req, res) => {
-    const labels = [
-        // Example placeholder labels for demonstration
-        { id: 1, category: 'Assets', label: 'Total' },
-        { id: 2, category: 'Debts', label: 'Total' },
-        { id: 3, category: 'Expenses', label: 'Total' },
-    ];
-
-    const summaries = [];
-    const entries = [];
-    const entryMap = labels.map(label => ({
-        id: label.id,
-        category: label.category,
-        label: label.label,
-        values: [], // Start with no values
-    }));
-
-    res.render('public-dashboard', {
-        loggedIn: false,
-        username: null,
-        summaries,
-        labels,
-        entries,
-        entryMap,
-    });
-});
-
 app.get('/register', (req, res) => {
     res.render('register', { loggedIn: false });
 });
