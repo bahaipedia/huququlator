@@ -19,6 +19,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const goldValueInput = document.getElementById("goldValue");
     const errorSpan = document.getElementById("goldError");
 
+    console.log({
+    a1, a2, a3, a4, a5, a6, a7,
+    r0, r1, r2, r3, r4, r5, r6, r7,
+    dateLabel, goldDateInput, goldValueInput, errorSpan
+});
+    
     if (!a1 || !a2 || !a3 || !a4 || !a5 || !a6 || !a7 || !dateLabel || !goldDateInput || !goldValueInput || !errorSpan) {
         console.error("One or more elements are missing in the DOM.");
         return;
