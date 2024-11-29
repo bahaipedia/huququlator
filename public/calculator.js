@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // Update the input field with the gold price
                 if (!isCustomMithqalValue) {
                     a4.value = data.value.toFixed(2);
-                    dateLabel.textContent = date; // Update label with selected date
+                    dateLabel.textContent = date === new Date().toISOString().split('T')[0] ? "Today" : date;
                     r3.textContent = `${date}'s gold rate multiplied by 2.22456.`;
                 }
                 calculate(); // Recalculate after updating gold price
