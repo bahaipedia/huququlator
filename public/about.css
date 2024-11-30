@@ -57,12 +57,13 @@ body.main-page-body {
 
 .about-content {
     padding: 15px;
-    display: none; /* Initially hidden */
+    display: none; 
     color: #333;
+    transition: max-height 0.3s ease;
 }
 
 .about-content.expanded {
-    display: block; /* Show content when expanded */
+    display: block; 
 }
 
 .about-content ul {
