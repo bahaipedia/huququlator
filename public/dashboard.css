@@ -33,8 +33,6 @@
     font-weight: bold;
     text-align: left;
     border-bottom: 2px solid #ccc;
-    top: 0;
-    z-index: 2;
 }
 .dashboard-title {
     margin-bottom: 20px;
@@ -94,7 +92,6 @@
     font-size: 0.85rem;
     color: #333;
 }
-
 .debt-value {
     color: red;
     font-style: italic;
