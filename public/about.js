@@ -1,52 +1,30 @@
-// Function to toggle the visibility of a section
-function toggleAbout(sectionId) {
-    // Find the section by its ID
-    const section = document.getElementById(sectionId);
-    if (!section) return;
-
-    // Find the content and button within the section
-    const content = section.querySelector('.about-content');
-    const button = section.querySelector('.view-more');
-
-    if (!content || !button) return;
-
-    // Toggle the expanded state
-    const isExpanded = content.classList.contains('expanded');
-
-    if (isExpanded) {
-        // Collapse the section
-        content.classList.remove('expanded');
-        content.style.display = 'none';
-        button.textContent = 'Expand';
-    } else {
-        // Expand the section
-        content.classList.add('expanded');
-        content.style.display = 'block';
-        button.textContent = 'Collapse';
-    }
-}
-
-// Attach event listeners after DOM has loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Select all sections
-    const sections = document.querySelectorAll('.about-item');
-
-    sections.forEach(section => {
-        const sectionId = section.id;
-        const title = section.querySelector('h2');
+    // Function to toggle the visibility and button text of about content
+    window.toggleAbout = function(sectionId) {
+        const section = document.getElementById(sectionId);
+        const content = section.querySelector('.about-content');
         const button = section.querySelector('.view-more');
 
-        // Add a click event listener to the title
-        if (title) {
-            title.addEventListener('click', () => toggleAbout(sectionId));
+        // Toggle the expanded class
+        content.classList.toggle('expanded');
+
+        // Change button text based on current state
+        if (content.classList.contains('expanded')) {
+            button.textContent = 'Collapse';
+        } else {
+            button.textContent = 'Expand';
         }
 
-        // Add a click event listener to the button
-        if (button) {
-            button.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent triggering the title's event
-                toggleAbout(sectionId);
-            });
-        }
-    });
+        // Close other sections
+        const allSections = document.querySelectorAll('.about-item');
+        allSections.forEach(otherSection => {
+            if (otherSection.id !== sectionId) {
+                const otherContent = otherSection.querySelector('.about-content');
+                const otherButton = otherSection.querySelector('.view-more');
+                
+                otherContent.classList.remove('expanded');
+                otherButton.textContent = 'Expand';
+            }
+        });
+    }
 });
