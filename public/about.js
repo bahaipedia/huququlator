@@ -1,16 +1,16 @@
-// Function to toggle the visibility of the about sections
+// Function to toggle the visibility of a section
 function toggleAbout(sectionId) {
-    // Get the specific section by its ID
+    // Find the section by its ID
     const section = document.getElementById(sectionId);
     if (!section) return;
 
-    // Find the content within the section
+    // Find the content and button within the section
     const content = section.querySelector('.about-content');
     const button = section.querySelector('.view-more');
 
     if (!content || !button) return;
 
-    // Check if the content is currently expanded
+    // Toggle the expanded state
     const isExpanded = content.classList.contains('expanded');
 
     if (isExpanded) {
@@ -26,26 +26,27 @@ function toggleAbout(sectionId) {
     }
 }
 
-// Attach event listeners to buttons and titles
+// Attach event listeners after DOM has loaded
 document.addEventListener('DOMContentLoaded', () => {
+    // Select all sections
     const sections = document.querySelectorAll('.about-item');
 
     sections.forEach(section => {
         const sectionId = section.id;
-        const button = section.querySelector('.view-more');
         const title = section.querySelector('h2');
+        const button = section.querySelector('.view-more');
 
-        // Ensure the "view-more" button works
-        if (button) {
-            button.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent triggering the title click event
-                toggleAbout(sectionId);
-            });
-        }
-
-        // The titles already work, so no need to duplicate their functionality
+        // Add a click event listener to the title
         if (title) {
             title.addEventListener('click', () => toggleAbout(sectionId));
+        }
+
+        // Add a click event listener to the button
+        if (button) {
+            button.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent triggering the title's event
+                toggleAbout(sectionId);
+            });
         }
     });
 });
