@@ -25,18 +25,6 @@
     padding: 8px 10px;
     border: 1px solid #ddd;
 }
-.dashboard-table td:first-child,
-.dashboard-table th:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 1;
-}
-.summary-table td:first-child,
-.summary-table th:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 1;
-}
 .dashboard-table th,
 .summary-table th {
     min-width: 170px;
@@ -45,7 +33,6 @@
     font-weight: bold;
     text-align: left;
     border-bottom: 2px solid #ccc;
-    position: sticky;
     top: 0;
     z-index: 2;
 }
