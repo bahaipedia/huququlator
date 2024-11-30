@@ -191,21 +191,6 @@ input[type="number"] {
     margin-left: 220px; 
     padding: 0px 20px 20px 20px;
 }
-/* Table styling */
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-table, th, td {
-    /* border: 1px solid #ddd;  give the table a name later so this doesn't target all other tables */
-}
-th, td {
-    padding: 8px;
-    text-align: left;
-}
-th {
-    background-color: #f2f2f2;
-}
 /* Tabs Navigation */
 .tab {
     display: inline-block;
