@@ -907,58 +907,6 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
     }
 });
 
-// Route to update wealth previously taxed for subsequent years
-app.put('/api/summary/update-subsequent-wealth-taxed', checkLoginStatus, async (req, res) => {
-    if (!req.loggedIn) {
-        return res.status(403).send('Unauthorized');
-    }
-
-    try {
-        const { current_end_date, huquq_payments_made } = req.body;
-        const userId = req.userId;
-
-        // First, fetch all summaries for this user, ordered by end_date
-        const [summaries] = await pool.query(
-            'SELECT * FROM financial_summary WHERE user_id = ? ORDER BY end_date',
-            [userId]
-        );
-
-        // Find the index of the current summary
-        const currentIndex = summaries.findIndex(summary => summary.end_date === current_end_date);
-
-        if (currentIndex === -1) {
-            return res.status(404).json({ error: 'Current summary not found' });
-        }
-
-        // Calculate the wealth previously taxed for subsequent years
-        // This is (payments made / 0.19), which represents the total wealth that was subject to Huquq
-        const currentWealthSubjectToHuquq = huquq_payments_made / 0.19;
-
-        // Update subsequent years
-        for (let i = currentIndex + 1; i < summaries.length; i++) {
-            const updateQuery = `
-                UPDATE financial_summary
-                SET wealth_already_taxed = ?
-                WHERE user_id = ? AND end_date = ?
-            `;
-
-            await pool.query(updateQuery, [
-                currentWealthSubjectToHuquq, 
-                userId, 
-                summaries[i].end_date
-            ]);
-        }
-
-        res.status(200).json({ message: 'Subsequent years wealth previously taxed updated successfully' });
-    } catch (error) {
-        logger.error('Error updating subsequent years wealth previously taxed:', { 
-            error: error.message, 
-            stack: error.stack 
-        });
-        res.status(500).send('Server Error');
-    }
-});
-
 // Route used for when the user updates their payments to Huquq
 app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
@@ -966,10 +914,15 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        const { value, end_date } = req.body;
+        const { value, end_date } = req.body; // Value and reporting period
         const userId = req.userId;
 
-        // Existing validation and update logic...
+        // Validate input
+        if (!value || !end_date) {
+            logger.warn('Missing value or end_date in request:', { value, end_date });
+            return res.status(400).json({ error: 'Value and end_date are required.' });
+        }
+
         const parsedValue = parseFloat(value);
 
         const updateQuery = `
@@ -978,27 +931,12 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
             WHERE user_id = ? AND end_date = ?
         `;
 
+        // Execute query
         const [result] = await pool.query(updateQuery, [parsedValue, userId, end_date]);
 
         if (result.affectedRows === 0) {
+            logger.warn('No matching summary found to update:', { userId, end_date });
             return res.status(404).json({ error: 'No matching summary found to update.' });
-        }
-
-        // NEW: Trigger update of subsequent years' wealth previously taxed
-        const subsequentUpdateResponse = await fetch(`/api/summary/update-subsequent-wealth-taxed`, {
-            method: 'PUT',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Cookie': req.headers.cookie // Pass along session/authentication
-            },
-            body: JSON.stringify({
-                current_end_date: end_date,
-                huquq_payments_made: parsedValue
-            })
-        });
-
-        if (!subsequentUpdateResponse.ok) {
-            logger.warn('Failed to update subsequent years wealth previously taxed');
         }
 
         res.status(200).json({ message: 'Huquq payments made updated successfully.' });
