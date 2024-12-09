@@ -334,7 +334,7 @@ document.querySelectorAll('.financial-input').forEach(input => {
                     return response.json();
                 })
                 .then(() => {
-                    updateSummaryTable(); // Recalculate and refresh the summary table
+                    updateSummaryTable(); 
                 })
                 .catch(err => {
                     console.error('Error saving value:', err);
@@ -362,7 +362,7 @@ document.querySelectorAll('.save-button').forEach(button => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                updateSummaryTable(); // Recalculate all the fields after the update
+                location.reload();
             })
             .catch(err => {
                 console.error('Error updating summary fields:', err);
@@ -394,7 +394,7 @@ document.querySelectorAll('.save-huquq-payments').forEach(button => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                updateSummaryTable(); // Recalculate all fields after the update
+                location.reload();
             })
             .catch(err => {
                 console.error('Error updating Huquq Payments Made:', err);
