@@ -384,21 +384,20 @@ document.querySelectorAll('.save-huquq-payments').forEach(button => {
             return;
         }
 
-        // Send the update to the server
         fetch('/api/summary/update-huquq', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ value, end_date: endDate }),
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                updateSummaryTable(); // Recalculate all fields after the update
-            })
-            .catch(err => {
-                console.error('Error updating Huquq Payments Made:', err);
-                alert('Failed to save Huquq Payments Made. Please try again.');
-            });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            window.location.reload(); 
+        })
+        .catch(err => {
+            console.error('Error updating Huquq Payments Made:', err);
+            alert('Failed to save Huquq Payments Made. Please try again.');
+        });
     });
 });
