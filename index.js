@@ -914,10 +914,9 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
     }
 
     try {
-        const { value, end_date } = req.body; // Value and reporting period
+        const { value, end_date } = req.body;
         const userId = req.userId;
 
-        // Validate input
         if (!value || !end_date) {
             logger.warn('Missing value or end_date in request:', { value, end_date });
             return res.status(400).json({ error: 'Value and end_date are required.' });
@@ -925,13 +924,12 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
 
         const parsedValue = parseFloat(value);
 
+        // Update the current year's Huquq Payments Made
         const updateQuery = `
             UPDATE financial_summary
             SET huquq_payments_made = ?
             WHERE user_id = ? AND end_date = ?
         `;
-
-        // Execute query
         const [result] = await pool.query(updateQuery, [parsedValue, userId, end_date]);
 
         if (result.affectedRows === 0) {
@@ -939,7 +937,32 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
             return res.status(404).json({ error: 'No matching summary found to update.' });
         }
 
-        res.status(200).json({ message: 'Huquq payments made updated successfully.' });
+        // Update subsequent years' Wealth Previously Taxed
+        const updateSubsequentYearsQuery = `
+            WITH RECURSIVE cte AS (
+                SELECT 
+                    end_date, 
+                    wealth_already_taxed, 
+                    huquq_payments_made
+                FROM financial_summary
+                WHERE user_id = ? AND end_date = ?
+                UNION ALL
+                SELECT 
+                    fs.end_date,
+                    fs.wealth_already_taxed,
+                    (prev.huquq_payments_made * (100 / 19)) AS updated_wealth
+                FROM financial_summary fs
+                INNER JOIN cte prev
+                    ON fs.user_id = ? AND fs.end_date > prev.end_date
+            )
+            UPDATE financial_summary
+            JOIN cte
+            ON financial_summary.end_date = cte.end_date
+            SET wealth_already_taxed = cte.updated_wealth
+        `;
+        await pool.query(updateSubsequentYearsQuery, [userId, end_date, userId]);
+
+        res.status(200).json({ message: 'Huquq payments and subsequent wealth updates applied successfully.' });
     } catch (error) {
         logger.error('Error updating Huquq payments made:', { error: error.message, stack: error.stack });
         res.status(500).send('Server Error');
