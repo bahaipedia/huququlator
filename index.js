@@ -956,7 +956,7 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
 
         // Update each subsequent year iteratively
         for (const year of subsequentYears) {
-            const updatedWealthTaxed = parseFloat((previousWealthTaxed + (year.huquq_payments_made * (100 / 19))).toFixed(2));
+            const updatedWealthTaxed = parseFloat((parseFloat(previousWealthTaxed || 0) + (parseFloat(year.huquq_payments_made || 0) * (100 / 19))).toFixed(2));
 
             const updateWealthTaxedQuery = `
                 UPDATE financial_summary
