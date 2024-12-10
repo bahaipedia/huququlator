@@ -161,7 +161,7 @@ input[type="number"] {
 }
 /* Sidebar styling */
 .sidebar {
-    width: 220px;
+    width: 180px;
     background-color: #fff;
     padding: 20px;
     position: fixed; 
@@ -191,7 +191,7 @@ input[type="number"] {
     text-decoration: none;
     color: #333;
     display: block;
-    padding: 8px 12px; 
+    padding: 5px 10px; 
     border-radius: 4px; 
     transition: background-color 0.3s;
     font-size: 0.95em;
