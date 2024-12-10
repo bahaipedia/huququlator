@@ -926,6 +926,16 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
 
         const parsedValue = parseFloat(value);
 
+        // Fetch the current Huquq Payments Made before updating
+        const [currentHuquq] = await pool.query(
+            'SELECT huquq_payments_made FROM financial_summary WHERE user_id = ? AND end_date = ?',
+            [userId, end_date]
+        );
+        const currentHuquqPaymentsMade = parseFloat(currentHuquq[0]?.huquq_payments_made || 0);
+
+        // Log Huquq Payments Made before the update
+        logger.info(`huquq_payments_made prior to insert: ${currentHuquqPaymentsMade}`);
+
         // Update the current year's Huquq Payments Made
         const updateQuery = `
             UPDATE financial_summary
@@ -939,42 +949,54 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
             return res.status(404).json({ error: 'No matching summary found to update.' });
         }
 
-        // Fetch the current year's wealth_already_taxed
-        const [currentYearData] = await pool.query(
-            'SELECT wealth_already_taxed FROM financial_summary WHERE user_id = ? AND end_date = ?',
-            [userId, end_date]
-        );
-        const currentYearWealthTaxed = parseFloat(currentYearData[0]?.wealth_already_taxed || 0);
+        // Log Huquq Payments Made after the update
+        logger.info(`huquq_payments_made after insert: ${parsedValue}`);
 
-        // Fetch subsequent years
+        // Recalculate wealth_already_taxed for the current year
+        const updatedWealthTaxed = parseFloat((parsedValue * (100 / 19)).toFixed(2));
+
+        // Update the current year's wealth_already_taxed
+        const updateWealthQuery = `
+            UPDATE financial_summary
+            SET wealth_already_taxed = ?
+            WHERE user_id = ? AND end_date = ?
+        `;
+        await pool.query(updateWealthQuery, [updatedWealthTaxed, userId, end_date]);
+
+        logger.info(`wealth_already_taxed after recalculation for year ${end_date}: ${updatedWealthTaxed}`);
+
+        // Fetch all subsequent years
         const subsequentYearsQuery = `
-            SELECT id, end_date, huquq_payments_made, wealth_already_taxed
+            SELECT id, end_date, wealth_already_taxed, huquq_payments_made
             FROM financial_summary
             WHERE user_id = ? AND end_date > ?
             ORDER BY end_date ASC
         `;
         const [subsequentYears] = await pool.query(subsequentYearsQuery, [userId, end_date]);
 
-        // Calculate and update subsequent years
-        let previousWealthTaxed = currentYearWealthTaxed;
+        // Update each subsequent year's wealth_already_taxed iteratively
+        let previousWealthTaxed = updatedWealthTaxed;
 
         for (const year of subsequentYears) {
-            // Calculate new wealth_already_taxed
+            // Calculate the new wealth_already_taxed
             const updatedWealthTaxedForYear = parseFloat(
                 (previousWealthTaxed + (parseFloat(year.huquq_payments_made || 0) * (100 / 19))).toFixed(2)
             );
 
-            // Update the database for subsequent years
+            // Log wealth_already_taxed calculation
+            logger.info(`wealth_already_taxed after calculation for year ${year.end_date}: ${updatedWealthTaxedForYear}`);
+
+            // Update the database
             const updateWealthTaxedQuery = `
                 UPDATE financial_summary
                 SET wealth_already_taxed = ?
                 WHERE id = ?
             `;
-            await pool.query(updateWealthTaxedQuery, [updatedWealthTaxedForYear, year.id]);
+            const [updateResult] = await pool.query(updateWealthTaxedQuery, [updatedWealthTaxedForYear, year.id]);
 
-            logger.info(`Updated wealth_already_taxed for year ${year.end_date}: ${updatedWealthTaxedForYear}`);
+            logger.info(`Update result for year ${year.end_date}:`, updateResult);
 
-            // Prepare for next iteration
+            // Use the new wealth_already_taxed for the next iteration
             previousWealthTaxed = updatedWealthTaxedForYear;
         }
 
