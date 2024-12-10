@@ -333,7 +333,7 @@ document.querySelectorAll('.financial-input').forEach(input => {
                     return response.json();
                 })
                 .then(() => {
-                    updateSummaryTable(); 
+                    location.reload();
                 })
                 .catch(err => {
                     console.error('Error saving value:', err);
