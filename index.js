@@ -924,67 +924,63 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
 
         const parsedValue = parseFloat(value);
 
-        // Fetch the current Huquq Payments Made before updating
-        const [currentHuquq] = await pool.query(
-            'SELECT huquq_payments_made FROM financial_summary WHERE user_id = ? AND end_date = ?',
-            [userId, end_date]
-        );
-        const currentHuquqPaymentsMade = parseFloat(currentHuquq[0]?.huquq_payments_made || 0);
-
-        // Update the current year's Huquq Payments Made
-        const updateQuery = `
+        // Update the Huquq Payments Made for the specified year
+        const updateHuquqQuery = `
             UPDATE financial_summary
             SET huquq_payments_made = ?
             WHERE user_id = ? AND end_date = ?
         `;
-        const [result] = await pool.query(updateQuery, [parsedValue, userId, end_date]);
+        const [result] = await pool.query(updateHuquqQuery, [parsedValue, userId, end_date]);
 
         if (result.affectedRows === 0) {
             logger.warn('No matching summary found to update:', { userId, end_date });
             return res.status(404).json({ error: 'No matching summary found to update.' });
         }
 
-        // Recalculate wealth_already_taxed for the current year
-        const updatedWealthTaxed = parseFloat((parsedValue * (100 / 19)).toFixed(2));
-
-        // Update the current year's wealth_already_taxed
-        const updateWealthQuery = `
-            UPDATE financial_summary
-            SET wealth_already_taxed = ?
-            WHERE user_id = ? AND end_date = ?
-        `;
-        await pool.query(updateWealthQuery, [updatedWealthTaxed, userId, end_date]);
-
-        // Fetch all subsequent years
-        const subsequentYearsQuery = `
+        // Fetch all records for this user sorted by end_date
+        const allYearsQuery = `
             SELECT id, end_date, wealth_already_taxed, huquq_payments_made
             FROM financial_summary
-            WHERE user_id = ? AND end_date > ?
+            WHERE user_id = ?
             ORDER BY end_date ASC
         `;
-        const [subsequentYears] = await pool.query(subsequentYearsQuery, [userId, end_date]);
+        const [allYears] = await pool.query(allYearsQuery, [userId]);
 
-        // Update each subsequent year's wealth_already_taxed iteratively
-        let previousWealthTaxed = updatedWealthTaxed;
-
-        for (const year of subsequentYears) {
-            // Calculate the new wealth_already_taxed
-            const updatedWealthTaxedForYear = parseFloat(
-                (previousWealthTaxed + (parseFloat(year.huquq_payments_made || 0) * (100 / 19))).toFixed(2)
-            );
-
-            // Update the database
-            const updateWealthTaxedQuery = `
-                UPDATE financial_summary
-                SET wealth_already_taxed = ?
-                WHERE id = ?
-            `;
-            const [updateResult] = await pool.query(updateWealthTaxedQuery, [updatedWealthTaxedForYear, year.id]);
-
-            previousWealthTaxed = updatedWealthTaxedForYear;
+        if (!allYears || allYears.length === 0) {
+            logger.warn('No financial records found for user:', { userId });
+            return res.status(404).json({ error: 'No financial summaries found.' });
         }
 
-        res.status(200).json({ message: 'Huquq payments and cascading updates applied successfully.' });
+        // We will recalculate wealth_already_taxed from Year 2 onwards based on the chain described.
+        // Year 1's wealth_already_taxed is user-provided and should remain unchanged.
+        for (let i = 1; i < allYears.length; i++) {
+            const prevYear = allYears[i - 1];
+            const currentYear = allYears[i];
+
+            // Calculate the current year's wealth_already_taxed from the previous year's data
+            const recalculatedWealth = parseFloat(
+                (
+                    parseFloat(prevYear.wealth_already_taxed) +
+                    (parseFloat(prevYear.huquq_payments_made || 0) * (100 / 19))
+                ).toFixed(2)
+            );
+
+            currentYear.wealth_already_taxed = recalculatedWealth;
+        }
+
+        // Update the recalculated wealth_already_taxed values back to the database
+        const updatePromises = allYears.map((year) => {
+            return pool.query(
+                `UPDATE financial_summary
+                 SET wealth_already_taxed = ?
+                 WHERE id = ?`,
+                [year.wealth_already_taxed, year.id]
+            );
+        });
+
+        await Promise.all(updatePromises);
+
+        res.status(200).json({ message: 'Huquq payments and wealth_already_taxed recalculations applied successfully.' });
     } catch (error) {
         logger.error('Error updating Huquq payments made:', { error: error.message, stack: error.stack });
         res.status(500).send('Server Error');
