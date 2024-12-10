@@ -953,13 +953,13 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
         );
 
         let previousWealthTaxed = currentYear[0].wealth_already_taxed || 0;
-logger.debug(`do we ever get here?`);
+
         // Update each subsequent year iteratively
 for (const year of subsequentYears) {
     // Debugging at the start of the loop
-    logger.debug(`Processing year: ${year.end_date}`);
-    logger.debug(`Previous Wealth Taxed: ${previousWealthTaxed}`);
-    logger.debug(`Huquq Payments Made for this year: ${year.huquq_payments_made}`);
+    console.log('Processing year:', year.end_date);
+    console.log('Previous Wealth Taxed:', previousWealthTaxed);
+    console.log('Huquq Payments Made for this year:', year.huquq_payments_made);
 
     // Calculate updated wealth_already_taxed
     const updatedWealthTaxed = parseFloat(
@@ -967,7 +967,7 @@ for (const year of subsequentYears) {
     );
 
     // Debugging after calculation
-    logger.debug(`Updated Wealth Taxed for year ${year.end_date} = ${updatedWealthTaxed}`);
+    console.log('Updated Wealth Taxed for year:', year.end_date, '=', updatedWealthTaxed);
 
     // Update the database for the current year
     const updateWealthTaxedQuery = `
@@ -978,13 +978,13 @@ for (const year of subsequentYears) {
     const [updateResult] = await pool.query(updateWealthTaxedQuery, [updatedWealthTaxed, year.id]);
 
     // Debugging after database update
-    logger.debug(`Update result for year ${year.end_date}:`, updateResult);
+    console.log('Update result for year:', year.end_date, updateResult);
 
     // Update the previousWealthTaxed for the next iteration
     previousWealthTaxed = updatedWealthTaxed;
 
     // Debugging after setting the new previousWealthTaxed
-    logger.debug(`New Previous Wealth Taxed for next iteration: ${previousWealthTaxed}`);
+    console.log('New Previous Wealth Taxed for next iteration:', previousWealthTaxed);
 }
 
         res.status(200).json({ message: 'Huquq payments and cascading updates applied successfully.' });
