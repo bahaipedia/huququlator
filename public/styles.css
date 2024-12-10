@@ -97,6 +97,23 @@ body.main-page-body {
     font-weight: bold;
     margin-top: 10px;
 }
+.open-source-info {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ccc;
+}
+.open-source-info p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.open-source-info a {
+    color: #0066cc;
+    text-decoration: none;
+}
+.open-source-info a:hover {
+    text-decoration: underline;
+}
 /* Remove up/down arrows for number inputs */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
