@@ -913,8 +913,6 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
         return res.status(403).send('Unauthorized');
     }
 
-    logger.info('Entering api/summary/update-huquq route');
-
     try {
         const { value, end_date } = req.body;
         const userId = req.userId;
@@ -933,9 +931,6 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
         );
         const currentHuquqPaymentsMade = parseFloat(currentHuquq[0]?.huquq_payments_made || 0);
 
-        // Log Huquq Payments Made before the update
-        logger.info(`huquq_payments_made prior to insert: ${currentHuquqPaymentsMade}`);
-
         // Update the current year's Huquq Payments Made
         const updateQuery = `
             UPDATE financial_summary
@@ -949,9 +944,6 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
             return res.status(404).json({ error: 'No matching summary found to update.' });
         }
 
-        // Log Huquq Payments Made after the update
-        logger.info(`huquq_payments_made after insert: ${parsedValue}`);
-
         // Recalculate wealth_already_taxed for the current year
         const updatedWealthTaxed = parseFloat((parsedValue * (100 / 19)).toFixed(2));
 
@@ -962,8 +954,6 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
             WHERE user_id = ? AND end_date = ?
         `;
         await pool.query(updateWealthQuery, [updatedWealthTaxed, userId, end_date]);
-
-        logger.info(`wealth_already_taxed after recalculation for year ${end_date}: ${updatedWealthTaxed}`);
 
         // Fetch all subsequent years
         const subsequentYearsQuery = `
@@ -983,9 +973,6 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
                 (previousWealthTaxed + (parseFloat(year.huquq_payments_made || 0) * (100 / 19))).toFixed(2)
             );
 
-            // Log wealth_already_taxed calculation
-            logger.info(`wealth_already_taxed after calculation for year ${year.end_date}: ${updatedWealthTaxedForYear}`);
-
             // Update the database
             const updateWealthTaxedQuery = `
                 UPDATE financial_summary
@@ -994,9 +981,6 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
             `;
             const [updateResult] = await pool.query(updateWealthTaxedQuery, [updatedWealthTaxedForYear, year.id]);
 
-            logger.info(`Update result for year ${year.end_date}:`, updateResult);
-
-            // Use the new wealth_already_taxed for the next iteration
             previousWealthTaxed = updatedWealthTaxedForYear;
         }
 
