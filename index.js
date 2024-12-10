@@ -886,13 +886,12 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
 
         const parsedValue = parseFloat(value);
 
+        // First, update the specified year's wealth_already_taxed
         const updateQuery = `
             UPDATE financial_summary
             SET wealth_already_taxed = ?
             WHERE user_id = ? AND end_date = ?
         `;
-
-        // Execute query
         const [result] = await pool.query(updateQuery, [parsedValue, userId, end_date]);
 
         if (result.affectedRows === 0) {
@@ -900,7 +899,60 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
             return res.status(404).json({ error: 'No matching summary found to update.' });
         }
 
-        res.status(200).json({ message: 'Wealth already taxed updated successfully.' });
+        // Now we need to update subsequent years if this updated year is Year 1 or occurs before other years.
+        // We will re-fetch all the years and recalculate forward if needed.
+        const allYearsQuery = `
+            SELECT id, end_date, wealth_already_taxed, huquq_payments_made
+            FROM financial_summary
+            WHERE user_id = ?
+            ORDER BY end_date ASC
+        `;
+        const [allYears] = await pool.query(allYearsQuery, [userId]);
+
+        if (!allYears || allYears.length === 0) {
+            logger.warn('No financial records found for user:', { userId });
+            return res.status(404).json({ error: 'No financial summaries found.' });
+        }
+
+        // Find the index of the updated year in the allYears array
+        const updatedYearIndex = allYears.findIndex((year) => year.end_date === end_date);
+        if (updatedYearIndex === -1) {
+            // This theoretically shouldn't happen since we just updated this year
+            logger.error('Updated year not found in the retrieved summaries.', { userId, end_date });
+            return res.status(500).send('Server Error');
+        }
+
+        // Recalculate wealth_already_taxed for all subsequent years
+        // starting from updatedYearIndex + 1
+        for (let i = updatedYearIndex + 1; i < allYears.length; i++) {
+            const prevYear = allYears[i - 1];
+            const currentYear = allYears[i];
+
+            const recalculatedWealth = parseFloat(
+                (
+                    parseFloat(prevYear.wealth_already_taxed) +
+                    (parseFloat(prevYear.huquq_payments_made || 0) * (100 / 19))
+                ).toFixed(2)
+            );
+
+            currentYear.wealth_already_taxed = recalculatedWealth;
+        }
+
+        // Update the recalculated wealth_already_taxed values in the database
+        const updatePromises = [];
+        for (let i = updatedYearIndex + 1; i < allYears.length; i++) {
+            const year = allYears[i];
+            updatePromises.push(
+                pool.query(
+                    `UPDATE financial_summary SET wealth_already_taxed = ? WHERE id = ?`,
+                    [year.wealth_already_taxed, year.id]
+                )
+            );
+        }
+
+        await Promise.all(updatePromises);
+
+        res.status(200).json({ message: 'Wealth already taxed and subsequent years recalculated successfully.' });
     } catch (error) {
         logger.error('Error updating wealth already taxed:', { error: error.message, stack: error.stack });
         res.status(500).send('Server Error');
