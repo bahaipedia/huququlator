@@ -952,18 +952,12 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
         // Log Huquq Payments Made after the update
         logger.info(`huquq_payments_made after insert: ${parsedValue}`);
 
-        // Recalculate wealth_already_taxed for the current year
-        const updatedWealthTaxed = parseFloat((parsedValue * (100 / 19)).toFixed(2));
-
-        // Update the current year's wealth_already_taxed
-        const updateWealthQuery = `
-            UPDATE financial_summary
-            SET wealth_already_taxed = ?
-            WHERE user_id = ? AND end_date = ?
-        `;
-        await pool.query(updateWealthQuery, [updatedWealthTaxed, userId, end_date]);
-
-        logger.info(`wealth_already_taxed after recalculation for year ${end_date}: ${updatedWealthTaxed}`);
+        // Fetch the current year's wealth_already_taxed before modification
+        const [currentYearData] = await pool.query(
+            'SELECT wealth_already_taxed FROM financial_summary WHERE user_id = ? AND end_date = ?',
+            [userId, end_date]
+        );
+        const currentYearWealthTaxed = parseFloat(currentYearData[0]?.wealth_already_taxed || 0);
 
         // Fetch all subsequent years
         const subsequentYearsQuery = `
@@ -975,7 +969,7 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
         const [subsequentYears] = await pool.query(subsequentYearsQuery, [userId, end_date]);
 
         // Update each subsequent year's wealth_already_taxed iteratively
-        let previousWealthTaxed = updatedWealthTaxed;
+        let previousWealthTaxed = currentYearWealthTaxed;
 
         for (const year of subsequentYears) {
             // Calculate the new wealth_already_taxed
