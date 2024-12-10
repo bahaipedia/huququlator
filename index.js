@@ -886,7 +886,7 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
 
         const parsedValue = parseFloat(value);
 
-        // First, update the specified year's wealth_already_taxed
+        // Update the specified year's wealth_already_taxed
         const updateQuery = `
             UPDATE financial_summary
             SET wealth_already_taxed = ?
@@ -899,8 +899,7 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
             return res.status(404).json({ error: 'No matching summary found to update.' });
         }
 
-        // Now we need to update subsequent years if this updated year is Year 1 or occurs before other years.
-        // We will re-fetch all the years and recalculate forward if needed.
+        // Fetch all records and sort by end_date
         const allYearsQuery = `
             SELECT id, end_date, wealth_already_taxed, huquq_payments_made
             FROM financial_summary
@@ -914,45 +913,48 @@ app.put('/api/summary/update', checkLoginStatus, async (req, res) => {
             return res.status(404).json({ error: 'No financial summaries found.' });
         }
 
-        // Find the index of the updated year in the allYears array
+        // Convert allYears end_date to a string in YYYY-MM-DD format for comparison
+        allYears.forEach(year => {
+            if (year.end_date instanceof Date) {
+                year.end_date = year.end_date.toISOString().split('T')[0];
+            }
+        });
+
+        // Find the index of the updated year
         const updatedYearIndex = allYears.findIndex((year) => year.end_date === end_date);
+
         if (updatedYearIndex === -1) {
-            // This theoretically shouldn't happen since we just updated this year
-            logger.error('Updated year not found in the retrieved summaries.', { userId, end_date });
+            logger.error('Updated year not found in retrieved summaries.', { userId, end_date });
             return res.status(500).send('Server Error');
         }
 
-        // Recalculate wealth_already_taxed for all subsequent years
-        // starting from updatedYearIndex + 1
+        // Recalculate wealth_already_taxed for subsequent years
         for (let i = updatedYearIndex + 1; i < allYears.length; i++) {
             const prevYear = allYears[i - 1];
             const currentYear = allYears[i];
 
-            const recalculatedWealth = parseFloat(
-                (
-                    parseFloat(prevYear.wealth_already_taxed) +
-                    (parseFloat(prevYear.huquq_payments_made || 0) * (100 / 19))
-                ).toFixed(2)
-            );
+            const prevWealthTaxed = parseFloat(prevYear.wealth_already_taxed) || 0;
+            const prevHuquq = parseFloat(prevYear.huquq_payments_made) || 0;
+            const recalculatedWealth = parseFloat((prevWealthTaxed + (prevHuquq * (100 / 19))).toFixed(2));
 
             currentYear.wealth_already_taxed = recalculatedWealth;
         }
 
-        // Update the recalculated wealth_already_taxed values in the database
+        // Update subsequent years in the database
         const updatePromises = [];
         for (let i = updatedYearIndex + 1; i < allYears.length; i++) {
             const year = allYears[i];
-            updatePromises.push(
-                pool.query(
-                    `UPDATE financial_summary SET wealth_already_taxed = ? WHERE id = ?`,
-                    [year.wealth_already_taxed, year.id]
-                )
-            );
+            updatePromises.push(pool.query(
+                `UPDATE financial_summary
+                 SET wealth_already_taxed = ?
+                 WHERE id = ?`,
+                [year.wealth_already_taxed, year.id]
+            ));
         }
 
         await Promise.all(updatePromises);
 
-        res.status(200).json({ message: 'Wealth already taxed and subsequent years recalculated successfully.' });
+        res.status(200).json({ message: 'Wealth previously taxed and subsequent years updated successfully.' });
     } catch (error) {
         logger.error('Error updating wealth already taxed:', { error: error.message, stack: error.stack });
         res.status(500).send('Server Error');
