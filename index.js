@@ -912,7 +912,7 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
     if (!req.loggedIn) {
         return res.status(403).send('Unauthorized');
     }
-
+logger.debug(`part1`);
     try {
         const { value, end_date } = req.body;
         const userId = req.userId;
@@ -921,7 +921,7 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
             logger.warn('Missing value or end_date in request:', { value, end_date });
             return res.status(400).json({ error: 'Value and end_date are required.' });
         }
-
+logger.debug(`part2`);
         const parsedValue = parseFloat(value);
 
         // Update the current year's Huquq Payments Made
@@ -931,12 +931,12 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
             WHERE user_id = ? AND end_date = ?
         `;
         const [result] = await pool.query(updateQuery, [parsedValue, userId, end_date]);
-
+logger.debug(`part3`);
         if (result.affectedRows === 0) {
             logger.warn('No matching summary found to update:', { userId, end_date });
             return res.status(404).json({ error: 'No matching summary found to update.' });
         }
-
+logger.debug(`part4`);
         // Fetch all subsequent years
         const subsequentYearsQuery = `
             SELECT id, end_date, wealth_already_taxed, huquq_payments_made
@@ -945,21 +945,21 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
             ORDER BY end_date ASC
         `;
         const [subsequentYears] = await pool.query(subsequentYearsQuery, [userId, end_date]);
-
+logger.debug(`part5`);
         // Fetch the current year's updated wealth_already_taxed
         const [currentYear] = await pool.query(
             'SELECT wealth_already_taxed FROM financial_summary WHERE user_id = ? AND end_date = ?',
             [userId, end_date]
         );
-
+logger.debug(`part6`);
         let previousWealthTaxed = currentYear[0].wealth_already_taxed || 0;
-
+logger.debug(`part7`);
         // Update each subsequent year iteratively
 for (const year of subsequentYears) {
     // Debugging at the start of the loop
-    console.log('Processing year:', year.end_date);
-    console.log('Previous Wealth Taxed:', previousWealthTaxed);
-    console.log('Huquq Payments Made for this year:', year.huquq_payments_made);
+    logger.debug(`Processing year: ${year.end_date}`);
+    logger.debug(`Previous Wealth Taxed: ${previousWealthTaxed}`);
+    logger.debug(`Huquq Payments Made for this year: ${year.huquq_payments_made}`);
 
     // Calculate updated wealth_already_taxed
     const updatedWealthTaxed = parseFloat(
@@ -967,7 +967,7 @@ for (const year of subsequentYears) {
     );
 
     // Debugging after calculation
-    console.log('Updated Wealth Taxed for year:', year.end_date, '=', updatedWealthTaxed);
+    logger.debug(`Updated Wealth Taxed for year ${year.end_date} = ${updatedWealthTaxed}`);
 
     // Update the database for the current year
     const updateWealthTaxedQuery = `
@@ -978,13 +978,13 @@ for (const year of subsequentYears) {
     const [updateResult] = await pool.query(updateWealthTaxedQuery, [updatedWealthTaxed, year.id]);
 
     // Debugging after database update
-    console.log('Update result for year:', year.end_date, updateResult);
+    logger.debug(`Update result for year ${year.end_date}:`, updateResult);
 
     // Update the previousWealthTaxed for the next iteration
     previousWealthTaxed = updatedWealthTaxed;
 
     // Debugging after setting the new previousWealthTaxed
-    console.log('New Previous Wealth Taxed for next iteration:', previousWealthTaxed);
+    logger.debug(`New Previous Wealth Taxed for next iteration: ${previousWealthTaxed}`);
 }
 
         res.status(200).json({ message: 'Huquq payments and cascading updates applied successfully.' });
