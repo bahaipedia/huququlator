@@ -953,7 +953,7 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
         );
 
         let previousWealthTaxed = currentYear[0].wealth_already_taxed || 0;
-
+logger.debug(`do we ever get here?`);
         // Update each subsequent year iteratively
 for (const year of subsequentYears) {
     // Debugging at the start of the loop
