@@ -29,7 +29,6 @@ document.querySelector('.add-year-button').addEventListener('click', () => {
                 return response.json();
             })
             .then(() => {
-                alert('New reporting period and entries added successfully!');
                 location.reload(); // Reload to reflect the new column
             })
             .catch(err => {
