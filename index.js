@@ -955,19 +955,39 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
         let previousWealthTaxed = currentYear[0].wealth_already_taxed || 0;
 
         // Update each subsequent year iteratively
-        for (const year of subsequentYears) {
-            const updatedWealthTaxed = parseFloat((parseFloat(previousWealthTaxed || 0) + (parseFloat(year.huquq_payments_made || 0) * (100 / 19))).toFixed(2));
+for (const year of subsequentYears) {
+    // Fetch the latest wealth_already_taxed for the current year
+    const [currentRecord] = await pool.query(
+        'SELECT wealth_already_taxed FROM financial_summary WHERE id = ?',
+        [year.id]
+    );
 
-            const updateWealthTaxedQuery = `
-                UPDATE financial_summary
-                SET wealth_already_taxed = ?
-                WHERE id = ?
-            `;
-            await pool.query(updateWealthTaxedQuery, [updatedWealthTaxed, year.id]);
+    const currentWealthTaxed = parseFloat(currentRecord[0]?.wealth_already_taxed || 0);
 
-            // Update for the next iteration
-            previousWealthTaxed = updatedWealthTaxed;
-        }
+    // Debugging for fetched values
+    logger.info(`Fetched wealth_already_taxed for year ${year.end_date}:`, currentWealthTaxed);
+
+    // Calculate the new wealth_already_taxed
+    const updatedWealthTaxed = parseFloat(
+        (currentWealthTaxed + (parseFloat(year.huquq_payments_made || 0) * (100 / 19))).toFixed(2)
+    );
+
+    // Debugging for calculated values
+    logger.info(`Calculated wealth_already_taxed for year ${year.end_date}:`, updatedWealthTaxed);
+
+    // Update the database
+    const updateWealthTaxedQuery = `
+        UPDATE financial_summary
+        SET wealth_already_taxed = ?
+        WHERE id = ?
+    `;
+    const [updateResult] = await pool.query(updateWealthTaxedQuery, [updatedWealthTaxed, year.id]);
+
+    logger.info(`Update result for year ${year.end_date}:`, updateResult);
+
+    // Use the new wealth_already_taxed for the next iteration
+    previousWealthTaxed = updatedWealthTaxed;
+}
 
         res.status(200).json({ message: 'Huquq payments and cascading updates applied successfully.' });
     } catch (error) {
