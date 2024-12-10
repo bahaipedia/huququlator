@@ -98,15 +98,12 @@ body.main-page-body {
     margin-top: 10px;
 }
 .open-source-info {
-    margin-top: 2rem;
     padding-top: 1rem;
-    border-top: 1px solid #ccc;
 }
 .open-source-info p {
     font-size: 0.9rem;
     color: #666;
 }
-
 .open-source-info a {
     color: #0066cc;
     text-decoration: none;
