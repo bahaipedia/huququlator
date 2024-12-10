@@ -926,16 +926,6 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
 
         const parsedValue = parseFloat(value);
 
-        // Fetch the current Huquq Payments Made before updating
-        const [currentHuquq] = await pool.query(
-            'SELECT huquq_payments_made FROM financial_summary WHERE user_id = ? AND end_date = ?',
-            [userId, end_date]
-        );
-        const currentHuquqPaymentsMade = parseFloat(currentHuquq[0]?.huquq_payments_made || 0);
-
-        // Log Huquq Payments Made before the update
-        logger.info(`huquq_payments_made prior to insert: ${currentHuquqPaymentsMade}`);
-
         // Update the current year's Huquq Payments Made
         const updateQuery = `
             UPDATE financial_summary
@@ -949,49 +939,32 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
             return res.status(404).json({ error: 'No matching summary found to update.' });
         }
 
-        // Log Huquq Payments Made after the update
-        logger.info(`huquq_payments_made after insert: ${parsedValue}`);
-
-        // Fetch the current year's wealth_already_taxed before modification
-        const [currentYearData] = await pool.query(
-            'SELECT wealth_already_taxed FROM financial_summary WHERE user_id = ? AND end_date = ?',
-            [userId, end_date]
-        );
-        const currentYearWealthTaxed = parseFloat(currentYearData[0]?.wealth_already_taxed || 0);
-
-        // Fetch all subsequent years
-        const subsequentYearsQuery = `
-            SELECT id, end_date, wealth_already_taxed, huquq_payments_made
+        // Fetch all years from the updated year onwards
+        const yearsQuery = `
+            SELECT id, end_date, huquq_payments_made, wealth_already_taxed
             FROM financial_summary
-            WHERE user_id = ? AND end_date > ?
+            WHERE user_id = ? AND end_date >= ?
             ORDER BY end_date ASC
         `;
-        const [subsequentYears] = await pool.query(subsequentYearsQuery, [userId, end_date]);
+        const [years] = await pool.query(yearsQuery, [userId, end_date]);
 
-        // Update each subsequent year's wealth_already_taxed iteratively
-        let previousWealthTaxed = currentYearWealthTaxed;
+        // Recalculate wealth_already_taxed starting from the first year
+        let cumulativeWealthTaxed = 0;
 
-        for (const year of subsequentYears) {
-            // Calculate the new wealth_already_taxed
-            const updatedWealthTaxedForYear = parseFloat(
-                (previousWealthTaxed + (parseFloat(year.huquq_payments_made || 0) * (100 / 19))).toFixed(2)
-            );
+        for (const year of years) {
+            // Calculate wealth_already_taxed
+            cumulativeWealthTaxed += parseFloat(year.huquq_payments_made || 0) * (100 / 19);
+            const roundedCumulativeWealthTaxed = parseFloat(cumulativeWealthTaxed.toFixed(2));
 
-            // Log wealth_already_taxed calculation
-            logger.info(`wealth_already_taxed after calculation for year ${year.end_date}: ${updatedWealthTaxedForYear}`);
-
-            // Update the database
+            // Update wealth_already_taxed for this year
             const updateWealthTaxedQuery = `
                 UPDATE financial_summary
                 SET wealth_already_taxed = ?
                 WHERE id = ?
             `;
-            const [updateResult] = await pool.query(updateWealthTaxedQuery, [updatedWealthTaxedForYear, year.id]);
+            await pool.query(updateWealthTaxedQuery, [roundedCumulativeWealthTaxed, year.id]);
 
-            logger.info(`Update result for year ${year.end_date}:`, updateResult);
-
-            // Use the new wealth_already_taxed for the next iteration
-            previousWealthTaxed = updatedWealthTaxedForYear;
+            logger.info(`Updated wealth_already_taxed for year ${year.end_date}: ${roundedCumulativeWealthTaxed}`);
         }
 
         res.status(200).json({ message: 'Huquq payments and cascading updates applied successfully.' });
