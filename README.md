@@ -1,14 +1,8 @@
-A Huququllah calculator, still in the process of being created. Available here: https://huququlator.com/
+This is a Ḥuqúqu’lláh calculator, available at https://huququlator.com
 
-It's primary functions are categorizing expenses as necessary or unnecessary. 
+Its primary functions include providing a public calculator and, for logged in users, tracking assets, debts, payments, and amounts due, as well as automatically categorizing expenses.
 
-Roadmap:
-- Tracking of changes in assets over time
-- Tracking of previous payments
-
-
-
-Steps to install this project on a new ubuntu server. 
+Below are the steps to install this project on a new Ubuntu server:
 
 ```bash
 sudo apt install -y nodejs npm
