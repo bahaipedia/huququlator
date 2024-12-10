@@ -939,32 +939,43 @@ app.put('/api/summary/update-huquq', checkLoginStatus, async (req, res) => {
             return res.status(404).json({ error: 'No matching summary found to update.' });
         }
 
-        // Fetch all years from the updated year onwards
-        const yearsQuery = `
+        // Fetch the current year's wealth_already_taxed
+        const [currentYearData] = await pool.query(
+            'SELECT wealth_already_taxed FROM financial_summary WHERE user_id = ? AND end_date = ?',
+            [userId, end_date]
+        );
+        const currentYearWealthTaxed = parseFloat(currentYearData[0]?.wealth_already_taxed || 0);
+
+        // Fetch subsequent years
+        const subsequentYearsQuery = `
             SELECT id, end_date, huquq_payments_made, wealth_already_taxed
             FROM financial_summary
-            WHERE user_id = ? AND end_date >= ?
+            WHERE user_id = ? AND end_date > ?
             ORDER BY end_date ASC
         `;
-        const [years] = await pool.query(yearsQuery, [userId, end_date]);
+        const [subsequentYears] = await pool.query(subsequentYearsQuery, [userId, end_date]);
 
-        // Recalculate wealth_already_taxed starting from the first year
-        let cumulativeWealthTaxed = 0;
+        // Calculate and update subsequent years
+        let previousWealthTaxed = currentYearWealthTaxed;
 
-        for (const year of years) {
-            // Calculate wealth_already_taxed
-            cumulativeWealthTaxed += parseFloat(year.huquq_payments_made || 0) * (100 / 19);
-            const roundedCumulativeWealthTaxed = parseFloat(cumulativeWealthTaxed.toFixed(2));
+        for (const year of subsequentYears) {
+            // Calculate new wealth_already_taxed
+            const updatedWealthTaxedForYear = parseFloat(
+                (previousWealthTaxed + (parseFloat(year.huquq_payments_made || 0) * (100 / 19))).toFixed(2)
+            );
 
-            // Update wealth_already_taxed for this year
+            // Update the database for subsequent years
             const updateWealthTaxedQuery = `
                 UPDATE financial_summary
                 SET wealth_already_taxed = ?
                 WHERE id = ?
             `;
-            await pool.query(updateWealthTaxedQuery, [roundedCumulativeWealthTaxed, year.id]);
+            await pool.query(updateWealthTaxedQuery, [updatedWealthTaxedForYear, year.id]);
 
-            logger.info(`Updated wealth_already_taxed for year ${year.end_date}: ${roundedCumulativeWealthTaxed}`);
+            logger.info(`Updated wealth_already_taxed for year ${year.end_date}: ${updatedWealthTaxedForYear}`);
+
+            // Prepare for next iteration
+            previousWealthTaxed = updatedWealthTaxedForYear;
         }
 
         res.status(200).json({ message: 'Huquq payments and cascading updates applied successfully.' });
