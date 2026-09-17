@@ -17,7 +17,7 @@ exports.getDashboardStats = async (req, res) => {
 
         // Fetch recent users
         const [usersList] = await pool.query(
-            'SELECT id, username, email, role, is_verified, created_at, last_login FROM users ORDER BY created_at DESC LIMIT 50'
+            'SELECT id, username, email, role, is_verified, created_at, last_login FROM users ORDER BY created_at DESC'
         );
 
         res.status(200).json({
