@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const jwt = require('jsonwebtoken');
 
 exports.getDashboardStats = async (req, res) => {
     try {
@@ -61,5 +62,35 @@ exports.deleteUser = async (req, res) => {
     } catch (error) {
         console.error('Delete user error:', error);
         res.status(500).json({ message: 'Server Error deleting user' });
+    }
+};
+
+// Debug on behalf of a user
+exports.impersonateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Fetch the target user
+        const [rows] = await pool.query('SELECT id, username, role FROM users WHERE id = ?', [id]);
+        if (rows.length === 0) return res.status(404).json({ message: 'User not found' });
+        
+        const targetUser = rows[0];
+
+        // Generate a new token for the TARGET user
+        const token = jwt.sign(
+            { id: targetUser.id, username: targetUser.username, role: targetUser.role }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '12h' }
+        );
+
+        // Overwrite the admin's cookie with the target user's cookie
+        res.cookie('token', token, { 
+            httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Lax', maxAge: 12 * 3600000
+        });
+
+        res.status(200).json({ message: 'Impersonation successful', user: targetUser });
+    } catch (error) {
+        console.error('Impersonation error:', error);
+        res.status(500).json({ message: 'Server Error during impersonation' });
     }
 };
