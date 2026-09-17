@@ -31,6 +31,7 @@ export default function Sidebar() {
                     </>
                 ) : (
                     <>
+                        {user.role === 'admin' && <li><Link to="/admin" style={{ color: 'orange', fontWeight: 'bold' }}>Admin Panel</Link></li>}
                         <li><Link to="/">Calculator</Link></li>
                         <li><Link to="/about">About</Link></li>
                         <li><Link to="/help">Help</Link></li>
