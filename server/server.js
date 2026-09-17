@@ -8,6 +8,8 @@ const pool = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+const ruleRoutes = require('./routes/ruleRoutes');
 
 dotenv.config();
 
@@ -27,6 +29,8 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/rules', ruleRoutes);
 
 // Test Database Connection
 app.get('/api/health', async (req, res) => {
