@@ -161,6 +161,16 @@ export default function AdminDashboard() {
                                     <td>{u.email}</td>
                                     <td>{u.role === 'admin' ? <strong style={{color: 'orange'}}>Admin</strong> : 'User'}</td>
                                     <td>{u.is_verified ? '✅' : '❌'}</td>
+                                    <td>
+                                        <span style={{ color: u.transaction_count > 0 ? 'var(--link-color)' : 'inherit', fontWeight: u.transaction_count > 0 ? 'bold' : 'normal' }}>
+                                            {u.transaction_count}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span style={{ color: u.rule_count > 0 ? 'var(--link-color)' : 'inherit', fontWeight: u.rule_count > 0 ? 'bold' : 'normal' }}>
+                                            {u.rule_count}
+                                        </span>
+                                    </td>
                                     <td>{new Date(u.created_at).toISOString().split('T')[0]}</td>
                                     <td>{u.last_login ? new Date(u.last_login).toISOString().split('T')[0] : 'Never'}</td>
                                     <td>
@@ -172,7 +182,7 @@ export default function AdminDashboard() {
                             ))}
                             {processedUsers.length === 0 && (
                                 <tr>
-                                    <td colSpan="7" style={{ textAlign: 'center' }}>No users found matching "{searchTerm}"</td>
+                                    <td colSpan="9" style={{ textAlign: 'center' }}>No users found matching "{searchTerm}"</td>
                                 </tr>
                             )}
                         </tbody>
