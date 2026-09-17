@@ -6,6 +6,8 @@ import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import Upload from './pages/Upload';
+import Transactions from './pages/Transactions';
+import FilterRules from './pages/FilterRules';
 
 function App() {
     return (
@@ -34,6 +36,8 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
+                    <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
+                    <Route path="/filter-rules" element={<ProtectedRoute><FilterRules /></ProtectedRoute>} />
                 </Routes>
             </Router>
         </AuthProvider>
