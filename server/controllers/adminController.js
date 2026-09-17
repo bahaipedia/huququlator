@@ -15,12 +15,13 @@ exports.getDashboardStats = async (req, res) => {
             pool.query('SELECT COUNT(*) as count FROM upload_history WHERE status = "error"')
         ]);
 
-        // Fetch users with their transaction and rule counts
+        // Fetch users with their transaction, rule, and dashboard counts
         const [usersList] = await pool.query(`
             SELECT 
                 u.id, u.username, u.email, u.role, u.is_verified, u.created_at, u.last_login,
                 (SELECT COUNT(*) FROM transactions t WHERE t.user_id = u.id) as transaction_count,
-                (SELECT COUNT(*) FROM filter_rules fr WHERE fr.user_id = u.id) as rule_count
+                (SELECT COUNT(*) FROM filter_rules fr WHERE fr.user_id = u.id) as rule_count,
+                (SELECT COUNT(*) FROM financial_summary fs WHERE fs.user_id = u.id) as dashboard_count
             FROM users u 
             ORDER BY u.created_at DESC
         `);
