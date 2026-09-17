@@ -12,6 +12,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Help from './pages/Help';
 import VerifyEmail from './pages/VerifyEmail';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
     return (
@@ -45,6 +46,7 @@ function App() {
                     />
                     <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
                     <Route path="/filter-rules" element={<ProtectedRoute><FilterRules /></ProtectedRoute>} />
+                    <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                 </Routes>
             </Router>
         </AuthProvider>
