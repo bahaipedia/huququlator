@@ -238,7 +238,7 @@
 .home-container {
     display: flex;
     flex-direction: column;
-    gap: 4rem;
+    gap: 2.5rem;
 }
 
 .hero-section {
@@ -249,18 +249,20 @@
 
 .hero-text {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
 .hero-text h1 {
-    font-size: 2.2rem;
-    color: #0073e6; /* Restored original blue */
-    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+    color: #0073e6; 
+    margin-bottom: 0.25rem;
+    margin-top: 0;
 }
 
 .hero-text p {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #555;
+    margin: 0;
 }
 
 /* Modernized Calculator Card */
