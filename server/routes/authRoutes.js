@@ -13,5 +13,6 @@ router.post('/register', [
 router.post('/login', authController.login);
 router.post('/logout', authController.logout);
 router.get('/check', verifyToken, authController.checkAuth);
+router.get('/verify', authController.verifyEmail);
 
 module.exports = router;
