@@ -152,7 +152,7 @@ export default function Home() {
             </section>
 
             <section className="features-section">
-                <h2>More than just a calculator</h2>
+                <h2>Create an account to:</h2>
                 <div className="feature-grid">
                     <div className="feature-card">
                         <h3>Track Over Time</h3>
