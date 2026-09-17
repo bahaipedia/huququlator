@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
+import Upload from './pages/Upload';
 
 function App() {
     return (
@@ -24,6 +25,14 @@ function App() {
                                 <Dashboard />
                             </ProtectedRoute>
                         } 
+                    />
+                    <Route 
+                        path="/upload" 
+                        element={
+                            <ProtectedRoute>
+                                <Upload />
+                            </ProtectedRoute>
+                        }
                     />
                 </Routes>
             </Router>
