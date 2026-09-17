@@ -15,6 +15,7 @@ import About from './pages/About';
 import Help from './pages/Help';
 import VerifyEmail from './pages/VerifyEmail';
 import AdminDashboard from './pages/AdminDashboard';
+import './App.css';
 
 // Global Layout Component
 function AppLayout() {
