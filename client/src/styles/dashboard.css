@@ -1,0 +1,90 @@
+.dashboard-wrapper {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.table-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* Ensures it scrolls if screen is small */
+}
+
+/* Sticky First Column */
+.dashboard-table th:first-child,
+.dashboard-table td:first-child {
+    position: sticky;
+    left: 0;
+    background-color: var(--bg-color);
+    z-index: 2;
+    border-right: 2px solid var(--border-color);
+    font-weight: bold;
+}
+
+.dashboard-table th, .dashboard-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.dashboard-table th {
+    background-color: var(--nav-bg);
+}
+
+.section-title {
+    background-color: var(--nav-bg);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+/* Interactive Inputs */
+.cell-input {
+    width: 100px;
+    padding: 0.4rem;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-color);
+    border-radius: 4px;
+    text-align: right;
+}
+
+.cell-input:focus {
+    border: 1px solid var(--link-color);
+    outline: none;
+    background: var(--nav-bg);
+}
+
+/* Hover Delete Buttons */
+.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.2s ease-in-out;
+    margin-left: 10px;
+    float: right;
+}
+
+.dashboard-table tr:hover .delete-btn {
+    opacity: 1; /* Revealed on row hover */
+}
+
+.add-row-form {
+    display: flex;
+    gap: 10px;
+}
+.add-row-form input {
+    flex: 1;
+    padding: 0.4rem;
+}
