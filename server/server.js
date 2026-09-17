@@ -10,6 +10,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const ruleRoutes = require('./routes/ruleRoutes');
+const publicRoutes = require('./routes/publicRoutes');
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/rules', ruleRoutes);
+app.use('/api', publicRoutes);
 
 // Test Database Connection
 app.get('/api/health', async (req, res) => {
