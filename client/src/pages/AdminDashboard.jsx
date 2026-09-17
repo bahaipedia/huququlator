@@ -1,8 +1,12 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
 import Sidebar from '../components/Sidebar';
+import { AuthContext } from '../context/AuthContext';
 
 export default function AdminDashboard() {
+    const { setUser } = useContext(AuthContext);
+    const navigate = useNavigate();
     const [data, setData] = useState({ stats: {}, users: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -33,6 +37,18 @@ export default function AdminDashboard() {
             fetchAdminData();
         } catch (err) {
             alert('Error deleting user');
+        }
+    };
+
+    const handleImpersonate = async (id, username) => {
+        if (!window.confirm(`Are you sure you want to impersonate ${username}? You will need to log out and log back in to regain your Admin access.`)) return;
+        
+        try {
+            const response = await axios.post(`/admin/impersonate/${id}`);
+            setUser(response.data.user); // Update React state to the new user
+            navigate('/dashboard'); // Redirect to their dashboard
+        } catch (err) {
+            alert('Failed to impersonate user');
         }
     };
 
@@ -160,7 +176,23 @@ export default function AdminDashboard() {
                         <tbody>
                             {processedUsers.map(u => (
                                 <tr key={u.id}>
-                                    <td>{u.username}</td>
+                                    <td>
+                                        {u.role === 'admin' ? (
+                                            u.username
+                                        ) : (
+                                            <button 
+                                                onClick={() => handleImpersonate(u.id, u.username)}
+                                                style={{ 
+                                                    background: 'none', border: 'none', color: 'var(--link-color)', 
+                                                    cursor: 'pointer', textDecoration: 'underline', padding: 0, 
+                                                    fontSize: 'inherit', fontWeight: 'bold'
+                                                }}
+                                                title="Click to impersonate this user"
+                                            >
+                                                {u.username}
+                                            </button>
+                                        )}
+                                    </td>
                                     <td>{u.email}</td>
                                     <td>{u.role === 'admin' ? <strong style={{color: 'orange'}}>Admin</strong> : 'User'}</td>
                                     <td>{u.is_verified ? '✅' : '❌'}</td>
