@@ -67,57 +67,72 @@ export default function Home() {
             <section className="hero-section">
                 <div className="hero-text">
                     <h1>Welcome to Huququlator</h1>
-                    <p>A simple, private calculator for Ḥuqúqu’lláh. If you don't understand any of the fields below, visit our <Link to="/help">Help page</Link>.</p>
+                    <p>A calculator for Ḥuqúqu’lláh. If you don't understand any of the fields below, visit our <Link to="/help">Help page</Link>.</p>
                 </div>
 
                 <div className="calculator-card">
-                    <div className="form-group">
-                        <label>Excess wealth:</label>
-                        <input type="number" value={a1} onChange={e => setA1(e.target.value)} placeholder="Enter amount" />
-                        <small className="help-text">Total assets less any debts.</small>
+                    
+                    <div className="calc-row">
+                        <label className="calc-label">Excess wealth:</label>
+                        <div className="calc-input">
+                            <input type="number" value={a1} onChange={e => setA1(e.target.value)} placeholder="0" />
+                        </div>
+                        <div className="calc-helper">Total assets less any debts.</div>
                     </div>
 
-                    <div className="form-group">
-                        <label>Unnecessary expenditures:</label>
-                        <input type="number" value={a2} onChange={e => setA2(e.target.value)} placeholder="Enter amount" />
-                        <small className="help-text">These are purchases or expenditures subject to Ḥuqúqu'lláh.</small>
+                    <div className="calc-row">
+                        <label className="calc-label">Unnecessary expenditures:</label>
+                        <div className="calc-input">
+                            <input type="number" value={a2} onChange={e => setA2(e.target.value)} placeholder="0" />
+                        </div>
+                        <div className="calc-helper">These are purchases or expenditures subject to Ḥuqúqu'lláh.</div>
                     </div>
 
-                    <div className="form-group">
-                        <label>Wealth Ḥuqúq has already been paid on:</label>
-                        <input type="number" value={a3} onChange={e => setA3(e.target.value)} placeholder="Enter amount" />
-                        <small className="help-text">If you only know past payments, multiply those by (100/19).</small>
+                    <div className="calc-row">
+                        <label className="calc-label">Wealth Ḥuqúq has already been paid on:</label>
+                        <div className="calc-input">
+                            <input type="number" value={a3} onChange={e => setA3(e.target.value)} placeholder="0" />
+                        </div>
+                        <div className="calc-helper">If you only know past payments, multiply those by (100/19).</div>
                     </div>
 
-                    <div className="form-group">
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            Value of 19 Mithqáls of gold on: 
-                            <input type="date" value={date} onChange={e => { setDate(e.target.value); setIsCustomGold(false); }} style={{ width: 'auto', padding: '0.2rem' }} />
-                        </label>
-                        <input type="number" value={a4} onChange={handleCustomGoldChange} />
-                        <small className="help-text">{date}'s gold rate multiplied by 2.22456.</small>
+                    <div className="calc-row">
+                        <div className="calc-label">
+                            <label>Value of 19 Mithqáls of gold on:</label>
+                            <input type="date" value={date} onChange={e => { setDate(e.target.value); setIsCustomGold(false); }} className="date-picker" />
+                        </div>
+                        <div className="calc-input">
+                            <input type="number" value={a4} onChange={handleCustomGoldChange} placeholder="0" />
+                        </div>
+                        <div className="calc-helper">{date}'s gold rate multiplied by 2.22456.</div>
                     </div>
 
-                    <div className="form-group">
-                        <label>Payment due on the following units of Ḥuqúq:</label>
-                        <input type="number" value={a5 || ''} readOnly className="readonly-input" />
-                        <small className="help-text">
+                    <div className="calc-row">
+                        <label className="calc-label">Payment due on the following units of Ḥuqúq:</label>
+                        <div className="calc-input">
+                            <input type="number" value={a5 || ''} readOnly className="readonly-input" />
+                        </div>
+                        <div className="calc-helper">
                             {numA4 > 0 && taxableWealth > numA4 
                                 ? `We rounded down from ${(taxableWealth / numA4).toFixed(2)} because payments are only due on whole units of Huquq.` 
                                 : 'Payments are only due on whole units of Huquq.'}
-                        </small>
+                        </div>
                     </div>
 
-                    <div className="form-group">
-                        <label>The amount of wealth you are paying Ḥuqúq on today:</label>
-                        <input type="number" value={a6 || ''} readOnly className="readonly-input" />
-                        <small className="help-text">Today's gold rate multiplied by full units of Ḥuqúq.</small>
+                    <div className="calc-row">
+                        <label className="calc-label">The amount of wealth you are paying Ḥuqúq on today:</label>
+                        <div className="calc-input">
+                            <input type="number" value={a6 || ''} readOnly className="readonly-input" />
+                        </div>
+                        <div className="calc-helper">Today's gold rate multiplied by full units of Ḥuqúq.</div>
                     </div>
 
-                    <div className="form-group">
-                        <label>19% of the above:</label>
-                        <input type="number" value={a7 || ''} readOnly className="readonly-input" />
-                        <small className="help-text">Ḥuqúqu'lláh is a 19% tax on the wealth listed above.</small>
+                    <div className="calc-row">
+                        <label className="calc-label">19% of the above:</label>
+                        <div className="calc-input">
+                            <input type="number" value={a7 || ''} readOnly className="readonly-input" />
+                        </div>
+                        <div className="calc-helper">Ḥuqúqu'lláh is a 19% tax on the wealth listed above.</div>
                     </div>
 
                     {r7 && (
