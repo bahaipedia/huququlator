@@ -1,0 +1,50 @@
+.static-content {
+    max-width: 800px;
+    line-height: 1.6;
+}
+
+.static-content h1 {
+    margin-bottom: 1rem;
+}
+
+.accordion-item {
+    background: var(--nav-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.accordion-header {
+    margin: 0;
+    padding: 1rem;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--nav-bg);
+}
+
+.accordion-header:hover {
+    background: var(--border-color);
+}
+
+.accordion-body {
+    padding: 0 1rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+}
+
+.accordion-body.expanded {
+    max-height: 2000px; /* Arbitrary large number for CSS transition */
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.accordion-body img {
+    border-radius: 4px;
+    margin-top: 1rem;
+    border: 1px solid var(--border-color);
+}
