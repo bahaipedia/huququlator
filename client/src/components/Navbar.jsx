@@ -19,26 +19,25 @@ export default function Navbar() {
 
     return (
         <nav className="navbar">
-            {user ? (
-                <>
-                    <span>Welcome, {user.username}</span>
-                    <div className="navbar-right">
+            <div className="navbar-left">
+                <Link to="/">Calculator</Link>
+                <Link to="/about">About</Link>
+                <Link to="/help">Help</Link>
+            </div>
+            <div className="navbar-right">
+                {user ? (
+                    <>
+                        <span>Welcome, {user.username}</span>
                         <Link to="/dashboard">Dashboard</Link>
                         <button onClick={handleLogout}>Log out</button>
-                    </div>
-                </>
-            ) : (
-                <>
-                    <div className="navbar-left">
-                        <Link to="/">Calculator</Link>
-                    </div>
-                    <div className="navbar-right">
+                    </>
+                ) : (
+                    <>
                         <Link to="/login">Login</Link>
                         <Link to="/register">Register</Link>
-                    </div>
-                </>
-            )}
+                    </>
+                )}
+            </div>
         </nav>
     );
 }
-
