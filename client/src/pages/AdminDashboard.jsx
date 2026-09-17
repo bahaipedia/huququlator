@@ -139,6 +139,9 @@ export default function AdminDashboard() {
                                 <th onClick={() => handleSort('is_verified')} style={{ cursor: 'pointer' }}>
                                     Verified{getSortIndicator('is_verified')}
                                 </th>
+                                <th onClick={() => handleSort('dashboard_count')} style={{ cursor: 'pointer' }}>
+                                    Dashboard{getSortIndicator('dashboard_count')}
+                                </th>
                                 <th onClick={() => handleSort('transaction_count')} style={{ cursor: 'pointer' }}>
                                     Transactions{getSortIndicator('transaction_count')}
                                 </th>
@@ -162,6 +165,11 @@ export default function AdminDashboard() {
                                     <td>{u.role === 'admin' ? <strong style={{color: 'orange'}}>Admin</strong> : 'User'}</td>
                                     <td>{u.is_verified ? '✅' : '❌'}</td>
                                     <td>
+                                        <span style={{ color: u.dashboard_count > 0 ? 'var(--link-color)' : 'inherit', fontWeight: u.dashboard_count > 0 ? 'bold' : 'normal' }}>
+                                            {u.dashboard_count}
+                                        </span>
+                                    </td>
+                                    <td>
                                         <span style={{ color: u.transaction_count > 0 ? 'var(--link-color)' : 'inherit', fontWeight: u.transaction_count > 0 ? 'bold' : 'normal' }}>
                                             {u.transaction_count}
                                         </span>
@@ -182,7 +190,7 @@ export default function AdminDashboard() {
                             ))}
                             {processedUsers.length === 0 && (
                                 <tr>
-                                    <td colSpan="9" style={{ textAlign: 'center' }}>No users found matching "{searchTerm}"</td>
+                                    <td colSpan="10" style={{ textAlign: 'center' }}>No users found matching "{searchTerm}"</td>
                                 </tr>
                             )}
                         </tbody>
