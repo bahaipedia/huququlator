@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const pool = require('./config/db');
+const cron = require('node-cron');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -46,6 +47,21 @@ app.get('/api/health', async (req, res) => {
     } catch (error) {
         console.error('Database connection failed:', error);
         res.status(500).json({ status: 'error', message: 'Database connection failed' });
+    }
+});
+
+// Run every day at midnight to delete unverified accounts older than 30 days
+cron.schedule('0 0 * * *', async () => {
+    console.log('Running daily cleanup of unverified accounts...');
+    try {
+        const [result] = await pool.query(
+            `DELETE FROM users WHERE is_verified = FALSE AND created_at < NOW() - INTERVAL 30 DAY`
+        );
+        if (result.affectedRows > 0) {
+            console.log(`Deleted ${result.affectedRows} unverified bot accounts.`);
+        }
+    } catch (error) {
+        console.error('Error during account cleanup task:', error);
     }
 });
 
