@@ -88,3 +88,39 @@
     flex: 1;
     padding: 0.4rem;
 }
+
+.tab-container {
+    display: flex;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+.tab {
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1rem;
+    opacity: 0.7;
+}
+.tab.active {
+    opacity: 1;
+    font-weight: bold;
+    border-bottom: 3px solid var(--link-color);
+    margin-bottom: -2px;
+}
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: var(--nav-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+.filter-bar select, .filter-bar input {
+    padding: 0.4rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
