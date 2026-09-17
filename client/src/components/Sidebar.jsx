@@ -22,6 +22,9 @@ export default function Sidebar() {
             <ul>
                 {!user ? (
                     <>
+                        <li><Link to="/">Calculator</Link></li>
+                        <li><Link to="/about">About</Link></li>
+                        <li><Link to="/help">Help</Link></li>
                         <li><Link to="/">Home</Link></li>
                         <li><Link to="/login">Login</Link></li>
                         <li><Link to="/register">Register</Link></li>
@@ -29,6 +32,8 @@ export default function Sidebar() {
                 ) : (
                     <>
                         <li><Link to="/">Calculator</Link></li>
+                        <li><Link to="/about">About</Link></li>
+                        <li><Link to="/help">Help</Link></li>
                         <li><Link to="/dashboard">Dashboard</Link></li>
                         <li><Link to="/upload">Upload Transactions</Link></li>
                         <li><Link to="/filter-rules">Categorization rules</Link></li>
