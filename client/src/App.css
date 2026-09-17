@@ -278,9 +278,9 @@
 .calc-row {
     display: grid;
     grid-template-columns: 1fr 140px 1fr;
-    column-gap: 2.5rem;
+    gap: 1.5rem;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .calc-label {
@@ -294,6 +294,7 @@
     gap: 0.25rem;
 }
 
+
 .date-picker {
     padding: 0.2rem 0.5rem;
     border: 1px solid #ccc;
@@ -304,12 +305,13 @@
 /* Input Styling */
 .calc-input input {
     width: 100%;
-    padding: 0.6rem;
+    padding: 0.6rem 0.75rem;
     border: 2px solid #e0e0e0;
     border-radius: 6px;
     font-size: 1rem;
-    text-align: right; /* Numbers look cleaner right-aligned */
+    text-align: left;
     transition: border-color 0.2s ease;
+    box-sizing: border-box; 
 }
 
 .calc-input input:focus {
