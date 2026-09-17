@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const goldService = require('../services/goldService');
 
 exports.getDashboardData = async (req, res) => {
     try {
@@ -113,6 +114,10 @@ exports.addYear = async (req, res) => {
         const { end_date } = req.body;
         const userId = req.userId;
 
+        // Fetch gold rate using our new service
+        const isFutureDate = end_date > new Date().toISOString().split('T')[0];
+        const goldRate = isFutureDate ? 0.00 : await goldService.getGoldPrice(end_date);
+
         // Fetch previous summary to carry over chained values
         const [prevSummary] = await pool.query(
             'SELECT wealth_already_taxed, huquq_payments_made FROM financial_summary WHERE user_id = ? ORDER BY end_date DESC LIMIT 1',
@@ -126,13 +131,11 @@ exports.addYear = async (req, res) => {
             updatedWealthTaxed = prevWealth + (prevHuquq * (100 / 19));
         }
 
-        // Insert new summary (Gold rate defaulting to 0 for now, can be updated later)
         await pool.query(
-            `INSERT INTO financial_summary (user_id, end_date, wealth_already_taxed, gold_rate) VALUES (?, ?, ?, 0)`,
-            [userId, end_date, updatedWealthTaxed]
+            `INSERT INTO financial_summary (user_id, end_date, wealth_already_taxed, gold_rate) VALUES (?, ?, ?, ?)`,
+            [userId, end_date, updatedWealthTaxed, goldRate]
         );
 
-        // Create 0.00 entries for all existing labels for this new date
         const [labels] = await pool.query(`SELECT id FROM financial_labels WHERE user_id = ?`, [userId]);
         if (labels.length > 0) {
             const entries = labels.map(l => [userId, l.id, end_date, 0.00]);
@@ -162,26 +165,58 @@ exports.deleteYear = async (req, res) => {
     }
 };
 
-// Update a Summary Field (Wealth Taxed or Huquq Payments)
+// Update a Summary Field & Trigger Chained Math
 exports.updateSummaryField = async (req, res) => {
     try {
         const { date } = req.params;
-        const { field, value } = req.body; // field will be 'wealth_already_taxed' or 'huquq_payments_made'
+        const { field, value } = req.body; 
         const userId = req.userId;
-
         const safeValue = Math.abs(parseFloat(value)) || 0;
-        
+
         // Ensure only allowed columns are updated to prevent SQL injection
         if (!['wealth_already_taxed', 'huquq_payments_made'].includes(field)) {
             return res.status(400).json({ message: 'Invalid field' });
         }
 
+        // 1. Update the specific year
         await pool.query(
             `UPDATE financial_summary SET ?? = ? WHERE end_date = ? AND user_id = ?`,
             [field, safeValue, date, userId]
         );
 
-        res.status(200).json({ message: 'Summary updated' });
+        // 2. Recalculate the chain for all subsequent years
+        const [allYears] = await pool.query(
+            `SELECT id, DATE_FORMAT(end_date, '%Y-%m-%d') as end_date, wealth_already_taxed, huquq_payments_made 
+             FROM financial_summary WHERE user_id = ? ORDER BY end_date ASC`,
+            [userId]
+        );
+
+        const updatedYearIndex = allYears.findIndex(y => y.end_date === date);
+        
+        if (updatedYearIndex !== -1) {
+            const updatePromises = [];
+            
+            // If updating wealth_taxed, recalculate from the NEXT year onward.
+            // If updating huquq_payments, recalculate from the NEXT year onward (based on your V1 logic).
+            for (let i = updatedYearIndex + 1; i < allYears.length; i++) {
+                const prevYear = allYears[i - 1];
+                const currentYear = allYears[i];
+
+                const prevWealth = parseFloat(prevYear.wealth_already_taxed) || 0;
+                const prevHuquq = parseFloat(prevYear.huquq_payments_made) || 0;
+                
+                const recalculatedWealth = parseFloat((prevWealth + (prevHuquq * (100 / 19))).toFixed(2));
+                currentYear.wealth_already_taxed = recalculatedWealth;
+
+                updatePromises.push(pool.query(
+                    `UPDATE financial_summary SET wealth_already_taxed = ? WHERE id = ?`,
+                    [recalculatedWealth, currentYear.id]
+                ));
+            }
+            await Promise.all(updatePromises);
+        }
+
+        res.status(200).json({ message: 'Summary updated and chain recalculated' });
     } catch (error) {
         console.error('Error updating summary:', error);
         res.status(500).json({ message: 'Server Error' });
