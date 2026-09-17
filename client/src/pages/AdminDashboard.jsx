@@ -139,6 +139,12 @@ export default function AdminDashboard() {
                                 <th onClick={() => handleSort('is_verified')} style={{ cursor: 'pointer' }}>
                                     Verified{getSortIndicator('is_verified')}
                                 </th>
+                                <th onClick={() => handleSort('transaction_count')} style={{ cursor: 'pointer' }}>
+                                    Transactions{getSortIndicator('transaction_count')}
+                                </th>
+                                <th onClick={() => handleSort('rule_count')} style={{ cursor: 'pointer' }}>
+                                    Rules{getSortIndicator('rule_count')}
+                                </th>
                                 <th onClick={() => handleSort('created_at')} style={{ cursor: 'pointer' }}>
                                     Created{getSortIndicator('created_at')}
                                 </th>
