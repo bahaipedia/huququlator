@@ -11,6 +11,7 @@ import FilterRules from './pages/FilterRules';
 import Home from './pages/Home';
 import About from './pages/About';
 import Help from './pages/Help';
+import VerifyEmail from './pages/VerifyEmail';
 
 function App() {
     return (
@@ -23,6 +24,7 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/help" element={<Help />} />
+                    <Route path="/verify-email" element={<VerifyEmail />} />
                     
                     {/* Protected Routes */}
                     <Route 
