@@ -9,6 +9,8 @@ import Upload from './pages/Upload';
 import Transactions from './pages/Transactions';
 import FilterRules from './pages/FilterRules';
 import Home from './pages/Home';
+import About from './pages/About';
+import Help from './pages/Help';
 
 function App() {
     return (
@@ -19,6 +21,8 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/help" element={<Help />} />
                     
                     {/* Protected Routes */}
                     <Route 
