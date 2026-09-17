@@ -277,18 +277,10 @@
 /* 3-Column Grid Layout */
 .calc-row {
     display: grid;
-    grid-template-columns: 1fr 140px 1fr; /* Label (flexible) | Input (fixed 140px) | Helper (flexible) */
-    gap: 1.5rem;
+    grid-template-columns: 1fr 140px 1fr;
+    column-gap: 2.5rem;
     align-items: center;
-    margin-bottom: 1.25rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.calc-row:last-of-type {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
+    margin-bottom: 0.5rem;
 }
 
 .calc-label {
