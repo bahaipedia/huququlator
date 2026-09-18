@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import axios from '../api/axios';
-import Sidebar from '../components/Sidebar';
 
 export default function FilterRules() {
     const [rules, setRules] = useState([]);
@@ -31,7 +30,6 @@ export default function FilterRules() {
 
     return (
         <div className="app-container">
-            <Sidebar />
             <div className="main-content" style={{ padding: '2rem' }}>
                 <h1>Categorization Rules</h1>
                 
