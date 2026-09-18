@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import axios from '../api/axios';
-import Sidebar from '../components/Sidebar';
 
 export default function Transactions() {
     const [transactions, setTransactions] = useState([]);
@@ -75,7 +74,6 @@ export default function Transactions() {
 
     return (
         <div className="app-container">
-            <Sidebar />
             <div className="main-content" style={{ padding: '2rem' }}>
                 <h1>Transactions</h1>
 
