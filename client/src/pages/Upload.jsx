@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import axios from '../api/axios';
-import Sidebar from '../components/Sidebar';
 
 export default function Upload() {
     const [rules, setRules] = useState([]);
@@ -75,7 +74,6 @@ export default function Upload() {
 
     return (
         <div className="app-container">
-            <Sidebar />
             <div className="main-content" style={{ padding: '2rem' }}>
                 
                 <div style={{ background: 'var(--nav-bg)', padding: '1.5rem', borderRadius: '8px', marginBottom: '2rem' }}>
