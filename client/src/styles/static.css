@@ -70,9 +70,6 @@
 }
 
 .view-more {
-    position: absolute; 
-    right: 15px; 
-    bottom: 9px; 
     background-color: #0056A8;
     color: white;
     border: none;
@@ -80,7 +77,6 @@
     padding: 8px 12px;
     cursor: pointer;
     font-size: 14px;
-    z-index: 1; 
 }
 
 .view-more:hover {
