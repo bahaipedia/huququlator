@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
-import Sidebar from '../components/Sidebar';
 import { AuthContext } from '../context/AuthContext';
 
 export default function AdminDashboard() {
@@ -98,7 +97,6 @@ export default function AdminDashboard() {
 
     return (
         <div className="app-container">
-            <Sidebar />
             <div className="main-content" style={{ padding: '2rem' }}>
                 <h1>Admin Dashboard</h1>
                 
