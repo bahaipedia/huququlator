@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import axios from '../api/axios';
-import Sidebar from '../components/Sidebar';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
@@ -166,8 +165,6 @@ export default function Dashboard() {
 
     return (
         <div className="app-container">
-            <Sidebar />
-            
             <div className="main-content dashboard-wrapper">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h1>Financial Dashboard</h1>
