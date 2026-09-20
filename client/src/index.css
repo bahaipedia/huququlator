@@ -1,31 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600&family=Nunito:wght@400;600;700&display=swap');
+
 :root {
-  --bg-color: #ffffff;
-  --text-color: #333333;
-  --nav-bg: #f8f9fa;
-  --nav-text: #333333;
-  --link-color: #007bff;
-  --border-color: #dddddd;
-  --btn-bg: #007bff;
+  /* Warm Earthy Palette */
+  --bg-color: #fdfbf7; /* Cream */
+  --text-color: #4a423e; /* Warm Charcoal */
+  --nav-bg: #f5f2eb; /* Slightly darker cream */
+  --nav-text: #4a423e;
+  --link-color: #c86b5e; /* Terracotta */
+  --border-color: #e6e1d8; /* Soft beige */
+  --btn-bg: #c86b5e;
   --btn-text: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-color: #121212;
-    --text-color: #e0e0e0;
-    --nav-bg: #1e1e1e;
-    --nav-text: #e0e0e0;
-    --link-color: #66b3ff;
-    --border-color: #333333;
-    --btn-bg: #3399ff;
-    --btn-text: #121212;
+    /* Warm Dark Mode */
+    --bg-color: #2a2624; /* Deep warm brown */
+    --text-color: #e6e1d8; /* Soft off-white */
+    --nav-bg: #36312d; /* Lighter warm brown */
+    --nav-text: #e6e1d8;
+    --link-color: #d98a7f; /* Soft terracotta */
+    --border-color: #4a423e; /* Warm charcoal */
+    --btn-bg: #d98a7f;
+    --btn-text: #2a2624;
   }
 }
 
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: Arial, sans-serif;
+  font-family: 'Nunito', system-ui, sans-serif;
   margin: 0;
   padding: 0;
 }
@@ -33,6 +37,11 @@ body {
 a {
   color: var(--link-color);
   text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  opacity: 0.8;
 }
 
 /* Navbar Styles */
@@ -51,6 +60,7 @@ a {
   color: var(--link-color);
   cursor: pointer;
   font-size: 1rem;
+  font-weight: 600;
 }
 
 /* Form Styles */
@@ -58,24 +68,40 @@ a {
   max-width: 400px;
   margin: 2rem auto;
   padding: 2rem;
+  background-color: #fffdfa; /* Warm surface */
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(74, 66, 62, 0.06); /* Soft warm shadow */
 }
+
+@media (prefers-color-scheme: dark) {
+  .form-container {
+    background-color: #322d2b;
+  }
+}
+
 .form-group {
   margin-bottom: 1rem;
 }
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 .form-group input {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.6rem;
   box-sizing: border-box;
   background-color: var(--bg-color);
   color: var(--text-color);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-family: 'Nunito', sans-serif;
+  transition: border-color 0.2s ease;
+}
+.form-group input:focus {
+  border-color: var(--link-color);
+  outline: none;
 }
 button[type="submit"] {
   width: 100%;
@@ -83,11 +109,16 @@ button[type="submit"] {
   background-color: var(--btn-bg);
   color: var(--btn-text);
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 1rem;
+  font-weight: 700;
+  transition: background-color 0.2s ease;
 }
-.error { color: red; margin-bottom: 1rem; }
+button[type="submit"]:hover {
+  filter: brightness(0.9);
+}
+.error { color: #c86b5e; margin-bottom: 1rem; font-weight: 600; }
 
 /* Sidebar Layout */
 .app-container {
@@ -105,6 +136,7 @@ button[type="submit"] {
 .sidebar h3 {
   margin-top: 0;
   padding-left: 1rem;
+  color: var(--text-color);
 }
 
 .sidebar ul {
@@ -121,13 +153,16 @@ button[type="submit"] {
   padding: 0.75rem 1rem;
   color: var(--link-color);
   text-decoration: none;
-  border-radius: 4px;
+  border-radius: 6px;
   background: none;
   border: none;
   width: 100%;
   text-align: left;
   font-size: 1rem;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .sidebar a:hover, .sidebar-logout:hover {
