@@ -160,7 +160,7 @@ export default function Home() {
                     </div>
                     <div className="feature-card">
                         <h3>Upload Transactions</h3>
-                        <p>Import CSV files directly from your bank to automate your math and find unnecessary expenditures.</p>
+                        <p>Import CSV files of financial transactions to automatically calculate what you owe.</p>
                     </div>
                     <div className="feature-card">
                         <h3>Smart Filters</h3>
