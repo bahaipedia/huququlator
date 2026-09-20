@@ -22,7 +22,7 @@
 .help-container h1 {
     font-size: 28px;
     margin-bottom: 15px;
-    color: #2c4c4e;
+    color: var(--link-color);
 }
 
 .faq-section {
@@ -78,8 +78,8 @@
 }
 
 .view-more {
-    background-color: var(--btn-bg);
-    color: var(--btn-text);
+    background-color: #7a8b76;
+    color: white;
     border: none;
     border-radius: 6px;
     padding: 8px 16px;
@@ -87,11 +87,11 @@
     font-size: 14px;
     font-weight: 600;
     font-family: 'Nunito', sans-serif;
-    transition: filter 0.2s ease;
+    transition: background-color 0.2s ease;
 }
 
 .view-more:hover {
-    filter: brightness(0.9);
+    background-color: #657561;
 }
 
 .note-link {
@@ -122,7 +122,7 @@
 }
 
 .about-container h1 {
-    color: #2c4c4e;
+    color: var(--link-color);
     font-size: 28px;
     margin-bottom: 20px;
 }
@@ -144,14 +144,14 @@
     font-size: 18px;
     margin: 0;
     padding: 15px 20px;
-    background-color: #2c4c4e;
-    color: #fdfbf7;
+    background-color: var(--link-color);
+    color: white;
     cursor: pointer;
     transition: filter 0.2s ease;
 }
 
 .about-item h2:hover {
-    filter: brightness(1.2);
+    filter: brightness(0.9);
 }
 
 .about-content {
@@ -178,7 +178,7 @@
     font-weight: 600;
     font-family: 'Nunito', sans-serif;
     color: var(--link-color);
-    background-color: var(--sidebar-bg);
+    background-color: var(--nav-bg);
     border: none;
     border-top: 1px solid var(--border-color);
     cursor: pointer;
@@ -203,7 +203,7 @@
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     }
     .help-container h1, .about-container h1 { 
-        color: #79a6a9; 
+        color: var(--link-color); 
     }
     .georgia-text, .about-content { 
         color: var(--text-color); 
@@ -224,14 +224,14 @@
         color: var(--text-color);
     }
     .about-item h2 {
-        background-color: #1d3334;
-        color: var(--text-color);
+        background-color: var(--link-color);
+        color: var(--btn-text);
     }
     .about-content {
         background-color: #322d2b;
     }
     .view-more-about {
-        background-color: var(--sidebar-bg);
+        background-color: var(--nav-bg);
         color: var(--link-color);
         border-top-color: var(--border-color);
     }
