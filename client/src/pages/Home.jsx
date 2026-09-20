@@ -34,7 +34,7 @@ export default function Home() {
             a5 = Math.floor(taxableWealth / numA4);
             a6 = Math.floor((a5 * numA4) * 100) / 100; // Round down to 2 decimals
             a7 = Math.ceil((a6 * 0.19) * 100) / 100; // Round up to 2 decimals
-            r7 = `This year you owe $${a7.toFixed(2)} to Huququllah.`;
+            r7 = `You owe $${a7.toFixed(2)} to Huququllah.`;
             hasCalculated = true; // Trigger CTA
         }
     }
