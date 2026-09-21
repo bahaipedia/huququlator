@@ -66,7 +66,7 @@ export default function Home() {
         <div className="home-container">
             <section className="hero-section">
                 <div className="hero-text">
-                    <h1>Welcome to Huququlator</h1>
+                    <h1>Welcome to the Huququlator</h1>
                     <p>A calculator for Ḥuqúqu’lláh. If you don't understand any of the fields below, visit our <Link to="/help">Help page</Link>.</p>
                 </div>
 
